@@ -1,0 +1,21 @@
+{
+  "name": "@jiwoqr/math",
+  "version": "0.1.0",
+  "description": "Spatial projection, extrusion, and easing math algorithms for JiwoQR",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": ["math", "3d", "spherical", "extrusion", "easing", "projections"],
+  "author": "JiwoQR",
+  "license": "MIT"
+}

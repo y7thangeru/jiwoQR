@@ -1,0 +1,30 @@
+{
+  "name": "@jiwoqr/renderer-webgl",
+  "version": "0.1.0",
+  "description": "High-performance WebGL / Three.js procedural 3D QR code renderer for JiwoQR",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@jiwoqr/core": "workspace:*",
+    "@jiwoqr/math": "workspace:*",
+    "three": "^0.174.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.174.0",
+    "typescript": "^5.7.3"
+  },
+  "keywords": ["threejs", "webgl", "qrcode", "procedural", "3d", "instancedmesh"],
+  "author": "JiwoQR",
+  "license": "MIT"
+}

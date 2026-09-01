@@ -1,0 +1,28 @@
+{
+  "name": "@jiwoqr/web-component",
+  "version": "0.1.0",
+  "description": "Native Web Component <jiwo-qr> for procedural 3D JiwoQR codes",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@jiwoqr/core": "workspace:*",
+    "@jiwoqr/renderer-webgl": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  },
+  "keywords": ["web-component", "custom-element", "qrcode", "3d", "procedural"],
+  "author": "JiwoQR",
+  "license": "MIT"
+}

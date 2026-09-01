@@ -1,0 +1,28 @@
+{
+  "name": "@jiwoqr/renderer-webgpu",
+  "version": "0.1.0",
+  "description": "Modern WGSL compute/vertex pipeline renderer for JiwoQR",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@jiwoqr/core": "workspace:*",
+    "@jiwoqr/math": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  },
+  "keywords": ["webgpu", "wgsl", "qrcode", "procedural", "3d"],
+  "author": "JiwoQR",
+  "license": "MIT"
+}

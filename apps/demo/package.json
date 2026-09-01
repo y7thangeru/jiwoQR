@@ -1,0 +1,21 @@
+{
+  "name": "demo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@jiwoqr/core": "workspace:*",
+    "@jiwoqr/math": "workspace:*",
+    "@jiwoqr/renderer-webgl": "workspace:*",
+    "three": "^0.174.0"
+  },
+  "devDependencies": {
+    "vite": "^6.2.0",
+    "typescript": "^5.7.3"
+  }
+}

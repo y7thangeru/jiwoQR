@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JiwoQR — Procedural 3D QR Code Ecosystem</title>
+    <link rel="stylesheet" href="./src/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Outfit:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="app">
+      <!-- 3D Canvas Viewport -->
+      <div id="canvas-container"></div>
+
+      <!-- Floating Header -->
+      <header class="top-nav">
+        <div class="brand">
+          <span class="logo-badge">3D</span>
+          <h1>JIWO<span>QR</span></h1>
+          <span class="version-tag">v0.1.0-alpha</span>
+        </div>
+        <div class="header-actions">
+          <button id="btn-mode-toggle" class="mode-btn scan-mode">
+            <span class="mode-icon">📷</span>
+            <span class="mode-text">Switch to Scan Mode (2D)</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Sidebar Controls & DNA Telemetry -->
+      <aside class="control-panel">
+        <div class="panel-section">
+          <label for="url-input" class="section-title">TARGET URL / PAYLOAD</label>
+          <div class="input-row">
+            <input
+              type="text"
+              id="url-input"
+              value="https://github.com/AlbertAZ1992/every-qrcode"
+              placeholder="https://your-domain.com"
+              spellcheck="false"
+            />
+            <button id="btn-apply" class="primary-btn">Generate</button>
+          </div>
+          <div class="presets-row">
+            <span class="preset-label">Presets:</span>
+            <button class="preset-chip" data-url="https://github.com/AlbertAZ1992/every-qrcode">every-qrcode</button>
+            <button class="preset-chip" data-url="https://jiwoqr.dev">jiwoqr.dev</button>
+            <button class="preset-chip" data-url="https://threejs.org">Three.js</button>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="section-header-flex">
+            <label class="section-title">MORPH INTERPOLATION</label>
+            <span id="morph-value" class="param-badge">3D WORLD (0.00)</span>
+          </div>
+          <input
+            type="range"
+            id="morph-slider"
+            min="0"
+            max="1"
+            step="0.01"
+            value="0"
+            class="slider"
+          />
+          <div class="slider-labels">
+            <span>3D Cyber City</span>
+            <span>Canonical 2D Scan</span>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <label class="section-title">VISUAL MODEL ARCHETYPE</label>
+          <div class="model-selector">
+            <button class="model-btn active" data-model="architecture">
+              <span class="model-name">Architecture</span>
+              <span class="model-desc">Cyberpunk Brutalist Cityscape</span>
+            </button>
+            <button class="model-btn" data-model="globe">
+              <span class="model-name">Globe</span>
+              <span class="model-desc">Spherical Geodesic Projection</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Deterministic DNA Telemetry -->
+        <div class="panel-section dna-telemetry">
+          <label class="section-title">DETERMINISTIC DNA TELEMETRY</label>
+          <div class="telemetry-grid">
+            <div class="tele-item">
+              <span class="tele-label">64-bit Seed Hash</span>
+              <span id="dna-hash" class="tele-val mono">-</span>
+            </div>
+            <div class="tele-item">
+              <span class="tele-label">32-bit Seed</span>
+              <span id="dna-seed" class="tele-val mono">-</span>
+            </div>
+            <div class="tele-item">
+              <span class="tele-label">QR Specs</span>
+              <span id="qr-specs" class="tele-val mono">-</span>
+            </div>
+            <div class="tele-item">
+              <span class="tele-label">Tower Archetype</span>
+              <span id="dna-tower" class="tele-val mono">-</span>
+            </div>
+            <div class="tele-item">
+              <span class="tele-label">Max Height</span>
+              <span id="dna-height" class="tele-val mono">-</span>
+            </div>
+            <div class="tele-item">
+              <span class="tele-label">Roof Rhythm</span>
+              <span id="dna-roof" class="tele-val mono">-</span>
+            </div>
+          </div>
+
+          <div class="palette-container">
+            <span class="tele-label">Procedural Palette</span>
+            <div id="palette-chips" class="palette-chips"></div>
+          </div>
+        </div>
+
+        <!-- Scanability Verification Badge -->
+        <div id="scan-badge" class="scan-status-card">
+          <div class="status-indicator-dot"></div>
+          <div class="status-content">
+            <div class="status-title">Scanability Guard: Active</div>
+            <div class="status-desc" id="scan-guard-desc">
+              Interact with 3D model. Switch to Scan Mode to align camera and flatten modules for immediate phone scanning.
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
