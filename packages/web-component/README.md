@@ -53,7 +53,7 @@ import '@jiwoqr/web-component';
 | Atribut | Tipe | Nilai Default | Pilihan Nilai | Deskripsi |
 | :--- | :--- | :--- | :--- | :--- |
 | `value` | `string` | `"https://jiwoqr.dev"` | Teks string atau URL apa pun | Payload yang akan di-encode ke dalam matriks QR. |
-| `model` | `string` | `"architecture"` | `"architecture"`, `"globe"` | Arketipe visual 3D yang aktif. |
+| `model` | `string` | `"architecture"` | `"architecture"`, `"globe"`, `"circuit"` | Arketipe visual 3D yang aktif. |
 | `mode` | `string` | `"3d"` | `"3d"`, `"scan"` | Mode tampilan interaktif 3D atau mode pemindaian 2D datar. |
 
 ---

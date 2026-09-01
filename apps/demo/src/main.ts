@@ -1,14 +1,29 @@
 import { JiwoWebGLRenderer, RenderMode, RenderModel } from '@jiwoqr/renderer-webgl';
 import { JiwoQREntity } from '@jiwoqr/core';
+import {
+  exportGLB,
+  exportSTL,
+  exportPNG,
+  exportSVG,
+  downloadFile,
+} from '@jiwoqr/exporter';
 
 const container = document.getElementById('canvas-container') as HTMLDivElement;
 const urlInput = document.getElementById('url-input') as HTMLInputElement;
 const btnApply = document.getElementById('btn-apply') as HTMLButtonElement;
 const btnModeToggle = document.getElementById('btn-mode-toggle') as HTMLButtonElement;
+const btnGyroToggle = document.getElementById('btn-gyro-toggle') as HTMLButtonElement;
+const gyroText = document.getElementById('gyro-text') as HTMLSpanElement;
 const morphSlider = document.getElementById('morph-slider') as HTMLInputElement;
 const morphValueLabel = document.getElementById('morph-value') as HTMLSpanElement;
 const presetChips = document.querySelectorAll('.preset-chip');
 const modelButtons = document.querySelectorAll<HTMLButtonElement>('.model-btn');
+
+// Export toolbar buttons
+const btnExportGLB = document.getElementById('btn-export-glb') as HTMLButtonElement;
+const btnExportSTL = document.getElementById('btn-export-stl') as HTMLButtonElement;
+const btnExportPNG = document.getElementById('btn-export-png') as HTMLButtonElement;
+const btnExportSVG = document.getElementById('btn-export-svg') as HTMLButtonElement;
 
 // Telemetry DOM elements
 const dnaHashEl = document.getElementById('dna-hash') as HTMLSpanElement;
@@ -46,11 +61,19 @@ function updateTelemetry(entity?: JiwoQREntity) {
     dnaTowerEl.textContent = `SATELLITES: ${dna.globe.satelliteCount}`;
     dnaHeightEl.textContent = `Elev: ${dna.globe.continentElevation} (depth: ${dna.globe.oceanDepth})`;
     dnaRoofEl.textContent = `SPEED: ${dna.globe.rotationSpeed}x`;
+  } else if (currentModel === 'circuit') {
+    const chip = dna.circuit?.chipPackage?.toUpperCase() ?? 'QFP';
+    const mask = dna.circuit?.solderMaskColor?.toUpperCase() ?? 'GREEN';
+    const trace = dna.circuit?.traceStyle?.toUpperCase() ?? 'ORTHO';
+    dnaTowerEl.textContent = `IC: ${chip}`;
+    dnaHeightEl.textContent = `PCB: ${mask} mask`;
+    dnaRoofEl.textContent = `TRACE: ${trace}`;
   } else {
     dnaTowerEl.textContent = dna.architecture.towerArchetype.toUpperCase();
     dnaHeightEl.textContent = `${dna.architecture.maxHeight}x (var: ${dna.architecture.heightVariance})`;
     dnaRoofEl.textContent = dna.architecture.roofStyle.toUpperCase();
   }
+
 
   // Render palette chips
   paletteChipsEl.innerHTML = '';
@@ -97,7 +120,7 @@ presetChips.forEach((chip) => {
   });
 });
 
-// Model Archetype Switcher (Architecture vs Globe)
+// Model Archetype Switcher (Architecture vs Globe vs Circuit)
 modelButtons.forEach((btn) => {
   btn.addEventListener('click', () => {
     const model = btn.getAttribute('data-model') as RenderModel;
@@ -150,7 +173,111 @@ morphSlider.addEventListener('input', () => {
   updateUIForMode(progress > 0.5 ? 'scan' : '3d', progress);
 });
 
-// 6. Animation frame loop to sync slider when animating
+// 6. Export Toolbar Handlers
+btnExportGLB?.addEventListener('click', async () => {
+  try {
+    btnExportGLB.disabled = true;
+    btnExportGLB.textContent = 'Exporting...';
+    const glbBuffer = await exportGLB(renderer.getScene(), { binary: true });
+    downloadFile(glbBuffer, `jiwoqr-${renderer.getModel()}.glb`, 'model/gltf-binary');
+  } catch (err) {
+    console.error('Failed to export GLB', err);
+    alert('GLB Export error: ' + String(err));
+  } finally {
+    btnExportGLB.disabled = false;
+    btnExportGLB.innerHTML = '<span class="export-icon">📦</span><span class="export-label">Export GLB</span>';
+  }
+});
+
+btnExportSTL?.addEventListener('click', () => {
+  const entity = renderer.getEntity();
+  if (!entity) return;
+  try {
+    const currentModel = renderer.getModel();
+    const stlBuffer = exportSTL(entity.matrix, entity.dna, {
+      model: currentModel,
+      moduleSize: 2.0,
+      baseThickness: 2.0,
+      maxHeight: 7.0,
+    });
+    downloadFile(stlBuffer, `jiwoqr-${currentModel}-3dprint.stl`, 'application/sla');
+  } catch (err) {
+    console.error('Failed to export STL', err);
+    alert('STL Export error: ' + String(err));
+  }
+});
+
+
+btnExportPNG?.addEventListener('click', async () => {
+  const entity = renderer.getEntity();
+  if (!entity) return;
+  try {
+    btnExportPNG.disabled = true;
+    btnExportPNG.textContent = 'Rendering...';
+    const pngBlob = await exportPNG(entity.matrix, { size: 2048 });
+    downloadFile(pngBlob, `jiwoqr-300dpi.png`, 'image/png');
+  } catch (err) {
+    console.error('Failed to export PNG', err);
+    alert('PNG Export error: ' + String(err));
+  } finally {
+    btnExportPNG.disabled = false;
+    btnExportPNG.innerHTML = '<span class="export-icon">🖼️</span><span class="export-label">Export PNG (300 DPI)</span>';
+  }
+});
+
+btnExportSVG?.addEventListener('click', () => {
+  const entity = renderer.getEntity();
+  if (!entity) return;
+  try {
+    const svgStr = exportSVG(entity.matrix);
+    downloadFile(svgStr, `jiwoqr-vector.svg`, 'image/svg+xml');
+  } catch (err) {
+    console.error('Failed to export SVG', err);
+    alert('SVG Export error: ' + String(err));
+  }
+});
+
+// 7. Device Orientation (Gyroscope Tilt)
+let isGyroActive = false;
+
+function onDeviceOrientation(e: DeviceOrientationEvent) {
+  if (!isGyroActive) return;
+  if (e.gamma !== null && e.beta !== null) {
+    renderer.getCameraController().applyGyroTilt(e.gamma, e.beta);
+  }
+}
+
+btnGyroToggle?.addEventListener('click', async () => {
+  if (!isGyroActive) {
+    // Check for iOS 13+ permission request
+    const DeviceOrientation = window.DeviceOrientationEvent as unknown as {
+      requestPermission?: () => Promise<'granted' | 'denied'>;
+    };
+    if (typeof DeviceOrientation !== 'undefined' && typeof DeviceOrientation.requestPermission === 'function') {
+      try {
+        const perm = await DeviceOrientation.requestPermission();
+        if (perm !== 'granted') {
+          alert('Device orientation permission denied');
+          return;
+        }
+      } catch (err) {
+        console.warn('Orientation permission error:', err);
+      }
+    }
+
+    window.addEventListener('deviceorientation', onDeviceOrientation);
+    isGyroActive = true;
+    btnGyroToggle.classList.add('active');
+    gyroText.textContent = 'Gyro: ON';
+  } else {
+    window.removeEventListener('deviceorientation', onDeviceOrientation);
+    isGyroActive = false;
+    btnGyroToggle.classList.remove('active');
+    gyroText.textContent = 'Gyro: OFF';
+  }
+});
+
+// 8. Animation frame loop to sync slider when animating
 function syncUI() {
   const progress = renderer.getMorphProgress();
   const mode = renderer.getMode();
@@ -162,3 +289,4 @@ function syncUI() {
   requestAnimationFrame(syncUI);
 }
 requestAnimationFrame(syncUI);
+

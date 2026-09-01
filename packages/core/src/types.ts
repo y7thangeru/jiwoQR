@@ -72,6 +72,15 @@ export interface GlobeDNA {
   rotationSpeed: number;
 }
 
+export interface CircuitDNA {
+  traceStyle: 'orthogonal' | 'diagonal' | 'curved';
+  chipPackage: 'qfp' | 'bga' | 'soic';
+  solderMaskColor: 'green' | 'black' | 'blue' | 'purple';
+  componentDensity: number;
+  viaDensity: number;
+  traceWidth: number;
+}
+
 export interface DeterministicDNA {
   rawHash: bigint;
   seed32: number;
@@ -79,10 +88,18 @@ export interface DeterministicDNA {
   palette: ColorPalette;
   architecture: ArchitectureDNA;
   globe: GlobeDNA;
+  circuit: CircuitDNA;
 }
+
+/**
+ * Standard QR Code encoding modes according to ISO/IEC 18004.
+ */
+export type QRMode = 'numeric' | 'alphanumeric' | 'byte';
+export type QRModeOption = 'auto' | QRMode;
 
 export interface EncodeOptions {
   ecc?: ECCLevel;
+  mode?: QRModeOption;
   minVersion?: number;
   maxVersion?: number;
   quietZone?: number;
@@ -92,3 +109,4 @@ export interface JiwoQREntity {
   matrix: QRMatrix;
   dna: DeterministicDNA;
 }
+

@@ -89,8 +89,28 @@ export class CameraController {
   }
 
   /**
+   * Applies subtle gyro tilt from mobile device orientation sensors.
+   * @param gamma - Tilt left/right in degrees (-90 to 90)
+   * @param beta - Tilt front/back in degrees (-180 to 180)
+   */
+  public applyGyroTilt(gamma: number, beta: number) {
+    if (this.isDragging) return; // Touch drag overrides gyro
+
+    const tiltX = (gamma * Math.PI) / 180; // Radian tilt
+    const tiltY = ((beta - 45) * Math.PI) / 180; // Assuming ~45 deg viewing angle
+
+    const gyroSensitivity = 0.35;
+    this.targetSpherical.theta = Math.PI / 4 + tiltX * gyroSensitivity;
+    this.targetSpherical.phi = Math.max(
+      0.15,
+      Math.min(Math.PI / 2 - 0.05, Math.PI / 3.5 + tiltY * gyroSensitivity * 0.5)
+    );
+  }
+
+  /**
    * Updates camera position based on morph progress t (0 = 3D orbit, 1 = top-down 2D scan view)
    */
+
   public update(morphProgress: number, damping = 0.1) {
     // Smooth damping for 3D orbit
     this.spherical.theta += (this.targetSpherical.theta - this.spherical.theta) * damping;

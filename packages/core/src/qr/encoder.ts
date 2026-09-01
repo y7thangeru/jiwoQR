@@ -4,6 +4,7 @@ import {
   QRMatrix,
   QRModule,
   EncodeOptions,
+  QRMode,
 } from '../types.js';
 import {
   ALIGNMENT_PATTERN_COORDINATES,
@@ -19,26 +20,118 @@ interface RawGridModule {
   isReserved: boolean;
 }
 
+const NUMERIC_REGEX = /^[0-9]+$/;
+const ALPHANUMERIC_CHARS: Record<string, number> = {
+  '0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9,
+  'A': 10, 'B': 11, 'C': 12, 'D': 13, 'E': 14, 'F': 15, 'G': 16, 'H': 17, 'I': 18,
+  'J': 19, 'K': 20, 'L': 21, 'M': 22, 'N': 23, 'O': 24, 'P': 25, 'Q': 26, 'R': 27,
+  'S': 28, 'T': 29, 'U': 30, 'V': 31, 'W': 32, 'X': 33, 'Y': 34, 'Z': 35,
+  ' ': 36, '$': 37, '%': 38, '*': 39, '+': 40, '-': 41, '.': 42, '/': 43, ':': 44,
+};
+
+/**
+ * Automatically detects the most efficient standard QR encoding mode.
+ */
+export function detectQRMode(payload: string): QRMode {
+  if (payload.length > 0 && NUMERIC_REGEX.test(payload)) {
+    return 'numeric';
+  }
+  let isAlphanumeric = payload.length > 0;
+  for (let i = 0; i < payload.length; i++) {
+    if (ALPHANUMERIC_CHARS[payload[i]] === undefined) {
+      isAlphanumeric = false;
+      break;
+    }
+  }
+  if (isAlphanumeric) {
+    return 'alphanumeric';
+  }
+  return 'byte';
+}
+
+function getCharCountIndicatorBits(mode: QRMode, version: number): number {
+  if (mode === 'numeric') {
+    return version < 10 ? 10 : version < 27 ? 12 : 14;
+  }
+  if (mode === 'alphanumeric') {
+    return version < 10 ? 9 : version < 27 ? 11 : 13;
+  }
+  // Byte mode
+  return version < 10 ? 8 : 16;
+}
+
+function getModeIndicator(mode: QRMode): number {
+  switch (mode) {
+    case 'numeric':
+      return 0b0001;
+    case 'alphanumeric':
+      return 0b0010;
+    case 'byte':
+      return 0b0100;
+  }
+}
+
+function calculateTotalDataBits(
+  mode: QRMode,
+  payload: string,
+  dataBytes: Uint8Array,
+  version: number
+): number {
+  const headerBits = 4 + getCharCountIndicatorBits(mode, version);
+  let payloadBits = 0;
+
+  if (mode === 'numeric') {
+    const fullChunks = Math.floor(payload.length / 3);
+    const rem = payload.length % 3;
+    payloadBits = fullChunks * 10 + (rem === 2 ? 7 : rem === 1 ? 4 : 0);
+  } else if (mode === 'alphanumeric') {
+    const fullChunks = Math.floor(payload.length / 2);
+    const rem = payload.length % 2;
+    payloadBits = fullChunks * 11 + (rem === 1 ? 6 : 0);
+  } else {
+    payloadBits = dataBytes.length * 8;
+  }
+
+  return headerBits + payloadBits;
+}
+
 /**
  * Encodes a string payload into a semantic QRMatrix conforming to ISO/IEC 18004.
  */
 export function encodeQR(payload: string, options: EncodeOptions = {}): QRMatrix {
   const ecc: ECCLevel = options.ecc ?? 'Q'; // Adaptive default 'Q' (25% recovery for 3D procedural rendering)
-  const quietZone = options.quietZone ?? 4; // User Note 2: Minimum 4 modules Quiet Zone
+  const quietZone = options.quietZone ?? 4; // Minimum 4 modules Quiet Zone as per ISO/IEC 18004
+
+  // Determine encoding mode
+  let mode: QRMode;
+  if (!options.mode || options.mode === 'auto') {
+    mode = detectQRMode(payload);
+  } else {
+    mode = options.mode;
+    if (mode === 'numeric' && !NUMERIC_REGEX.test(payload)) {
+      throw new Error(`Payload "${payload}" contains non-numeric characters for numeric mode`);
+    }
+    if (mode === 'alphanumeric') {
+      for (const char of payload) {
+        if (ALPHANUMERIC_CHARS[char] === undefined) {
+          throw new Error(`Character "${char}" is not valid in QR alphanumeric mode`);
+        }
+      }
+    }
+  }
 
   const textEncoder = new TextEncoder();
-  const dataBytes = textEncoder.encode(payload);
+  const dataBytes = mode === 'byte' ? textEncoder.encode(payload) : new Uint8Array(0);
 
-  // 1. Select minimum version that fits data
+  // 1. Select minimum version that fits data with optimal packing
   let version = options.minVersion ?? 1;
   const maxVersion = options.maxVersion ?? 10;
   let capacity = 0;
 
   while (version <= maxVersion) {
     capacity = getDataCapacity(version, ecc);
-    // Overhead: 4 bits mode + (version < 10 ? 8 : 16) bits char count
-    const headerBits = 4 + (version < 10 ? 8 : 16);
-    const requiredBytes = Math.ceil((headerBits + dataBytes.length * 8) / 8);
+    const totalBits = calculateTotalDataBits(mode, payload, dataBytes, version);
+    const requiredBytes = Math.ceil(totalBits / 8);
     if (requiredBytes <= capacity) {
       break;
     }
@@ -47,11 +140,11 @@ export function encodeQR(payload: string, options: EncodeOptions = {}): QRMatrix
 
   if (version > maxVersion) {
     throw new Error(
-      `Payload too large for versions up to ${maxVersion} with ECC ${ecc}. Length: ${dataBytes.length} bytes`
+      `Payload too large for versions up to ${maxVersion} with ECC ${ecc} in ${mode} mode. Payload length: ${payload.length}`
     );
   }
 
-  // 2. Build data bitstream (Byte mode: 0100)
+  // 2. Build data bitstream
   const bitstream: number[] = [];
   function pushBits(val: number, length: number) {
     for (let i = length - 1; i >= 0; i--) {
@@ -59,24 +152,65 @@ export function encodeQR(payload: string, options: EncodeOptions = {}): QRMatrix
     }
   }
 
-  // Mode: 0100 (Byte mode)
-  pushBits(0b0100, 4);
-  // Character count indicator
-  const charCountBits = version < 10 ? 8 : 16;
-  pushBits(dataBytes.length, charCountBits);
-  // Data bytes
-  for (const byte of dataBytes) {
-    pushBits(byte, 8);
+  // 2a. Mode indicator
+  pushBits(getModeIndicator(mode), 4);
+
+  // 2b. Character count indicator
+  const charCountBits = getCharCountIndicatorBits(mode, version);
+  const charCount = mode === 'byte' ? dataBytes.length : payload.length;
+  pushBits(charCount, charCountBits);
+
+  // 2c. Encode payload data according to mode
+  if (mode === 'numeric') {
+    let i = 0;
+    while (i < payload.length) {
+      if (i + 3 <= payload.length) {
+        const val = parseInt(payload.substring(i, i + 3), 10);
+        pushBits(val, 10);
+        i += 3;
+      } else if (i + 2 <= payload.length) {
+        const val = parseInt(payload.substring(i, i + 2), 10);
+        pushBits(val, 7);
+        i += 2;
+      } else {
+        const val = parseInt(payload.substring(i, i + 1), 10);
+        pushBits(val, 4);
+        i += 1;
+      }
+    }
+  } else if (mode === 'alphanumeric') {
+    let i = 0;
+    while (i < payload.length) {
+      if (i + 2 <= payload.length) {
+        const c1 = ALPHANUMERIC_CHARS[payload[i]];
+        const c2 = ALPHANUMERIC_CHARS[payload[i + 1]];
+        const val = c1 * 45 + c2;
+        pushBits(val, 11);
+        i += 2;
+      } else {
+        const c1 = ALPHANUMERIC_CHARS[payload[i]];
+        pushBits(c1, 6);
+        i += 1;
+      }
+    }
+  } else {
+    // Byte mode
+    for (const byte of dataBytes) {
+      pushBits(byte, 8);
+    }
   }
-  // Terminator: up to 4 zeroes
+
+  // 2d. Terminator: up to 4 zeroes
   const remainingBitsForCodewords = capacity * 8 - bitstream.length;
   const terminatorCount = Math.min(4, Math.max(0, remainingBitsForCodewords));
   pushBits(0, terminatorCount);
-  // Pad to byte boundary
+
+  // 2e. Pad to byte boundary
   while (bitstream.length % 8 !== 0) {
     bitstream.push(0);
   }
-  // Pad bytes: alternating 0xEC (11101100) and 0x11 (00010001)
+
+  // 2f. Pad bytes: alternating 0xEC (11101100) and 0x11 (00010001)
   const padBytes = [0b11101100, 0b00010001];
   let padIdx = 0;
   while (bitstream.length < capacity * 8) {
@@ -93,6 +227,7 @@ export function encodeQR(payload: string, options: EncodeOptions = {}): QRMatrix
     }
     dataCodewords[i] = byteVal;
   }
+
 
   // 3. Error Correction Coding and Interleaving
   const eccInfo = ECC_TABLE[version][ecc];

@@ -1,7 +1,7 @@
 # 🎨 @jiwoqr/renderer-webgl
 
 > **Engine Visualisasi 3D WebGL / Three.js Kinerja Tinggi**  
-> *Instanced rendering 60 FPS, arketipe visual Arsitektur & Globe Voxel Mound, kontrol kamera orbit halus, serta sistem mitigasi pencahayaan & bayangan cerdas untuk jaminan pemindaian barcode 100%.*
+> *Instanced rendering 60 FPS, arketipe visual Arsitektur, Globe & Circuit PCB, kontrol kamera orbit & sensor giroskop, sistem mitigasi pencahayaan & bayangan, serta graceful fallback ke 2D Canvas.*
 
 [![Package: @jiwoqr/renderer-webgl](https://img.shields.io/badge/Package-%40jiwoqr%2Frenderer--webgl-blue.svg)](file:///d:/REPOS/jiwoQR/packages/renderer-webgl)
 [![Three.js](https://img.shields.io/badge/Three.js-r174-black.svg?logo=three.js)](https://threejs.org/)
@@ -19,8 +19,10 @@
 - [Model Visual 3D](#-model-visual-3d)
   - [1. Model Arsitektur (`src/models/architecture.ts`)](#1-model-arsitektur-srcmodelsarchitecturets)
   - [2. Model Bola Voxel (`src/models/globe.ts`)](#2-model-bola-voxel-srcmodelsglobets)
-- [Sistem Kamera & Kontrol Orbit (`src/scene/camera-controller.ts`)](#-sistem-kamera--kontrol-orbit-srcscenecamera-controllerts)
+  - [3. Model Sirkuit Elektronik (`src/models/circuit.ts`)](#3-model-sirkuit-elektronik-srcmodelscircuitts)
+- [Sistem Kamera, Orbit & Giroskop Mobile](#-sistem-kamera-orbit--giroskop-mobile)
 - [Sistem Mitigasi Pencahayaan & Bayangan untuk Pemindaian Optik](#-sistem-mitigasi-pencahayaan--bayangan-untuk-pemindaian-optik)
+- [Zero-WebGL Graceful Fallback (`src/fallback/`)](#-zero-webgl-graceful-fallback-srcfallback)
 - [Optimasi Performa Rendering](#-optimasi-performa-rendering)
 - [Contoh Kode Integrasi](#-contoh-kode-integrasi)
 
@@ -32,7 +34,8 @@ Paket `@jiwoqr/renderer-webgl` bertanggung jawab mengubah struktur semantik data
 
 Keunggulan utama:
 - **Zero Jitter 60 FPS Morphing**: Memanfaatkan `THREE.InstancedMesh` dengan atribut buffer `DynamicDrawUsage` sehingga pembaruan ribuan matriks posisi modul dalam satu frame dieksekusi tanpa overhead alokasi memori.
-- **Transisi Dual-Mode**: Berpindah mulus antara mode 3D eksploratif (*orbit drag, cyber lighting, perspective depth*) dan mode Scan 2D (*perpendicular camera, flat modules, pure binary contrast*).
+- **Tiga Arketipe Visual**: Architecture (kota brutalist), Globe (kubah bola voxel mound), dan Circuit (papan PCB microchip).
+- **Graceful Fallback**: Deteksi otomatis kapabilitas WebGL dengan fallback mulus ke Canvas 2D murni.
 
 ---
 
@@ -40,12 +43,15 @@ Keunggulan utama:
 
 ```
 packages/renderer-webgl/src/
+├── fallback/
+│   └── fallback.ts            # Deteksi WebGL & canvas 2D fallback renderer
 ├── models/
 │   ├── architecture.ts        # Model kota skyscraper cyber-brutalist & menara finder
-│   └── globe.ts               # Model dual-hemisphere voxel mound dome & gradien elevasi
+│   ├── globe.ts               # Model dual-hemisphere voxel mound dome & gradien elevasi
+│   └── circuit.ts             # Model PCB board, chip QFP, SMD components, via & traces
 ├── scene/
-│   └── camera-controller.ts   # Orbit drag 3D, pembatas zoom, & auto-alignment scan mode
-├── types.ts                   # Interface opsi renderer & mode types
+│   └── camera-controller.ts   # Orbit drag 3D, sensor giroskop tilt, & auto-alignment
+├── types.ts                   # Interface opsi renderer & model types
 ├── renderer.ts                # Kelas utama JiwoWebGLRenderer & render loop
 └── index.ts                   # Ekspor publik
 ```
@@ -61,7 +67,7 @@ import { JiwoWebGLRenderer, JiwoRendererOptions } from '@jiwoqr/renderer-webgl';
 
 const renderer = new JiwoWebGLRenderer({
   container: document.getElementById('canvas-container')!,
-  model: 'architecture', // 'architecture' | 'globe'
+  model: 'circuit',     // 'architecture' | 'globe' | 'circuit'
   mode: '3d',           // '3d' | 'scan'
   morphDuration: 800,   // Durasi animasi perpindahan mode (ms)
   antialias: true,
@@ -74,14 +80,16 @@ const renderer = new JiwoWebGLRenderer({
 | :--- | :--- |
 | `setData(payload: string)` | Menghitung DNA & matriks QR baru dari string/URL, lalu membangun ulang model 3D secara reaktif. |
 | `setEntity(entity: JiwoQREntity)` | Memuat entitas `JiwoQREntity` yang sudah dihitung sebelumnya. |
-| `setModel(model: RenderModel)` | Mengganti arketipe visual antara `'architecture'` dan `'globe'`. |
+| `setModel(model: RenderModel)` | Mengganti arketipe visual (`'architecture'`, `'globe'`, `'circuit'`). |
 | `getModel(): RenderModel` | Mengambil arketipe model yang sedang aktif. |
 | `setMode(mode: RenderMode)` | Memulai animasi transisi mulus antara `'3d'` dan `'scan'` mode. |
 | `getMode(): RenderMode` | Mengambil mode yang sedang aktif (`'3d'` atau `'scan'`). |
 | `setMorphProgress(progress: number)` | Mengatur progress morphing secara manual ($0.0 = 3\text{D}$, $1.0 = \text{Scan}$). |
 | `getMorphProgress(): number` | Mengambil nilai progress morphing saat ini. |
+| `getScene(): THREE.Scene` | Mengambil referensi THREE.Scene aktif (berguna untuk eksportir GLB). |
+| `getCameraController(): CameraController` | Mengambil instance pengontrol kamera. |
 | `resize(width: number, height: number)` | Menyesuaikan rasio aspek kamera dan ukuran viewport WebGL. |
-| `dispose()` | Menghentikan render loop, memutuskan ResizeObserver, menghapus event listener, dan membersihkan memori GPU (geometri & material). |
+| `dispose()` | Menghentikan render loop, memutuskan ResizeObserver, menghapus event listener, dan membersihkan memori GPU. |
 
 ---
 
@@ -90,53 +98,62 @@ const renderer = new JiwoWebGLRenderer({
 ### 1. Model Arsitektur (`src/models/architecture.ts`)
 - Membentuk kota bertingkat dari blok-blok instanced box (`BoxGeometry(1, 1, 1)`).
 - Menara Finder diekstrusi hingga $1.75\times$ tinggi maksimum dengan warna pendaran emisif khusus (`finderEmissive`).
-- Dilengkapi pelat dasar (*ground substrate plate*) yang menutupi area matriks QR beserta zona tenang 4 modul. Saat $t \to 1.0$, warna pelat diinterpolasi dari palet gelap menjadi putih murni (`#ffffff`).
+- Dilengkapi pelat dasar (*ground substrate plate*) yang menutupi area matriks QR beserta zona tenang 4 modul.
 
 ### 2. Model Bola Voxel (`src/models/globe.ts`)
-- Membentuk gundukan voxel 3D dual-hemisfer:
-  - **Top Mound A**: Menempel di bidang ekuator $Z = 0$ dan diekstrusi ke $+Z$.
-  - **Bottom Mound B**: Menempel di bidang ekuator $Z = 0$ dan diekstrusi ke $-Z$.
-- **Gradien Warna Elevasi**: Modul di dekat ekuator menggunakan warna substrate/terracotta, elevasi tengah menggunakan palet biru/ungu sekunder, dan puncak kubah menggunakan aksen emas/krem.
-- **Bidang Ekuator Tersembunyi di 3D**: Pelat ekuator $Z = 0$ sepenuhnya disembunyikan di mode 3D (`opacity = 0`, `visible = false`) agar bola voxel tampak melayang tanpa terbelah pelat. Pelat putih memudar masuk secara mulus hanya saat bertransisi ke Mode Scan.
+- Membentuk gundukan voxel 3D dual-hemisfer (Kubah A di $+Z$ dan Kubah B di $-Z$).
+- Gradasi warna kontinental dari terracotta di ekuator ke biru/ungu di tengah dan emas di puncak.
+- Pelat ekuator $Z = 0$ disembunyikan di mode 3D agar bola tampak melayang utuh, dan memudar masuk saat bertransisi ke Mode Scan.
+
+### 3. Model Sirkuit Elektronik (`src/models/circuit.ts`)
+- Menampilkan motherboard PCB lengkap dengan lapisan solder mask (hijau, hitam, biru, merah).
+- Tiga pola finder dirender sebagai chip mikroprosesor IC QFP dengan pin logam.
+- Modul data dirender sebagai komponen SMD (resistor, kapasitor, gold via pads, dan copper traces).
+- Seluruh komponen melebur rata menjadi modul biner 2D hitam pekat di atas pelat putih saat beralih ke Mode Scan.
 
 ---
 
-## 🎥 Sistem Kamera & Kontrol Orbit (`src/scene/camera-controller.ts`)
+## 🎥 Sistem Kamera, Orbit & Giroskop Mobile
 
-- **Mode 3D (`t = 0`)**:
-  - Mengizinkan rotasi orbit bebas melalui drag mouse atau sentuhan jari.
-  - Membatasi sudut polar vertikal agar kamera tidak terbalik.
-  - Menerapkan perlambatan inersia (*damping factor* $0.05$).
-- **Mode Scan (`t \to 1.0`)**:
-  - Menginterpolasi posisi kamera secara otomatis ke koordinat tegak lurus $(0, 0, \text{optimalDistance})$ yang menghadap tepat ke pusat matriks QR.
-  - Mengunci rotasi sehingga matriks QR sejajar sempurna dengan layar kamera smartphone.
+- **Orbit Mouse/Touch**: Rotasi bebas dengan redaman inersia $0.05$.
+- **Holographic Gyroscope Tilt (`applyGyroTilt`)**:
+  ```typescript
+  window.addEventListener('deviceorientation', (e) => {
+    if (e.gamma !== null && e.beta !== null) {
+      renderer.getCameraController().applyGyroTilt(e.gamma, e.beta);
+    }
+  });
+  ```
+- **Auto-Alignment Scan Mode**: Kamera otomatis berpindah tegak lurus ke posisi $(0, 0, Z)$ tepat menghadap QR.
 
 ---
 
 ## 💡 Sistem Mitigasi Pencahayaan & Bayangan untuk Pemindaian Optik
 
-Untuk memastikan kamera smartphone dapat membaca barcode secara instan tanpa kendala pantulan cahaya atau bayangan miring gedung:
-
-```typescript
-// Saat bertransisi ke mode scan (t > 0.85):
-this.directionalLight.castShadow = t < 0.85;
-this.directionalLight.intensity = (1.0 - t * 0.7) * 1.8;
-this.fillLight.intensity = (1.0 - t) * 0.5;
-this.ambientLight.intensity = 0.45 + t * 0.55;
-
-// Material dialihkan dari specular PBR menjadi matte diffuse murni:
-moduleMaterial.roughness = 1.0;
-moduleMaterial.metalness = 0.0;
-```
+Saat bertransisi ke Mode Scan ($t > 0.85$):
+- Bayangan directional dinonaktifkan (`castShadow = false`).
+- Ambient light dinaikkan menjadi $1.0\times$.
+- Material dialihkan dari PBR glossy menjadi matte diffuse murni.
 
 ---
 
-## ⚡ Optimasi Performa Rendering
+## 🛡️ Zero-WebGL Graceful Fallback (`src/fallback/`)
 
-1. **Instanced Rendering Tunggal**: Seluruh modul QR (hingga ribuan blok) dirender menggunakan satu panggilan `gl.drawElementsInstanced`.
-2. **Buffer Dinamis Tanpa Alokasi**: Penggunaan `instancedMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage)` memastikan pembaruan matriks posisi tidak memicu garbage collection.
-3. **Resize Observer Otomatis**: Secara reaktif menyesuaikan resolusi canvas saat ukuran container DOM berubah tanpa polling.
-4. **Pembersihan Memori Lengkap (`dispose`)**: Mencegah memory leak pada Single Page Application (SPA).
+Menyediakan fungsi utility untuk browser tanpa WebGL:
+
+```typescript
+import { isWebGLSupported, render2DFallbackCanvas } from '@jiwoqr/renderer-webgl';
+
+if (!isWebGLSupported()) {
+  const canvas = document.createElement('canvas');
+  render2DFallbackCanvas(canvas, matrix, {
+    size: 400,
+    darkColor: '#000000',
+    lightColor: '#ffffff',
+  });
+  container.appendChild(canvas);
+}
+```
 
 ---
 
@@ -145,19 +162,11 @@ moduleMaterial.metalness = 0.0;
 ```typescript
 import { JiwoWebGLRenderer } from '@jiwoqr/renderer-webgl';
 
-// 1. Inisialisasi
 const renderer = new JiwoWebGLRenderer({
   container: document.getElementById('app')!,
-  model: 'globe',
+  model: 'circuit',
   mode: '3d',
 });
 
-// 2. Set payload
-renderer.setData('https://github.com/AlbertAZ1992/every-qrcode');
-
-// 3. Kontrol transisi
-document.getElementById('toggle-btn')?.addEventListener('click', () => {
-  const current = renderer.getMode();
-  renderer.setMode(current === '3d' ? 'scan' : '3d');
-});
+renderer.setData('https://jiwoqr.dev');
 ```

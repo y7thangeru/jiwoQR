@@ -1,7 +1,7 @@
 # 📐 @jiwoqr/math
 
 > **Fondasi Matematika Grafika, Easing & Proyeksi Spasial 3D**  
-> *Transformasi vektor 3D, kurva interpolasi cubic easing, proyeksi ekstrusi arsitektur brutalist, serta pemetaan dual-hemisphere voxel mound dome untuk transisi mulus 3D ke 2D scan mode.*
+> *Transformasi vektor 3D, kurva interpolasi cubic easing, proyeksi ekstrusi arsitektur brutalist, pemetaan dual-hemisphere voxel mound dome, serta kalkulasi komponen sirkuit PCB untuk transisi mulus 3D ke 2D scan mode.*
 
 [![Package: @jiwoqr/math](https://img.shields.io/badge/Package-%40jiwoqr%2Fmath-blue.svg)](file:///d:/REPOS/jiwoQR/packages/math)
 [![TypeScript Strict](https://img.shields.io/badge/TypeScript-Strict-blue.svg)](file:///d:/REPOS/jiwoQR/packages/math/tsconfig.json)
@@ -15,6 +15,7 @@
 - [Fungsi Interpolasi & Easing (`src/easing.ts`)](#-fungsi-interpolasi--easing-srceasingts)
 - [Proyeksi Ekstrusi Arsitektur (`src/projections/extrusion.ts`)](#-proyeksi-ekstrusi-arsitektur-srcprojectionsextrusionts)
 - [Proyeksi Spherical & Voxel Mound Dome (`src/projections/spherical.ts`)](#-proyeksi-spherical--voxel-mound-dome-srcprojectionssphericalts)
+- [Proyeksi Komponen Sirkuit PCB (`src/projections/circuit.ts`)](#-proyeksi-komponen-sirkuit-pcb-srcprojectionscircuitts)
 - [Struktur Interface & Tipe Data](#-struktur-interface--tipe-data)
 - [Contoh Penggunaan API](#-contoh-penggunaan-api)
 - [Pengujian Unit](#-pengujian-unit)
@@ -36,8 +37,9 @@ packages/math/src/
 ├── easing.ts                  # lerp, lerpVec3, easeInOutCubic, smoothstep
 ├── projections/
 │   ├── extrusion.ts           # Ekstrusi ketinggian & transisi 3D-ke-2D Arsitektur
-│   └── spherical.ts           # Cube-to-sphere, UV-to-sphere & Voxel Dome Mound
-├── types.ts                   # Vec2, Vec3, ExtrusionModuleTransform, SpherifiedModuleTransform
+│   ├── spherical.ts           # Cube-to-sphere, UV-to-sphere & Voxel Dome Mound
+│   └── circuit.ts             # Transformasi IC chip, SMD resistor, via pad, & trace
+├── types.ts                   # Vec2, Vec3, ExtrusionModuleTransform, SpherifiedModuleTransform, CircuitModuleTransform
 └── index.ts                   # Ekspor publik
 ```
 
@@ -49,87 +51,63 @@ packages/math/src/
 $$\text{lerp}(a, b, t) = a + (b - a) \times t$$
 
 ### 2. Cubic Ease-In-Out (`easeInOutCubic`)
-Kurva transisi non-linear berakselerasi halus di awal dan melambat di akhir:
-
 $$f(t) = \begin{cases} 4t^3 & \text{jika } t < 0.5 \\ 1 - \frac{(-2t + 2)^3}{2} & \text{jika } t \ge 0.5 \end{cases}$$
-
-```typescript
-export function easeInOutCubic(x: number): number {
-  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
-}
-```
 
 ---
 
 ## 🏙️ Proyeksi Ekstrusi Arsitektur (`src/projections/extrusion.ts`)
 
-Pada model Arsitektur, setiap modul gelap QR code diekstrusi ke sumbu $+Z$ dengan aturan:
-1. **Modul Finder (Pola Sudut)**:
-   Modul pencari posisi diekstrusi lebih tinggi sebagai *landmark towers*:
-   $$H_{\text{finder}} = H_{\text{max}} \times \text{landmarkMultiplier} \quad (\text{default: } 1.75\times)$$
-2. **Modul Data Prosedural**:
-   Modul data reguler diberi variasi ketinggian deterministik berdasarkan hashing koordinat grid $(x, y)$ dan seed PRNG:
-   $$H_{\text{data}} = H_{\text{min}} + (H_{\text{max}} - H_{\text{min}}) \times \text{noiseScale}(x, y, \text{seed})$$
-3. **Interpolasi 3D ke 2D (`interpolateExtrusion`)**:
-   Saat berpindah ke Mode Scan ($t \in [0, 1]$), posisi $Z$ dan skala tinggi $S_z$ bertransisi secara mulus:
-   $$\mathbf{P}(t) = \text{lerpVec3}(\mathbf{P}_{3\text{D}}, \mathbf{P}_{2\text{D}}, \text{easeInOutCubic}(t))$$
-   $$\mathbf{S}(t) = \text{lerpVec3}(\mathbf{S}_{3\text{D}}, \mathbf{S}_{2\text{D}}, \text{easeInOutCubic}(t))$$
+Pada model Arsitektur, setiap modul gelap QR code diekstrusi ke sumbu $+Z$:
+1. **Modul Finder**: $H_{\text{finder}} = H_{\text{max}} \times 1.75$ sebagai *landmark towers*.
+2. **Modul Data**: $H_{\text{data}} = H_{\text{min}} + (H_{\text{max}} - H_{\text{min}}) \times \text{noise}(x, y, \text{seed})$.
+3. **Interpolasi 3D-ke-2D (`interpolateExtrusion`)**: Berkurang secara mulus menuju $Z = 0.01$ dan $S_z = 0.02$.
 
 ---
 
 ## 🌍 Proyeksi Spherical & Voxel Mound Dome (`src/projections/spherical.ts`)
 
-### 1. Pemetaan Spherified Cube (`cubeToSphere`)
-Mengonversi titik kubus $[-1, 1]^3$ ke permukaan bola unit untuk mencegah distorsi di kutub:
-$$x' = x \sqrt{1 - \frac{y^2}{2} - \frac{z^2}{2} + \frac{y^2 z^2}{3}}$$
-$$y' = y \sqrt{1 - \frac{z^2}{2} - \frac{x^2}{2} + \frac{z^2 x^2}{3}}$$
-$$z' = z \sqrt{1 - \frac{x^2}{2} - \frac{y^2}{2} + \frac{x^2 y^2}{3}}$$
+Formula medan elevasi kubah bola simetris:
+$$H(x, y) = H_{\text{max}} \times \sqrt{\max\left(0, 1 - \left(\frac{\text{dist}(x, y)}{R_{\text{max}}}\right)^2\right)}$$
+- **Top Mound A**: Menempel di $Z = 0$ diekstrusi ke $+Z$.
+- **Bottom Mound B**: Menempel di $Z = 0$ diekstrusi ke $-Z$.
+- Pertemuan kedua kubah membentuk bola voxel padu tanpa pelat pembelah di mode 3D.
 
-### 2. Dual-Hemisphere Voxel Mound Dome (`computeGlobeModuleTransform`)
-Pada model Globe (arsitektur medan voxel), modul-modul disusun membentuk gundukan kubah bola 3D simetris:
-- Jarak radial modul dari pusat grid dihitung sebagai:
-  $$\text{dist} = \sqrt{x_{\text{world}}^2 + y_{\text{world}}^2}, \quad r = \min\left(1.0, \frac{\text{dist}}{R_{\text{max}}}\right)$$
-- Profil ketinggian kubah setengah lingkaran:
-  $$\text{domeFactor} = \sqrt{\max\left(0, 1 - r^2\right)}$$
-- Ketinggian modul voxel 3D:
-  $$H_{\text{dome}}(x, y) = \max\left(0.2, H_{\text{max}} \times \text{domeFactor} \times \text{noise}(x, y)\right)$$
-- **Top Mound A**: Menempel pada bidang ekuator $Z = 0$ dan diekstrusi ke $+Z$.
-- **Bottom Mound B**: Menempel pada bidang ekuator $Z = 0$ dan diekstrusi ke $-Z$.
-- Pertemuan kedua kubah di $Z = 0$ membentuk bola voxel padu tanpa garis pembatas.
+---
+
+## 🔌 Proyeksi Komponen Sirkuit PCB (`src/projections/circuit.ts`)
+
+Menentukan jenis dan orientasi komponen elektronik mikro pada modul QR:
+1. **Pola Finder**: Diberi tipe `chip` (paket IC QFP dengan pin logam).
+2. **Modul Data**: Secara deterministik dibagi menjadi:
+   - `smd_resistor`: Balok resistor dengan tutup solder perak.
+   - `smd_capacitor`: Balok kapasitor keramik cokelat muda.
+   - `via_pad`: Silinder solder via pad emas.
+   - `trace`: Jalur konduktor tembaga dengan sudut 45 atau 90 derajat.
+3. **Interpolasi Morphing (`interpolateCircuitMorph`)**:
+   - Memutar orientasi komponen kembali ke sudut $\text{Rot} = (0, 0, 0)$.
+   - Meratakan tinggi modul $S_z \to 0.02$ tepat di atas pelat solder mask.
 
 ---
 
 ## 📐 Struktur Interface & Tipe Data
 
 ```typescript
-export interface Vec2 {
-  x: number;
-  y: number;
-}
+export type CircuitComponentType =
+  | 'chip'
+  | 'smd_resistor'
+  | 'smd_capacitor'
+  | 'via_pad'
+  | 'trace'
+  | 'substrate';
 
-export interface Vec3 {
-  x: number;
-  y: number;
-  z: number;
-}
-
-export interface ExtrusionModuleTransform {
-  gridX: number;
-  gridY: number;
-  isDark: boolean;
-  position3D: Vec3;
-  position2D: Vec3;
-  scale3D: Vec3;
-  scale2D: Vec3;
-}
-
-export interface SpherifiedModuleTransform {
+export interface CircuitModuleTransform {
   gridX: number;
   gridY: number;
   isDark: boolean;
   isFinder: boolean;
+  componentType: CircuitComponentType;
   position3D: Vec3;
-  normal3D: Vec3;
+  rotation3D: Vec3;
   scale3D: Vec3;
   position2D: Vec3;
   scale2D: Vec3;
@@ -142,27 +120,24 @@ export interface SpherifiedModuleTransform {
 
 ```typescript
 import {
-  computeExtrusionTransform,
-  interpolateExtrusion,
-  computeGlobeModuleTransform,
-  interpolateGlobeMorph,
+  computeCircuitModuleTransform,
+  interpolateCircuitMorph,
 } from '@jiwoqr/math';
 
-// 1. Menghitung transformasi ekstrusi untuk modul grid (10, 10)
-const transform = computeExtrusionTransform(
-  10,    // gridX
-  10,    // gridY
+// Menghitung transformasi sirkuit PCB untuk modul
+const transform = computeCircuitModuleTransform(
+  8,     // gridX
+  12,    // gridY
   29,    // totalGridSize
   true,  // isDark
   false, // isFinder
-  12345, // seed32
-  { maxHeight: 4.0, landmarkMultiplier: 1.75 }
+  98765  // seed32
 );
 
-// 2. Evaluasi interpolasi pada progress t = 0.5 (setengah jalan morphing)
-const currentSpasial = interpolateExtrusion(transform, 0.5);
-console.log('Current Position:', currentSpasial.position);
-console.log('Current Scale:', currentSpasial.scale);
+console.log('Tipe Komponen:', transform.componentType); // 'smd_resistor' | 'via_pad' | etc.
+
+// Interpolasi saat morphing ke scan mode
+const current = interpolateCircuitMorph(transform, 0.8);
 ```
 
 ---
@@ -172,4 +147,4 @@ console.log('Current Scale:', currentSpasial.scale);
 ```bash
 pnpm test
 ```
-Verifikasi unit test mencakup pengujian batas nilai easing, determinisme ekstrusi ketinggian, serta ketepatan unrolling 3D ke 2D.
+Memverifikasi batas kurva easing, proyeksi ekstrusi arsitektur, radial falloff gundukan bola, serta akurasi penempatan komponen circuit PCB.

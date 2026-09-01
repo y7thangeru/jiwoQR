@@ -55,6 +55,7 @@ describe('@jiwoqr/core', () => {
       expect(dna1.palette).toEqual(dna2.palette);
       expect(dna1.architecture).toEqual(dna2.architecture);
       expect(dna1.globe).toEqual(dna2.globe);
+      expect(dna1.circuit).toEqual(dna2.circuit);
 
       // Verify architecture properties
       expect(dna1.architecture.maxHeight).toBeGreaterThan(0);
@@ -62,6 +63,39 @@ describe('@jiwoqr/core', () => {
       expect(['monolith', 'citadel', 'obelisk', 'pagoda']).toContain(
         dna1.architecture.towerArchetype
       );
+
+      // Verify circuit properties
+      expect(['orthogonal', 'diagonal', 'curved']).toContain(dna1.circuit.traceStyle);
+      expect(['qfp', 'bga', 'soic']).toContain(dna1.circuit.chipPackage);
+      expect(['green', 'black', 'blue', 'purple']).toContain(dna1.circuit.solderMaskColor);
+      expect(dna1.circuit.componentDensity).toBeGreaterThan(0);
+    });
+  });
+
+  describe('Multi-Mode Encoding & Optimization', () => {
+    it('accurately auto-detects QR encoding modes', () => {
+      expect(detectQRMode('081234567890')).toBe('numeric');
+      expect(detectQRMode('HELLO WORLD 123 $%*+-.//:')).toBe('alphanumeric');
+      expect(detectQRMode('https://jiwoqr.dev/cyber-city')).toBe('byte'); // contains lowercase
+    });
+
+    it('encodes pure numeric strings with higher packing efficiency', () => {
+      // 25 digits
+      const digits = '1234567890123456789012345';
+      const matrixNumeric = encodeQR(digits, { ecc: 'M', mode: 'numeric' });
+      // In numeric mode: 4 + 10 + 8*10 + 4 = 98 bits = 13 bytes => Version 1-M (capacity 16) fits!
+      expect(matrixNumeric.version).toBe(1);
+
+      // In byte mode: 4 + 8 + 25*8 = 212 bits = 27 bytes => Version 2-M (capacity 28)
+      const matrixByte = encodeQR(digits, { ecc: 'M', mode: 'byte' });
+      expect(matrixByte.version).toBe(2);
+    });
+
+    it('encodes uppercase alphanumeric strings efficiently', () => {
+      const text = 'HELLO WORLD 2026';
+      const matrix = encodeQR(text, { ecc: 'Q' });
+      expect(matrix.version).toBe(1);
+      expect(matrix.size).toBe(21);
     });
   });
 
@@ -113,8 +147,10 @@ describe('@jiwoqr/core', () => {
       const entity = createJiwoQR('https://jiwoqr.dev');
       expect(entity.matrix).toBeDefined();
       expect(entity.dna).toBeDefined();
+      expect(entity.dna.circuit).toBeDefined();
       expect(entity.matrix.version).toBeGreaterThanOrEqual(1);
       expect(entity.matrix.ecc).toBe('Q'); // Default adaptive ECC Q
     });
   });
 });
+

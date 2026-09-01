@@ -25,6 +25,10 @@
           <span class="version-tag">v0.1.0-alpha</span>
         </div>
         <div class="header-actions">
+          <button id="btn-gyro-toggle" class="secondary-nav-btn" title="Toggle Device Orientation Tilt for mobile holographic orbit">
+            <span class="nav-icon">📱</span>
+            <span id="gyro-text">Gyro: OFF</span>
+          </button>
           <button id="btn-mode-toggle" class="mode-btn scan-mode">
             <span class="mode-icon">📷</span>
             <span class="mode-text">Switch to Scan Mode (2D)</span>
@@ -50,7 +54,8 @@
             <span class="preset-label">Presets:</span>
             <button class="preset-chip" data-url="https://github.com/AlbertAZ1992/every-qrcode">every-qrcode</button>
             <button class="preset-chip" data-url="https://jiwoqr.dev">jiwoqr.dev</button>
-            <button class="preset-chip" data-url="https://threejs.org">Three.js</button>
+            <button class="preset-chip" data-url="081234567890">Numeric Phone</button>
+            <button class="preset-chip" data-url="JIWO-QR-CYBER-2026">Alphanumeric</button>
           </div>
         </div>
 
@@ -69,7 +74,7 @@
             class="slider"
           />
           <div class="slider-labels">
-            <span>3D Cyber City</span>
+            <span>3D Interactive World</span>
             <span>Canonical 2D Scan</span>
           </div>
         </div>
@@ -84,6 +89,33 @@
             <button class="model-btn" data-model="globe">
               <span class="model-name">Globe</span>
               <span class="model-desc">Spherical Geodesic Projection</span>
+            </button>
+            <button class="model-btn" data-model="circuit">
+              <span class="model-name">Circuit</span>
+              <span class="model-desc">Cybernetic PCB & Microchip</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3D & Print Export Toolbar -->
+        <div class="panel-section export-panel-section">
+          <label class="section-title">EXPORT & 3D PRINT</label>
+          <div class="export-grid">
+            <button id="btn-export-glb" class="export-btn" title="Export current 3D scene to binary GLB">
+              <span class="export-icon">📦</span>
+              <span class="export-label">Export GLB</span>
+            </button>
+            <button id="btn-export-stl" class="export-btn highlight-stl" title="Export watertight 3D-printable binary STL file">
+              <span class="export-icon">🖨️</span>
+              <span class="export-label">Export STL (3D Print)</span>
+            </button>
+            <button id="btn-export-png" class="export-btn" title="Export high-resolution 300 DPI PNG">
+              <span class="export-icon">🖼️</span>
+              <span class="export-label">Export PNG (300 DPI)</span>
+            </button>
+            <button id="btn-export-svg" class="export-btn" title="Export canonical vector SVG">
+              <span class="export-icon">📐</span>
+              <span class="export-label">Export SVG</span>
             </button>
           </div>
         </div>
@@ -105,15 +137,15 @@
               <span id="qr-specs" class="tele-val mono">-</span>
             </div>
             <div class="tele-item">
-              <span class="tele-label">Tower Archetype</span>
+              <span class="tele-label">Model Feature A</span>
               <span id="dna-tower" class="tele-val mono">-</span>
             </div>
             <div class="tele-item">
-              <span class="tele-label">Max Height</span>
+              <span class="tele-label">Model Feature B</span>
               <span id="dna-height" class="tele-val mono">-</span>
             </div>
             <div class="tele-item">
-              <span class="tele-label">Roof Rhythm</span>
+              <span class="tele-label">Model Feature C</span>
               <span id="dna-roof" class="tele-val mono">-</span>
             </div>
           </div>
@@ -135,6 +167,7 @@
           </div>
         </div>
       </aside>
+
     </div>
     <script type="module" src="./src/main.ts"></script>
   </body>

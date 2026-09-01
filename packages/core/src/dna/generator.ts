@@ -1,6 +1,7 @@
-import { DeterministicDNA, ColorPalette, ArchitectureDNA, GlobeDNA } from '../types.js';
+import { DeterministicDNA, ColorPalette, ArchitectureDNA, GlobeDNA, CircuitDNA } from '../types.js';
 import { fnv1a64, normalizeInput } from './hasher.js';
 import { Mulberry32 } from './prng.js';
+
 
 const PALETTES: ColorPalette[] = [
   // Cyberpunk Neo-Tokyo
@@ -92,6 +93,19 @@ export function generateDNA(input: string): DeterministicDNA {
     rotationSpeed: Number(rng.range(0.2, 0.8).toFixed(2)),
   };
 
+  const traceStyles: CircuitDNA['traceStyle'][] = ['orthogonal', 'diagonal', 'curved'];
+  const chipPackages: CircuitDNA['chipPackage'][] = ['qfp', 'bga', 'soic'];
+  const solderMaskColors: CircuitDNA['solderMaskColor'][] = ['green', 'black', 'blue', 'purple'];
+
+  const circuit: CircuitDNA = {
+    traceStyle: rng.choice(traceStyles),
+    chipPackage: rng.choice(chipPackages),
+    solderMaskColor: rng.choice(solderMaskColors),
+    componentDensity: Number(rng.range(0.35, 0.85).toFixed(2)),
+    viaDensity: Number(rng.range(0.2, 0.6).toFixed(2)),
+    traceWidth: Number(rng.range(0.12, 0.28).toFixed(2)),
+  };
+
   return {
     rawHash,
     seed32,
@@ -99,5 +113,7 @@ export function generateDNA(input: string): DeterministicDNA {
     palette,
     architecture,
     globe,
+    circuit,
   };
 }
+

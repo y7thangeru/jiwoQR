@@ -57,7 +57,7 @@ export interface JiwoQRProps {
   /** Target URL atau teks string yang akan di-encode ke matriks QR */
   value: string;
 
-  /** Arketipe visual 3D ('architecture' | 'globe') - Default: 'architecture' */
+  /** Arketipe visual 3D ('architecture' | 'globe' | 'circuit') - Default: 'architecture' */
   model?: RenderModel;
 
   /** Mode tampilan ('3d' dunia interaktif | 'scan' 2D datar) - Default: '3d' */

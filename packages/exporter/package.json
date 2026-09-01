@@ -1,0 +1,44 @@
+{
+  "name": "@jiwoqr/exporter",
+  "version": "0.1.0",
+  "description": "3D (GLB, watertight STL) and 2D high-res print export engine for JiwoQR",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@jiwoqr/core": "workspace:*",
+    "@jiwoqr/math": "workspace:*",
+    "three": "^0.174.0"
+  },
+
+  "devDependencies": {
+    "@types/three": "^0.174.0",
+    "typescript": "^5.7.3"
+  },
+
+  "keywords": [
+    "jiwoqr",
+    "exporter",
+    "stl",
+    "glb",
+    "gltf",
+    "svg",
+    "png",
+    "3d-printing",
+    "print"
+  ],
+  "author": "JiwoQR",
+  "license": "MIT"
+}

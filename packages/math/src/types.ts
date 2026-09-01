@@ -40,3 +40,31 @@ export interface SpherifiedModuleTransform {
   scale2D: Vec3;
 }
 
+export type CircuitComponentType =
+  | 'CHIP_IC' // Finder pattern main QFP/BGA package
+  | 'CHIP_PIN' // IC lead pin
+  | 'RESISTOR' // 0805 SMD resistor
+  | 'CAPACITOR' // Ceramic SMD capacitor
+  | 'VIA_PAD' // Gold/copper circular via or pad
+  | 'TRACE_H' // Horizontal trace
+  | 'TRACE_V'; // Vertical trace
+
+export interface CircuitModuleTransform {
+  gridX: number;
+  gridY: number;
+  isDark: boolean;
+  isFinder: boolean;
+  componentType: CircuitComponentType;
+  /** 3D PCB elevation position */
+  position3D: Vec3;
+  /** 2D canonical flat position */
+  position2D: Vec3;
+  /** Scale in 3D circuit mode */
+  scale3D: Vec3;
+  /** Scale in 2D scan mode */
+  scale2D: Vec3;
+  /** Rotation in 3D mode (rad) */
+  rotationZ: number;
+}
+
+

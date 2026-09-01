@@ -10,7 +10,10 @@ import {
   uvToSphere,
   computeGlobeModuleTransform,
   interpolateGlobeMorph,
+  computeCircuitModuleTransform,
+  interpolateCircuitMorph,
 } from '../src/index.js';
+
 
 describe('@jiwoqr/math', () => {
   describe('Easing & Interpolation', () => {
@@ -129,5 +132,29 @@ describe('@jiwoqr/math', () => {
       expect(at1.position.z).toBeCloseTo(0.01, 2);
     });
   });
+
+  describe('Circuit Projections', () => {
+    it('generates CHIP_IC for finder patterns and SMD components for data modules', () => {
+      const finder = computeCircuitModuleTransform(3, 3, 29, true, true, 100);
+      expect(finder.componentType).toBe('CHIP_IC');
+      expect(finder.scale3D.z).toBeGreaterThan(0.5);
+
+      const dataResistor = computeCircuitModuleTransform(10, 10, 29, true, false, 100);
+      expect(['RESISTOR', 'CAPACITOR', 'VIA_PAD', 'TRACE_H', 'TRACE_V']).toContain(
+        dataResistor.componentType
+      );
+    });
+
+    it('smoothly melts circuit components into flat 2D modules in scan mode', () => {
+      const circuit = computeCircuitModuleTransform(5, 5, 29, true, false, 42);
+      const at0 = interpolateCircuitMorph(circuit, 0.0);
+      const at1 = interpolateCircuitMorph(circuit, 1.0);
+
+      expect(at0.scale.z).toBeCloseTo(circuit.scale3D.z, 2);
+      expect(at1.scale.z).toBeCloseTo(0.02, 2);
+      expect(at1.rotationZ).toBeCloseTo(0, 2);
+    });
+  });
 });
+
 

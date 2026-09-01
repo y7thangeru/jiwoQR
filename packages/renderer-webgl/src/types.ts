@@ -1,5 +1,6 @@
-export type RenderModel = 'architecture' | 'globe';
+export type RenderModel = 'architecture' | 'globe' | 'circuit';
 export type RenderMode = '3d' | 'scan';
+
 
 export interface JiwoRendererOptions {
   canvas?: HTMLCanvasElement;

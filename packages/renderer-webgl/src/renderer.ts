@@ -3,9 +3,14 @@ import { JiwoQREntity, createJiwoQR } from '@jiwoqr/core';
 import { JiwoRendererOptions, RenderMode, RenderModel } from './types.js';
 import { createArchitectureModel, ArchitectureModelInstance } from './models/architecture.js';
 import { createGlobeModel, GlobeModelInstance } from './models/globe.js';
+import { createCircuitModel, CircuitModelInstance } from './models/circuit.js';
 import { CameraController } from './scene/camera-controller.js';
 
-type ActiveModelInstance = ArchitectureModelInstance | GlobeModelInstance;
+type ActiveModelInstance =
+  | ArchitectureModelInstance
+  | GlobeModelInstance
+  | CircuitModelInstance;
+
 
 export class JiwoWebGLRenderer {
   private container: HTMLElement;
@@ -135,7 +140,13 @@ export class JiwoWebGLRenderer {
         this.currentEntity.matrix,
         this.currentEntity.dna
       );
+    } else if (this.modelType === 'circuit') {
+      this.currentModelInstance = createCircuitModel(
+        this.currentEntity.matrix,
+        this.currentEntity.dna
+      );
     }
+
 
     if (this.currentModelInstance) {
       this.scene.add(this.currentModelInstance.group);
@@ -267,7 +278,16 @@ export class JiwoWebGLRenderer {
     return this.morphProgress;
   }
 
+  public getScene(): THREE.Scene {
+    return this.scene;
+  }
+
+  public getCameraController(): CameraController {
+    return this.cameraController;
+  }
+
   public dispose() {
+
     this.isDisposed = true;
     cancelAnimationFrame(this.animFrameId);
     this.resizeObserver?.disconnect();
