@@ -99,6 +99,18 @@ Membangkitkan entitas `DeterministicDNA` yang mengatur seluruh karakteristik vis
    - `componentDensity`: Kepadatan resistor/kapasitor SMD.
    - `viaDensity`: Kepadatan via pad solder emas.
    - `traceWidth`: Lebar jalur konduktor.
+5. **Karakteristik Biomorphic (`BiomorphicDNA`)**:
+   - `crystalGrowthStyle`: Gaya pertumbuhan prisma kristal (`hexagonal`, `needle_prism`, `geode_cluster`, `coral_branch`).
+   - `refractionIndex`: Indeks bias optik mineral ($1.33$ hingga $1.72$).
+   - `facetSharpness`: Ketajaman facet prisma kristal.
+   - `clusterDensity`: Kepadatan formasi kristal geodesik.
+   - `glowIntensity`: Intensitas pendaran monolit finder kristal.
+6. **Karakteristik Kota Metropolis (`CityDNA`)**:
+   - `zoningArchetype`: Gaya zoning distrik perkotaan (`commercial`, `residential`, `civic`, `industrial`, `mixed`).
+   - `skylineDensity`: Kepadatan menara pencakar langit di pusat distrik CBD.
+   - `streetOrientationBias`: Kecenderungan rotasi fasad gedung menghadap jalan raya terbuka (*orthogonal 4-way analysis*).
+   - `landmarkStyle`: Bentuk dan elevasi menara sudut monumental (*spire*, *obelisk*, *citadel*).
+   - `buildingScale`: Proporsi skala gedung relatif terhadap modul QR.
 
 ---
 
@@ -169,12 +181,20 @@ export interface QRMatrix {
 }
 
 export interface CircuitDNA {
-  traceStyle: 'ortho-45' | 'manhattan' | 'curved';
-  chipPackage: 'QFP' | 'BGA' | 'DIP' | 'SOP';
-  solderMaskColor: 'green' | 'black' | 'blue' | 'red' | 'purple';
+  traceStyle: 'orthogonal' | 'diagonal' | 'curved';
+  chipPackage: 'qfp' | 'bga' | 'soic';
+  solderMaskColor: 'green' | 'black' | 'blue' | 'purple';
   componentDensity: number;
   viaDensity: number;
   traceWidth: number;
+}
+
+export interface BiomorphicDNA {
+  crystalGrowthStyle: 'hexagonal' | 'coral_branch' | 'geode_cluster' | 'needle_prism';
+  refractionIndex: number;
+  facetSharpness: number;
+  clusterDensity: number;
+  glowIntensity: number;
 }
 
 export interface DeterministicDNA {
@@ -185,6 +205,7 @@ export interface DeterministicDNA {
   architecture: ArchitectureDNA;
   globe: GlobeDNA;
   circuit: CircuitDNA;
+  biomorphic: BiomorphicDNA;
 }
 
 export interface EncodeOptions {

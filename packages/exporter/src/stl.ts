@@ -3,6 +3,8 @@ import {
   computeExtrusionTransform,
   computeGlobeModuleTransform,
   computeCircuitModuleTransform,
+  computeBiomorphicModuleTransform,
+  computeCityModuleTransform,
 } from '@jiwoqr/math';
 import { STLExportOptions } from './types.js';
 
@@ -69,9 +71,19 @@ function addBoxTriangles(
  */
 export function exportSTL(
   matrix: QRMatrix,
-  dna?: DeterministicDNA,
-  options: STLExportOptions = {}
+  dnaOrOptions?: DeterministicDNA | STLExportOptions,
+  maybeOptions?: STLExportOptions
 ): ArrayBuffer {
+  let dna: DeterministicDNA | undefined;
+  let options: STLExportOptions = {};
+
+  if (dnaOrOptions && 'seed32' in dnaOrOptions) {
+    dna = dnaOrOptions;
+    options = maybeOptions ?? {};
+  } else if (dnaOrOptions) {
+    options = dnaOrOptions as STLExportOptions;
+  }
+
   const model = options.model ?? (dna ? 'architecture' : 'flat');
   const moduleSize = options.moduleSize ?? 2.0; // mm
   const baseThickness = options.baseThickness ?? 2.0; // mm
@@ -102,7 +114,7 @@ export function exportSTL(
       let moduleHeight = options.moduleHeight ?? 2.0;
 
       if (model === 'architecture') {
-        const archMaxHeight = options.maxHeight ?? (dna?.architecture.maxHeight ? dna.architecture.maxHeight * 2.0 : 6.0);
+        const archMaxHeight = options.maxHeight ?? (dna?.architecture ? dna.architecture.maxHeight * 2.0 : 6.0);
         const transform = computeExtrusionTransform(
           mod.x,
           mod.y,
@@ -114,7 +126,7 @@ export function exportSTL(
             moduleSize,
             gap: 0,
             maxHeight: archMaxHeight,
-            heightVariance: dna?.architecture.heightVariance ?? 0.6,
+            heightVariance: dna?.architecture ? dna.architecture.heightVariance : 0.6,
             landmarkMultiplier: 1.75, // Tall landmark finder towers
           }
         );
@@ -153,6 +165,42 @@ export function exportSTL(
         moduleHeight = Math.max(0.8, transform.scale3D.z * 4.0);
         x2 = x1 + Math.max(0.8, transform.scale3D.x * moduleSize);
         y2 = y1 + Math.max(0.8, transform.scale3D.y * moduleSize);
+      } else if (model === 'biomorphic') {
+        const bioMaxHeight = options.maxHeight ?? 7.0;
+        const transform = computeBiomorphicModuleTransform(
+          mod.x,
+          mod.y,
+          totalModules,
+          true,
+          isFinder,
+          seed32,
+          {
+            moduleSize,
+            gap: 0,
+            maxHeight: bioMaxHeight,
+            finderMultiplier: 1.8,
+          }
+        );
+        moduleHeight = Math.max(1.0, transform.scale3D.z);
+      } else if (model === 'city') {
+        const cityMaxHeight = options.maxHeight ?? 7.0;
+        const transform = computeCityModuleTransform(
+          mod.x,
+          mod.y,
+          totalModules,
+          true,
+          isFinder,
+          seed32,
+          8,
+          undefined,
+          {
+            moduleSize,
+            gap: 0,
+            maxHeight: cityMaxHeight,
+            landmarkMultiplier: 2.0,
+          }
+        );
+        moduleHeight = Math.max(1.0, transform.scale3D.z);
       }
 
       const z1 = baseThickness;

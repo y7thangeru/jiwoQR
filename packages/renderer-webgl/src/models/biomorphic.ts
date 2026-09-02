@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import { QRMatrix, DeterministicDNA, QRModule } from '@jiwoqr/core';
-import { computeCircuitModuleTransform, easeInOutCubic } from '@jiwoqr/math';
+import { computeBiomorphicModuleTransform, easeInOutCubic } from '@jiwoqr/math';
 import { attachGPUMorphShader, setupGPUMorphAttributes } from '../shaders/gpu-morph.js';
 
-export interface CircuitModelInstance {
+export interface BiomorphicModelInstance {
   group: THREE.Group;
   update(morphProgress: number): void;
   dispose(): void;
@@ -12,20 +12,13 @@ export interface CircuitModelInstance {
 
 const COLOR_WHITE = new THREE.Color(0xffffff);
 
-const SOLDER_MASK_COLORS: Record<string, number> = {
-  green: 0x0a2618,
-  black: 0x0e1116,
-  blue: 0x0d1f38,
-  purple: 0x1e1030,
-};
-
-export function createCircuitModel(
+export function createBiomorphicModel(
   matrix: QRMatrix,
   dna: DeterministicDNA,
   options: { moduleSize?: number; gap?: number } = {}
-): CircuitModelInstance {
+): BiomorphicModelInstance {
   const group = new THREE.Group();
-  group.name = 'JiwoCircuitModel';
+  group.name = 'JiwoBiomorphicModel';
 
   const moduleSize = options.moduleSize ?? 1.0;
   const gap = options.gap ?? 0.04;
@@ -33,7 +26,7 @@ export function createCircuitModel(
   const totalGridSize = matrix.totalSize;
   const totalWorldSize = totalGridSize * unit;
 
-  // 1. Collect all dark modules (SMD components, traces, IC packages)
+  // 1. Collect all dark modules (Crystalline prisms & monolithic geode finder patterns)
   const darkModules: { raw: QRModule; isFinder: boolean }[] = [];
 
   for (let y = 0; y < totalGridSize; y++) {
@@ -48,38 +41,41 @@ export function createCircuitModel(
 
   const count = darkModules.length;
 
-  // 2. Base PCB Substrate Plate (Solder mask)
+  // 2. Substrate Bedrock Plate
   const substrateGeometry = new THREE.PlaneGeometry(
     totalWorldSize + unit * 0.5,
     totalWorldSize + unit * 0.5
   );
-
-  const solderMaskHex = SOLDER_MASK_COLORS[dna.circuit?.solderMaskColor ?? 'green'] ?? 0x0a2618;
-
-  const substrate3DColor = new THREE.Color(solderMaskHex);
+  const substrate3DColor = new THREE.Color(dna.palette.groundSubstrate);
   const substrateMaterial = new THREE.MeshStandardMaterial({
     color: substrate3DColor.clone(),
-    roughness: 0.6,
-    metalness: 0.2,
+    roughness: 0.85,
+    metalness: 0.15,
   });
 
   const substrateMesh = new THREE.Mesh(substrateGeometry, substrateMaterial);
-  substrateMesh.name = 'PCBSubstratePlate';
+  substrateMesh.name = 'MineralSubstrateBedrock';
   substrateMesh.position.set(0, 0, 0);
   group.add(substrateMesh);
 
-  // 3. InstancedMesh for Electronic Components
-  const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
-  const componentMaterial = new THREE.MeshStandardMaterial({
-    roughness: 0.3,
-    metalness: 0.7,
+  // 3. Hexagonal Crystal Column & Prism Geometry
+  // Radius top: 0.46, Radius bottom: 0.54, Height: 1.0, 6 radial segments (hexagonal crystal)
+  const crystalGeometry = new THREE.CylinderGeometry(0.46, 0.54, 1.0, 6);
+
+  // Translucent / refractive crystal physical material
+  const crystalMaterial = new THREE.MeshPhysicalMaterial({
+    roughness: 0.18,
+    metalness: 0.12,
+    transmission: 0.35,
+    ior: dna.biomorphic?.refractionIndex ?? 1.55,
+    clearcoat: 0.75,
     flatShading: true,
   });
 
-  const morphUniforms = attachGPUMorphShader(componentMaterial, 0);
+  const morphUniforms = attachGPUMorphShader(crystalMaterial, 0);
 
-  const instancedMesh = new THREE.InstancedMesh(boxGeometry, componentMaterial, count);
-  instancedMesh.name = 'CircuitSMDComponents';
+  const instancedMesh = new THREE.InstancedMesh(crystalGeometry, crystalMaterial, count);
+  instancedMesh.name = 'BiomorphicCrystalClusterMesh';
   instancedMesh.castShadow = true;
   instancedMesh.receiveShadow = true;
 
@@ -92,23 +88,27 @@ export function createCircuitModel(
   const colors3D = new Float32Array(count * 3);
   const colors2D = new Float32Array(count * 3);
 
+  const primaryColor = new THREE.Color(dna.palette.primary);
+  const secondaryColor = new THREE.Color(dna.palette.secondary);
+  const accentColor = new THREE.Color(dna.palette.accent);
   const finderColor = new THREE.Color(dna.palette.finderEmissive);
-  const copperColor = new THREE.Color(0xd48b48);
-  const goldColor = new THREE.Color(0xd4af37);
-  const resistorBodyColor = new THREE.Color(0x181a1f);
-  const capacitorColor = new THREE.Color(0x9c7a52);
   const tempColor = new THREE.Color();
 
   for (let i = 0; i < count; i++) {
     const { raw, isFinder } = darkModules[i];
-    const transform = computeCircuitModuleTransform(
+    const transform = computeBiomorphicModuleTransform(
       raw.x,
       raw.y,
       totalGridSize,
       raw.isDark,
       isFinder,
       dna.seed32,
-      { moduleSize, gap, chipElevation: 0.75 }
+      {
+        moduleSize,
+        gap,
+        maxHeight: dna.architecture.maxHeight * 1.25,
+        finderMultiplier: 1.9,
+      }
     );
 
     const i3 = i * 3;
@@ -131,23 +131,15 @@ export function createCircuitModel(
     rotationsZ3D[i] = transform.rotationZ;
 
     if (isFinder) {
+      // Glowing monolithic geodesic geode crystal monument
       tempColor.copy(finderColor);
     } else {
-      switch (transform.componentType) {
-        case 'RESISTOR':
-          tempColor.copy(resistorBodyColor);
-          break;
-        case 'CAPACITOR':
-          tempColor.copy(capacitorColor);
-          break;
-        case 'VIA_PAD':
-          tempColor.copy(goldColor);
-          break;
-        case 'TRACE_H':
-        case 'TRACE_V':
-        default:
-          tempColor.copy(copperColor);
-          break;
+      // Iridescent mineral hues (quartz, tourmaline, amethyst, opal)
+      const blend = ((raw.x * 17 + raw.y * 31 + dna.seed32) % 100) / 100;
+      if (blend > 0.6) {
+        tempColor.copy(primaryColor).lerp(accentColor, (blend - 0.6) / 0.4);
+      } else {
+        tempColor.copy(secondaryColor).lerp(primaryColor, blend / 0.6);
       }
     }
 
@@ -157,7 +149,7 @@ export function createCircuitModel(
   }
 
   setupGPUMorphAttributes(
-    boxGeometry,
+    crystalGeometry,
     {
       count,
       positions3D,
@@ -176,27 +168,32 @@ export function createCircuitModel(
   return {
     group,
     update(morphProgress: number) {
-      // GPU uniform update
+      // GPU uniform update (CPU execution: ~0.001ms)
       morphUniforms.uMorphProgress.value = morphProgress;
 
       const easedT = easeInOutCubic(morphProgress);
       substrateMaterial.color.copy(substrate3DColor).lerp(COLOR_WHITE, easedT);
 
+      // In scan mode (t -> 1.0), crystals solidify and flatten into canonical opaque black tiles
       if (morphProgress > 0.85) {
         instancedMesh.castShadow = false;
         instancedMesh.receiveShadow = false;
-        componentMaterial.roughness = 1.0;
-        componentMaterial.metalness = 0.0;
+        crystalMaterial.transmission = 0.0;
+        crystalMaterial.roughness = 1.0;
+        crystalMaterial.metalness = 0.0;
+        crystalMaterial.clearcoat = 0.0;
       } else {
         instancedMesh.castShadow = true;
         instancedMesh.receiveShadow = true;
-        componentMaterial.roughness = 0.3;
-        componentMaterial.metalness = 0.7;
+        crystalMaterial.transmission = 0.35 * (1.0 - easedT);
+        crystalMaterial.roughness = 0.18 + easedT * 0.82;
+        crystalMaterial.metalness = 0.12 * (1.0 - easedT);
+        crystalMaterial.clearcoat = 0.75 * (1.0 - easedT);
       }
     },
     dispose() {
-      boxGeometry.dispose();
-      componentMaterial.dispose();
+      crystalGeometry.dispose();
+      crystalMaterial.dispose();
       substrateGeometry.dispose();
       substrateMaterial.dispose();
       group.clear();

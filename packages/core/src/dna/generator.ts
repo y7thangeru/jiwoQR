@@ -1,4 +1,12 @@
-import { DeterministicDNA, ColorPalette, ArchitectureDNA, GlobeDNA, CircuitDNA } from '../types.js';
+import {
+  DeterministicDNA,
+  ColorPalette,
+  ArchitectureDNA,
+  GlobeDNA,
+  CircuitDNA,
+  BiomorphicDNA,
+  CityDNA,
+} from '../types.js';
 import { fnv1a64, normalizeInput } from './hasher.js';
 import { Mulberry32 } from './prng.js';
 
@@ -106,6 +114,42 @@ export function generateDNA(input: string): DeterministicDNA {
     traceWidth: Number(rng.range(0.12, 0.28).toFixed(2)),
   };
 
+  const crystalStyles: BiomorphicDNA['crystalGrowthStyle'][] = [
+    'hexagonal',
+    'coral_branch',
+    'geode_cluster',
+    'needle_prism',
+  ];
+
+  const biomorphic: BiomorphicDNA = {
+    crystalGrowthStyle: rng.choice(crystalStyles),
+    refractionIndex: Number(rng.range(1.45, 1.75).toFixed(2)),
+    facetSharpness: Number(rng.range(0.4, 0.95).toFixed(2)),
+    clusterDensity: Number(rng.range(0.3, 0.8).toFixed(2)),
+    glowIntensity: Number(rng.range(0.4, 1.2).toFixed(2)),
+  };
+
+  const zoningStyles: CityDNA['zoningArchetype'][] = [
+    'downtown',
+    'gridiron',
+    'avenues',
+    'cyber_district',
+  ];
+
+  const landmarkStyles: CityDNA['landmarkStyle'][] = [
+    'monumental_tower',
+    'stepped_spire',
+    'twin_plaza',
+  ];
+
+  const city: CityDNA = {
+    zoningArchetype: rng.choice(zoningStyles),
+    skylineDensity: Number(rng.range(0.4, 0.9).toFixed(2)),
+    streetOrientationBias: Number(rng.range(0.5, 0.95).toFixed(2)),
+    landmarkStyle: rng.choice(landmarkStyles),
+    buildingScale: Number(rng.range(0.85, 1.15).toFixed(2)),
+  };
+
   return {
     rawHash,
     seed32,
@@ -114,6 +158,8 @@ export function generateDNA(input: string): DeterministicDNA {
     architecture,
     globe,
     circuit,
+    biomorphic,
+    city,
   };
 }
 

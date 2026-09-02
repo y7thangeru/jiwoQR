@@ -1,6 +1,5 @@
-import type * as THREE from 'three';
+export type STLArchetypeModel = 'architecture' | 'globe' | 'circuit' | 'biomorphic' | 'city' | 'flat';
 
-export type STLArchetypeModel = 'architecture' | 'globe' | 'circuit' | 'flat';
 
 export interface STLExportOptions {
   /** Visual model archetype for 3D printing height extrusion (default 'architecture') */

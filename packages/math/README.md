@@ -16,6 +16,7 @@
 - [Proyeksi Ekstrusi Arsitektur (`src/projections/extrusion.ts`)](#-proyeksi-ekstrusi-arsitektur-srcprojectionsextrusionts)
 - [Proyeksi Spherical & Voxel Mound Dome (`src/projections/spherical.ts`)](#-proyeksi-spherical--voxel-mound-dome-srcprojectionssphericalts)
 - [Proyeksi Komponen Sirkuit PCB (`src/projections/circuit.ts`)](#-proyeksi-komponen-sirkuit-pcb-srcprojectionscircuitts)
+- [Proyeksi Mineral & Karang Biomorphic (`src/projections/biomorphic.ts`)](#-proyeksi-mineral--karang-biomorphic-srcprojectionsbiomorphicts)
 - [Struktur Interface & Tipe Data](#-struktur-interface--tipe-data)
 - [Contoh Penggunaan API](#-contoh-penggunaan-api)
 - [Pengujian Unit](#-pengujian-unit)
@@ -38,8 +39,10 @@ packages/math/src/
 ├── projections/
 │   ├── extrusion.ts           # Ekstrusi ketinggian & transisi 3D-ke-2D Arsitektur
 │   ├── spherical.ts           # Cube-to-sphere, UV-to-sphere & Voxel Dome Mound
-│   └── circuit.ts             # Transformasi IC chip, SMD resistor, via pad, & trace
-├── types.ts                   # Vec2, Vec3, ExtrusionModuleTransform, SpherifiedModuleTransform, CircuitModuleTransform
+│   ├── circuit.ts             # Transformasi IC chip, SMD resistor, via pad, & trace
+│   ├── biomorphic.ts          # Transformasi prisma kristal heksagonal, pilar geodesik & karang
+│   └── city.ts                # Kalkulasi orientasi hadap jalan (street-facing), cellular zoning & CBD gradient
+├── types.ts                   # Vec2, Vec3, ExtrusionModuleTransform, SpherifiedModuleTransform, CircuitModuleTransform, BiomorphicModuleTransform, CityModuleTransform
 └── index.ts                   # Ekspor publik
 ```
 
@@ -89,28 +92,55 @@ Menentukan jenis dan orientasi komponen elektronik mikro pada modul QR:
 
 ---
 
+## 💎 Proyeksi Mineral & Karang Biomorphic (`src/projections/biomorphic.ts`)
+
+Mengalkulasi pertumbuhan kristal mineral prisma heksagonal dan formasi karang:
+1. **Pola Finder**: Dimodelkan sebagai klaster monolitik kristal geodesik bercahaya tinggi ($H_{\text{finder}} = H_{\text{max}} \times 1.85$).
+2. **Modul Data**: Memiliki gaya pertumbuhan deterministik (`hexagonal`, `needle_prism`, `geode_cluster`, `coral_branch`) dengan variasi sudut facet $\theta_{\text{rot}}$ dan kemiringan organik $\phi_{\text{tilt}}$.
+3. **Interpolasi Morphing (`interpolateBiomorphicMorph`)**:
+   - Merotasikan kristal kembali tegak lurus ($\theta_{\text{rot}} \to 0, \phi_{\text{tilt}} \to 0$).
+   - Menurunkan ketinggian $S_z \to 0.02$ tepat di atas pelat dasar.
+
+---
+
+## 🏙️ Proyeksi Tata Kota Metropolis (`src/projections/city.ts`)
+
+Mengalkulasi parameter urban planning deterministik untuk model Kota Realistis (Model 5):
+1. **Orientasi Hadap Jalan (`computeStreetFacingAngle`)**:
+   - Menganalisa 4 tetangga ortogonal sel QR $(x \pm 1, y \pm 1)$.
+   - Jika 1 sisi terbuka (modul terang = jalan raya), bangunan berotasi menghadap jalan tersebut ($0^\circ, 90^\circ, 180^\circ, 270^\circ$).
+   - Jika berada di sudut pertemuan 2 jalan (corner lot), bangunan berotasi diagonal $45^\circ$ atau sejajar koridor utama.
+2. **Cellular Block Zoning & CBD Gradient (`computeCityModuleTransform`)**:
+   - Membagi matriks QR ke dalam blok seluler $3\times3$ atau $4\times4$ agar gedung-gedung bertetangga memiliki keharmonisan arsitektur.
+   - Mengalkulasi jarak radial ke pusat matriks ($c_x, c_y$); sel di dekat pusat (*Central Business District*) memiliki probabilitas tinggi menjadi pencakar langit megah (*High-Rise*), sedangkan tepi matriks menjadi blok residensial/komersial menengah (*Mid-Rise / Urban Block*).
+   - Tiga sudut Finder Pattern dimodelkan sebagai menara *Civic Landmark* monumental dengan elevasi $2.2\times$.
+3. **Interpolasi Morphing (`interpolateCityTransform`)**:
+   - Memutar orientasi yaw kembali ke $0^\circ$.
+   - Mengompresi ketinggian bangunan $S_z \to 0.02$ dan melebarkan dimensi horizontal ke ukuran penuh modul untuk pemindaian instan.
+
+---
+
 ## 📐 Struktur Interface & Tipe Data
 
 ```typescript
-export type CircuitComponentType =
-  | 'chip'
-  | 'smd_resistor'
-  | 'smd_capacitor'
-  | 'via_pad'
-  | 'trace'
-  | 'substrate';
+export type BiomorphicCrystalStyle =
+  | 'hexagonal'
+  | 'coral_branch'
+  | 'geode_cluster'
+  | 'needle_prism';
 
-export interface CircuitModuleTransform {
+export interface BiomorphicModuleTransform {
   gridX: number;
   gridY: number;
   isDark: boolean;
   isFinder: boolean;
-  componentType: CircuitComponentType;
+  crystalStyle: BiomorphicCrystalStyle;
   position3D: Vec3;
-  rotation3D: Vec3;
-  scale3D: Vec3;
   position2D: Vec3;
+  scale3D: Vec3;
   scale2D: Vec3;
+  rotationZ: number;
+  tiltAngle: number;
 }
 ```
 

@@ -7,6 +7,7 @@ import {
   encodeQR,
   createJiwoQR,
   calculateECC,
+  detectQRMode,
 } from '../src/index.js';
 
 describe('@jiwoqr/core', () => {
@@ -56,6 +57,26 @@ describe('@jiwoqr/core', () => {
       expect(dna1.architecture).toEqual(dna2.architecture);
       expect(dna1.globe).toEqual(dna2.globe);
       expect(dna1.circuit).toEqual(dna2.circuit);
+      expect(dna1.biomorphic).toEqual(dna2.biomorphic);
+      expect(dna1.city).toEqual(dna2.city);
+
+      // Verify city properties (Model 5)
+      expect(dna1.city.skylineDensity).toBeGreaterThan(0);
+      expect(['downtown', 'gridiron', 'avenues', 'cyber_district']).toContain(
+        dna1.city.zoningArchetype
+      );
+      expect(['monumental_tower', 'stepped_spire', 'twin_plaza']).toContain(
+        dna1.city.landmarkStyle
+      );
+
+      // Verify biomorphic properties
+      expect(dna1.biomorphic.refractionIndex).toBeGreaterThanOrEqual(1.4);
+      expect([
+        'hexagonal',
+        'coral_branch',
+        'geode_cluster',
+        'needle_prism',
+      ]).toContain(dna1.biomorphic.crystalGrowthStyle);
 
       // Verify architecture properties
       expect(dna1.architecture.maxHeight).toBeGreaterThan(0);

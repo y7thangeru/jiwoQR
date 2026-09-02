@@ -4,12 +4,19 @@ import { JiwoRendererOptions, RenderMode, RenderModel } from './types.js';
 import { createArchitectureModel, ArchitectureModelInstance } from './models/architecture.js';
 import { createGlobeModel, GlobeModelInstance } from './models/globe.js';
 import { createCircuitModel, CircuitModelInstance } from './models/circuit.js';
+import { createBiomorphicModel, BiomorphicModelInstance } from './models/biomorphic.js';
+import { createCityModel, CityModelInstance } from './models/city.js';
+import { BuildingModelManager } from './models/building-manager.js';
 import { CameraController } from './scene/camera-controller.js';
 
 type ActiveModelInstance =
   | ArchitectureModelInstance
   | GlobeModelInstance
-  | CircuitModelInstance;
+  | CircuitModelInstance
+  | BiomorphicModelInstance
+  | CityModelInstance;
+
+
 
 
 export class JiwoWebGLRenderer {
@@ -48,6 +55,13 @@ export class JiwoWebGLRenderer {
     this.targetMorphProgress = this.morphProgress;
     this.morphDuration = options.morphDuration ?? 800;
 
+    if (options.buildingGeometries) {
+      BuildingModelManager.getInstance().setGeometries(options.buildingGeometries);
+    }
+    if (options.cityModelUrls && options.cityModelUrls.length > 0) {
+      this.loadCityModels(options.cityModelUrls);
+    }
+
     // 1. Setup Canvas and Three.js Renderer
     if (options.canvas) {
       this.canvas = options.canvas;
@@ -69,9 +83,9 @@ export class JiwoWebGLRenderer {
       powerPreference: 'high-performance',
     });
     this.renderer.setSize(width, height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.type = THREE.PCFShadowMap;
 
     // 2. Setup Scene & Camera
     this.scene = new THREE.Scene();
@@ -87,8 +101,8 @@ export class JiwoWebGLRenderer {
     this.directionalLight = new THREE.DirectionalLight(0xffffff, 1.8);
     this.directionalLight.position.set(30, -40, 50);
     this.directionalLight.castShadow = true;
-    this.directionalLight.shadow.mapSize.width = 2048;
-    this.directionalLight.shadow.mapSize.height = 2048;
+    this.directionalLight.shadow.mapSize.width = 1024;
+    this.directionalLight.shadow.mapSize.height = 1024;
     this.directionalLight.shadow.camera.near = 0.5;
     this.directionalLight.shadow.camera.far = 200;
     const d = 40;
@@ -121,6 +135,16 @@ export class JiwoWebGLRenderer {
     this.buildModel();
   }
 
+  /**
+   * Asynchronously loads custom 3D STL building models and hot-swaps the city model if active.
+   */
+  public async loadCityModels(urls: string[]): Promise<void> {
+    await BuildingModelManager.getInstance().loadModels(urls);
+    if (this.modelType === 'city' && this.currentEntity) {
+      this.buildModel();
+    }
+  }
+
   private buildModel() {
     if (!this.currentEntity) return;
 
@@ -142,6 +166,16 @@ export class JiwoWebGLRenderer {
       );
     } else if (this.modelType === 'circuit') {
       this.currentModelInstance = createCircuitModel(
+        this.currentEntity.matrix,
+        this.currentEntity.dna
+      );
+    } else if (this.modelType === 'biomorphic') {
+      this.currentModelInstance = createBiomorphicModel(
+        this.currentEntity.matrix,
+        this.currentEntity.dna
+      );
+    } else if (this.modelType === 'city') {
+      this.currentModelInstance = createCityModel(
         this.currentEntity.matrix,
         this.currentEntity.dna
       );

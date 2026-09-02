@@ -19,10 +19,14 @@
   - [1. Model Arsitektur (Architecture Model)](#1-model-arsitektur-architecture-model)
   - [2. Model Bola Voxel (Globe Model)](#2-model-bola-voxel-globe-model)
   - [3. Model Sirkuit Elektronik (Circuit Model)](#3-model-sirkuit-elektronik-circuit-model)
+  - [4. Model Biomorphic Crystalline (Biomorphic Model)](#4-model-biomorphic-crystalline-biomorphic-model)
+  - [5. Model Kota Realistis Metropolitan (City Metropolis Model)](#5-model-kota-realistis-metropolitan-modelcity)
+- [GPU Vertex Shader Morphing Pipeline (120 FPS)](#-gpu-vertex-shader-morphing-pipeline-120-fps)
 - [Jaminan Scannability & Transisi Dual-Mode](#-jaminan-scannability--transisi-dual-mode)
+- [Interactive Studio Customizer (apps/demo)](#-interactive-studio-customizer-appsdemo)
 - [Mesin Ekspor 3D & Cetak 2D (@jiwoqr/exporter)](#-mesin-ekspor-3d--cetak-2d-jiwoqrexporter)
 - [Zero-WebGL Graceful Fallback](#-zero-webgl-graceful-fallback)
-- [Sensor Giroskop Mobile (Holographic Tilt)](#-sensor-giroskop-mobile-holographic-tilt)
+- [Sensor Giroskop Mobile (iOS Safari & Android Compatible)](#-sensor-giroskop-mobile-ios-safari--android-compatible)
 - [Struktur Monorepo](#-struktur-monorepo)
 - [Diagram Dependensi Paket](#-diagram-dependensi-paket)
 - [Panduan Instalasi & Menjalankan Proyek](#-panduan-instalasi--menjalankan-proyek)
@@ -39,11 +43,11 @@
 
 ## 🌟 Tentang JiwoQR
 
-**JiwoQR** adalah ekosistem generasi baru untuk menghasilkan QR code 3D prosedural yang sepenuhnya interaktif dan deterministik. Dikembangkan dengan arsitektur monorepo modern, JiwoQR menggabungkan keindahan estetika *cyber-brutalist skyscraper*, *dual-hemisphere voxel mound globe*, dan *cybernetic microchip PCB circuit* dengan kepatuhan penuh terhadap standar internasional **ISO/IEC 18004**.
+**JiwoQR** adalah ekosistem generasi baru untuk menghasilkan QR code 3D prosedural yang sepenuhnya interaktif dan deterministik. Dikembangkan dengan arsitektur monorepo modern, JiwoQR menggabungkan keindahan estetika *cyber-brutalist skyscraper*, *dual-hemisphere voxel mound globe*, *cybernetic microchip PCB circuit*, dan *crystalline mineral coral growth* dengan kepatuhan penuh terhadap standar internasional **ISO/IEC 18004**.
 
 Tidak seperti generator QR artistik konvensional berbasis difusi gambar (AI image generation) yang seringkali merusak integritas *Reed-Solomon Error Correction*, JiwoQR beroperasi pada level matematika bitstream kanonikal:
-1. **100% Deterministic DNA**: Setiap payload/URL menghasilkan struktur kota, bola voxel, atau komponen PCB yang unik namun konsisten setiap kali dirender.
-2. **Smooth 60 FPS Morphing**: Transisi mulus antara eksplorasi 3D bebas (orbit kamera, pencahayaan dramatis) dan mode pemindaian 2D datar (*perpendicular camera, zero-distortion, high binary contrast*).
+1. **100% Deterministic DNA**: Setiap payload/URL menghasilkan struktur kota, bola voxel, komponen PCB, atau prisma kristal yang unik namun konsisten setiap kali dirender.
+2. **GPU-Accelerated 120 FPS Morphing**: Transisi mulus antara eksplorasi 3D bebas dan mode pemindaian 2D datar dihitung langsung di GPU Vertex Shader melalui uniform `uMorphProgress` dan instanced buffer attributes.
 3. **Multi-Platform Ready**: Tersedia sebagai engine WebGL murni, komponen React siap pakai, serta Custom Element native tanpa dependensi framework dengan fallback otomatis ke Canvas 2D.
 
 ---
@@ -59,36 +63,29 @@ Tidak seperti generator QR artistik konvensional berbasis difusi gambar (AI imag
   - Aritmatika Galois Field $\text{GF}(2^{8})$ dan perhitungan polinomial **Reed-Solomon ECC** level L (~7%), M (~15%), Q (~25%), dan H (~30%).
   - Zona tenang (*Quiet Zone*) wajib 4 modul di sekeliling matriks QR.
   - Klasifikasi semantik setiap modul (`FINDER`, `ALIGNMENT`, `TIMING`, `DARK`, `DATA`, `QUIET`).
-- **High-Performance Instanced Rendering**:
-  - Menggunakan Three.js `InstancedMesh` dengan `DynamicDrawUsage` untuk rendering ribuan blok 3D dalam single draw call pada 60 FPS.
+- **GPU-Accelerated Instanced Rendering (120 FPS)**:
+  - Menggunakan Three.js `InstancedMesh` dengan shader hooks kustom untuk kalkulasi interpolasi morphing di GPU. Beban CPU per frame $< 0.01\text{ ms}$.
 - **Shadow & Lighting Mitigation**:
   - Secara otomatis mereduksi intensitas directional shadow, mematikan bayangan keras, dan menginterpolasi substrate plate menjadi putih bersih saat bertransisi ke Mode Scan untuk menjamin kamera smartphone dapat membaca barcode secara instan.
 - **3D Printing & Print-Ready Export Engine**:
-  - Generator mesh biner `.stl` yang 100% *watertight/manifold* dengan elevasi prosedural sesuai model 3D aktif (gedung bertingkat, gundukan kubah bola, chip SMD).
+  - Generator mesh biner `.stl` yang 100% *watertight/manifold* dengan elevasi prosedural sesuai model 3D aktif (gedung bertingkat, gundukan kubah bola, chip SMD, kristal biomorphic).
   - Ekspor 3D scene `.glb` Three.js, vector `.svg` mandiri, dan raster `.png` 300 DPI ultra-tajam.
+- **Advanced Studio Customizer (`apps/demo`)**:
+  - Color Theme Studio (Cyber Neon, Obsidian Gold, Emerald Tech, Minimalist Mono, Custom Hex).
+  - Pemilih level koreksi galat (L, M, Q, H).
+  - Generator template payload instan (Website URL, vCard kontak digital, Wi-Fi Network).
 
 ---
 
 ## 🏛️ Arketipe Visual 3D
 
-JiwoQR menyediakan tiga model visual utama yang dapat diganti secara dinamis:
+JiwoQR menyediakan empat model visual utama yang dapat diganti secara dinamis:
 
 ### 1. Model Arsitektur (`model="architecture"`)
 Menyusun modul-modul gelap matriks QR menjadi lanskap kota metropolitan *cyber-brutalist*.
 - **Landmark Finder Towers**: Pola finder di ketiga sudut QR diekstrusi menjadi menara pencakar langit tertinggi dengan aksen pendaran (*emissive glow*).
 - **Procedural Cityscape**: Modul data diekstrusi menjadi gedung-gedung dengan variasi ketinggian dan palet warna prosedural.
 - **Substrate Plate**: Pelat dasar yang mencakup QR code beserta 4-modul quiet zone.
-
-```
-       [Finder Tower]                [Finder Tower]
-         ┌─────────┐                   ┌─────────┐
-         │  █████  │   [City Blocks]   │  █████  │
-         │  █   █  │   ┌──┐ ┌──┐ ┌──┐  │  █   █  │
-         │  █████  │   │  │ │  │ │  │  │  █████  │
-         └─────────┘   └──┘ └──┘ └──┘  └─────────┘
-                       ══════════════
-                      [Substrate Plate]
-```
 
 ### 2. Model Bola Voxel (`model="globe"`)
 Menyusun modul-modul QR menjadi gundukan voxel 3D dual-hemisfer yang menyerupai planet mini atau medan medan kontinental (*voxel terrain mound*).
@@ -101,6 +98,28 @@ Menyusun matriks QR menjadi motherboard sirkuit cetak (*Cybernetic PCB / Microch
 - **Microprocessor IC Finders**: Tiga Finder Patterns dirender sebagai chip prosesor utama (*Main QFP/BGA IC package*) dengan pin logam di sekelilingnya.
 - **SMD Components & Traces**: Modul data bernilai `1` dirender sebagai komponen elektronik SMD (resistor 0805, kapasitor keramik, solder via pad emas) dan jalur konduktor tembaga (*traces*) di atas plat PCB *solder mask* hijau tua/hitam matte.
 - **Circuit Scan Melting**: Saat transisi ke Scan Mode ($t \to 1.0$), seluruh komponen elektronik, pin, dan jalur konduktor melebur rata menjadi modul biner pekat berdaya kontras tinggi.
+
+### 4. Model Biomorphic Crystalline (`model="biomorphic"`)
+Menyusun matriks QR menjadi struktur kristal mineral dan pertumbuhan karang heksagonal (*Crystalline Mineral & Coral Growth*).
+- **Geode Monolith Finders**: Tiga Finder Patterns dimodelkan sebagai klaster kristal geodesik monolitik besar bercahaya tinggi.
+- **Hexagonal Crystal Prisms**: Modul data dirender sebagai prisma kristal heksagonal dengan sudut facet dan kemiringan natural menggunakan material translusen/refraktif PBR.
+- **Crystalline Planar Fusion**: Saat beralih ke Mode Scan ($t \to 1.0$), kristal memadat dan permukaannya merata menjadi modul hitam-putih kanonikal.
+
+### 5. Model Kota Realistis Metropolitan (`model="city"`)
+Menyusun matriks QR menjadi sebuah kota metropolitan realistis menggunakan aset model 3D kustom (`STL-for-buildingModels/*.stl`) dengan tata ruang urban cerdas:
+- **Dynamic Model Auto-Discovery**: Secara otomatis mendeteksi dan memuat semua file `.stl` di direktori `STL-for-buildingModels/`. Pengguna dapat menambah, mengurangi, atau mengganti model referensi tanpa mengubah kode sumber.
+- **Street-Facing Orientation**: Menganalisa tetangga ortogonal sel QR untuk memutar orientasi bangunan ($0^\circ, 90^\circ, 180^\circ, 270^\circ$) agar fasad bangunan selalu menghadap ke arah jalan raya atau plaza terbuka (*light modules*).
+- **Cellular Block Zoning & CBD Density**: Pengelompokan distrik (*neighborhood zoning*) harmonis, dengan gedung pencakar langit terkonsentrasi di pusat matriks (*Central Business District*) dan menara monumental megah pada pola sudut Finder.
+- **Multi-Instanced GPU Rendering & Scan Morphing**: Setiap model bangunan di-instance secara independen pada GPU untuk performa 60+ FPS, dan merata secara mulus menjadi grid biner hitam pekat saat berpindah ke mode pemindaian.
+
+---
+
+## ⚡ GPU Vertex Shader Morphing Pipeline (120 FPS)
+
+Pada JiwoQR Fase 3, seluruh interpolasi posisi 3D ke 2D datar dikalkulasi langsung di GPU Vertex Shader melalui uniform `uMorphProgress` ($0.0 \to 1.0$):
+- **VBO Instanced Attributes**: Posisi 3D ($x_1, y_1, z_1$), posisi 2D ($x_0, y_0, z_0$), skala 3D/2D, rotasi Z, dan warna 3D disimpan langsung dalam buffer GPU (`aPosition3D`, `aPosition2D`, `aScale3D`, `aScale2D`, `aRotationZ3D`, `aColor3D`, `aColor2D`).
+- **Zero CPU Looping**: CPU hanya memperbarui `uMorphProgress` sekali per frame di `requestAnimationFrame`, menghilangkan iterasi per-modul dan menjaga rendering stabil di **120+ FPS**.
+
 
 ---
 

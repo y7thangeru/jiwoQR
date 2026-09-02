@@ -1,11 +1,7 @@
 import * as THREE from 'three';
 import { QRMatrix, DeterministicDNA, QRModule } from '@jiwoqr/core';
-import {
-  ExtrusionModuleTransform,
-  computeExtrusionTransform,
-  interpolateExtrusion,
-  easeInOutCubic,
-} from '@jiwoqr/math';
+import { computeExtrusionTransform, easeInOutCubic } from '@jiwoqr/math';
+import { attachGPUMorphShader, setupGPUMorphAttributes } from '../shaders/gpu-morph.js';
 
 export interface ArchitectureModelInstance {
   group: THREE.Group;
@@ -14,14 +10,7 @@ export interface ArchitectureModelInstance {
   getQRWorldBounds(): { width: number; height: number };
 }
 
-const COLOR_BLACK = new THREE.Color(0x000000);
 const COLOR_WHITE = new THREE.Color(0xffffff);
-
-interface ModuleMetadata {
-  transform: ExtrusionModuleTransform;
-  color3D: THREE.Color;
-  isFinder: boolean;
-}
 
 export function createArchitectureModel(
   matrix: QRMatrix,
@@ -53,29 +42,23 @@ export function createArchitectureModel(
   const count = darkModules.length;
 
   // 2. Geometry and Material for Instanced Skyscraper City
-  // 1x1x1 unit box geometry with center at (0, 0, 0)
   const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
 
-  // Standard PBR Material for 3D Cyber-Brutalist look
   const buildingMaterial = new THREE.MeshStandardMaterial({
     roughness: 0.35,
     metalness: 0.65,
     flatShading: true,
   });
 
+  // Attach GPU Vertex Shader morphing logic
+  const morphUniforms = attachGPUMorphShader(buildingMaterial, 0);
+
   const instancedMesh = new THREE.InstancedMesh(boxGeometry, buildingMaterial, count);
   instancedMesh.name = 'CityBlocksInstancedMesh';
   instancedMesh.castShadow = true;
   instancedMesh.receiveShadow = true;
 
-  // User Note 4: DynamicDrawUsage for smooth 60 FPS morphing buffers
-  instancedMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-  instancedMesh.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(count * 3), 3);
-  instancedMesh.instanceColor.setUsage(THREE.DynamicDrawUsage);
-
   // 3. Ground Substrate Plate (covers QR matrix + Quiet Zone)
-  // User Note 2: Minimum 4 modules Quiet Zone is included in totalWorldSize.
-  // In 3D mode: Cyberpunk/dark substrate plate. In Scan Mode: interpolates to crisp solid white.
   const substrateGeometry = new THREE.PlaneGeometry(
     totalWorldSize + unit * 0.5,
     totalWorldSize + unit * 0.5
@@ -89,14 +72,21 @@ export function createArchitectureModel(
 
   const substrateMesh = new THREE.Mesh(substrateGeometry, substrateMaterial);
   substrateMesh.name = 'GroundSubstrate';
-  substrateMesh.position.set(0, 0, 0); // Flat on XY plane, facing +Z
+  substrateMesh.position.set(0, 0, 0);
   group.add(substrateMesh);
 
-  // 4. Precompute Transforms & Color Mapping for Each Module
-  const metadata: ModuleMetadata[] = [];
+  // 4. Precompute GPU Buffer Attributes (Static one-time upload to GPU VBOs)
+  const positions3D = new Float32Array(count * 3);
+  const positions2D = new Float32Array(count * 3);
+  const scales3D = new Float32Array(count * 3);
+  const scales2D = new Float32Array(count * 3);
+  const colors3D = new Float32Array(count * 3);
+  const colors2D = new Float32Array(count * 3); // defaults to 0,0,0 (pitch black)
+
   const primaryColor = new THREE.Color(dna.palette.primary);
   const secondaryColor = new THREE.Color(dna.palette.secondary);
   const finderColor = new THREE.Color(dna.palette.finderEmissive);
+  const tempColor = new THREE.Color();
 
   for (let i = 0; i < count; i++) {
     const { raw, isFinder } = darkModules[i];
@@ -112,74 +102,81 @@ export function createArchitectureModel(
         gap,
         maxHeight: dna.architecture.maxHeight,
         heightVariance: dna.architecture.heightVariance,
-        landmarkMultiplier: 1.75, // Finder patterns tower higher as landmarks
+        landmarkMultiplier: 1.75,
       }
     );
 
-    let color3D: THREE.Color;
+    const i3 = i * 3;
+    // 3D position & scale
+    positions3D[i3] = transform.position3D.x;
+    positions3D[i3 + 1] = transform.position3D.y;
+    positions3D[i3 + 2] = transform.position3D.z;
+
+    scales3D[i3] = transform.scale3D.x;
+    scales3D[i3 + 1] = transform.scale3D.y;
+    scales3D[i3 + 2] = transform.scale3D.z;
+
+    // 2D position & scale
+    positions2D[i3] = transform.position2D.x;
+    positions2D[i3 + 1] = transform.position2D.y;
+    positions2D[i3 + 2] = transform.position2D.z;
+
+    scales2D[i3] = transform.scale2D.x;
+    scales2D[i3 + 1] = transform.scale2D.y;
+    scales2D[i3 + 2] = transform.scale2D.z;
+
+    // 3D Color
     if (isFinder) {
-      // Landmark towers have distinct emissive accent color
-      color3D = finderColor.clone();
+      colors3D[i3] = finderColor.r;
+      colors3D[i3 + 1] = finderColor.g;
+      colors3D[i3 + 2] = finderColor.b;
     } else {
-      // Deterministic palette variation for city buildings
       const blend = ((raw.x * 13 + raw.y * 37 + dna.seed32) % 100) / 100;
-      color3D = primaryColor.clone().lerp(secondaryColor, blend * 0.45);
+      tempColor.copy(primaryColor).lerp(secondaryColor, blend * 0.45);
+      colors3D[i3] = tempColor.r;
+      colors3D[i3 + 1] = tempColor.g;
+      colors3D[i3 + 2] = tempColor.b;
     }
 
-    metadata.push({ transform, color3D, isFinder });
+    // 2D Color is pitch black [0, 0, 0] (already 0 in Float32Array)
   }
 
-  // Helper objects for matrix calculation
-  const dummy = new THREE.Object3D();
-  const tempColor = new THREE.Color();
+  setupGPUMorphAttributes(
+    boxGeometry,
+    {
+      count,
+      positions3D,
+      positions2D,
+      scales3D,
+      scales2D,
+      colors3D,
+      colors2D,
+    },
+    instancedMesh
+  );
 
-  // Initial update at t = 0 (3D mode)
-  function applyMorph(t: number) {
-    const easedT = easeInOutCubic(t);
-
-    for (let i = 0; i < count; i++) {
-      const item = metadata[i];
-      const { position, scale } = interpolateExtrusion(item.transform, t);
-
-      dummy.position.set(position.x, position.y, position.z);
-      dummy.scale.set(scale.x, scale.y, scale.z);
-      dummy.updateMatrix();
-      instancedMesh.setMatrixAt(i, dummy.matrix);
-
-      // Interpolate color from 3D cyber palette to pure pitch black in scan mode (t -> 1.0)
-      tempColor.copy(item.color3D).lerp(COLOR_BLACK, easedT);
-      instancedMesh.setColorAt(i, tempColor);
-    }
-
-    instancedMesh.instanceMatrix.needsUpdate = true;
-    if (instancedMesh.instanceColor) {
-      instancedMesh.instanceColor.needsUpdate = true;
-    }
-
-    // User Note 2: Substrate plate color interpolates to pure solid white in scan mode
-    substrateMaterial.color.copy(substrate3DColor).lerp(COLOR_WHITE, easedT);
-
-    // User Note 3: Lighting & shadow mitigation in scan mode
-    if (t > 0.85) {
-      instancedMesh.castShadow = false;
-      instancedMesh.receiveShadow = false;
-      buildingMaterial.roughness = 1.0;
-      buildingMaterial.metalness = 0.0;
-    } else {
-      instancedMesh.castShadow = true;
-      instancedMesh.receiveShadow = true;
-      buildingMaterial.roughness = 0.35;
-      buildingMaterial.metalness = 0.65;
-    }
-  }
-
-  applyMorph(0);
   group.add(instancedMesh);
 
   return {
     group,
     update(morphProgress: number) {
-      applyMorph(morphProgress);
+      // GPU uniform update (CPU cost: ~0.001ms)
+      morphUniforms.uMorphProgress.value = morphProgress;
+
+      const easedT = easeInOutCubic(morphProgress);
+      substrateMaterial.color.copy(substrate3DColor).lerp(COLOR_WHITE, easedT);
+
+      if (morphProgress > 0.85) {
+        instancedMesh.castShadow = false;
+        instancedMesh.receiveShadow = false;
+        buildingMaterial.roughness = 1.0;
+        buildingMaterial.metalness = 0.0;
+      } else {
+        instancedMesh.castShadow = true;
+        instancedMesh.receiveShadow = true;
+        buildingMaterial.roughness = 0.35;
+        buildingMaterial.metalness = 0.65;
+      }
     },
     dispose() {
       boxGeometry.dispose();

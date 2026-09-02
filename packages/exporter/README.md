@@ -35,7 +35,7 @@ Setiap berkas mesh `.stl` yang dihasilkan dihitung secara presisi dengan topolog
 
 ## ✨ Fitur Utama
 
-- **Watertight Solid Binary STL**: Menghasilkan pelat substrate dasar padu ($W \times H \times T_{\text{base}}$) dan balok modul data timbul. Elevasi balok dapat mengikuti arketipe 3D aktif (`architecture` pencakar langit bertingkat, `globe` kubah bola, `circuit` chip SMD, atau `flat` standar).
+- **Watertight Solid Binary STL**: Menghasilkan pelat substrate dasar padu ($W \times H \times T_{\text{base}}$) dan balok modul data timbul. Elevasi balok dapat mengikuti arketipe 3D aktif (`architecture` pencakar langit bertingkat, `globe` kubah bola, `circuit` chip SMD, `biomorphic` pilar kristal, `city` blok kota metropolitan bertingkat, atau `flat` standar).
 - **Three.js Binary GLB**: Mengonversi `THREE.Scene` aktif ke file `.glb` biner dengan mempertahankan material PBR, instance mesh, dan warna vertex.
 - **300 DPI Print-Ready PNG**: Merender QR code kanonikal beresolusi ultra-tinggi ($2048\times2048+$) dengan anti-aliasing dinonaktifkan untuk mencegah pendaran piksel buram pada kemasan fisik.
 - **Vektor SVG Skalabel**: Format SVG mandiri dengan batas 4 modul quiet zone dan opsi radius sudut (*rounded corners*).
@@ -138,11 +138,12 @@ downloadFile(pngBlob, 'jiwo-qr-300dpi.png', 'image/png');
 ## 📐 Struktur Tipe Data & Interface
 
 ```typescript
-export type STLArchetypeModel = 'architecture' | 'globe' | 'circuit' | 'flat';
+export type STLArchetypeModel = 'architecture' | 'globe' | 'circuit' | 'biomorphic' | 'flat';
 
 export interface STLExportOptions {
   dna?: DeterministicDNA;
   model?: STLArchetypeModel;
+
   moduleSize?: number;     // Ukuran fisik modul (mm) - default: 2.0
   baseThickness?: number;  // Ketebalan pelat dasar (mm) - default: 2.0
   moduleHeight?: number;   // Ketinggian timbul modul (mm) - default: 2.0

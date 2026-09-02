@@ -4,6 +4,30 @@ import { encodeQR, createJiwoQR } from '@jiwoqr/core';
 
 import { exportSTL, exportSVG, exportGLB } from '../src/index.js';
 
+// Polyfill FileReader for Node.js environment in GLTFExporter tests
+if (typeof FileReader === 'undefined') {
+  (globalThis as any).FileReader = class FileReader {
+    onload: any = null;
+    onloadend: any = null;
+    result: any = null;
+    readAsArrayBuffer(blob: any) {
+      if (blob && typeof blob.arrayBuffer === 'function') {
+        blob.arrayBuffer().then((buf: any) => {
+          this.result = buf;
+          if (this.onload) this.onload({ target: this });
+          if (this.onloadend) this.onloadend({ target: this });
+        });
+      } else {
+        setTimeout(() => {
+          this.result = new ArrayBuffer(0);
+          if (this.onload) this.onload({ target: this });
+          if (this.onloadend) this.onloadend({ target: this });
+        }, 0);
+      }
+    }
+  };
+}
+
 describe('@jiwoqr/exporter', () => {
   const matrix = encodeQR('JIWO-3D-PRINT', { ecc: 'M' });
 
@@ -72,6 +96,32 @@ describe('@jiwoqr/exporter', () => {
       const headerBytes = new Uint8Array(buffer, 0, 80);
       const headerStr = new TextDecoder().decode(headerBytes);
       expect(headerStr).toContain('CIRCUIT');
+    });
+
+    it('generates 3D-printable STL for Biomorphic model', () => {
+      const entity = createJiwoQR('https://jiwoqr.dev/crystal-coral');
+      const buffer = exportSTL(entity.matrix, entity.dna, {
+        model: 'biomorphic',
+        maxHeight: 7.0,
+      });
+
+      expect(buffer).toBeInstanceOf(ArrayBuffer);
+      const headerBytes = new Uint8Array(buffer, 0, 80);
+      const headerStr = new TextDecoder().decode(headerBytes);
+      expect(headerStr).toContain('BIOMORPHIC');
+    });
+
+    it('generates 3D-printable STL for City Metropolis model (Model 5)', () => {
+      const entity = createJiwoQR('https://jiwoqr.dev/cyber-metropolis');
+      const buffer = exportSTL(entity.matrix, entity.dna, {
+        model: 'city',
+        maxHeight: 8.0,
+      });
+
+      expect(buffer).toBeInstanceOf(ArrayBuffer);
+      const headerBytes = new Uint8Array(buffer, 0, 80);
+      const headerStr = new TextDecoder().decode(headerBytes);
+      expect(headerStr).toContain('CITY');
     });
   });
 

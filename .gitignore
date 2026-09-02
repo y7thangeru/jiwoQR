@@ -32,3 +32,6 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+
+# Raw Un-decimated CAD STL Backups
+STL-for-buildingModels/_raw_originals/

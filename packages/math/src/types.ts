@@ -66,5 +66,55 @@ export interface CircuitModuleTransform {
   /** Rotation in 3D mode (rad) */
   rotationZ: number;
 }
+export type BiomorphicCrystalStyle =
+  | 'hexagonal'
+  | 'coral_branch'
+  | 'geode_cluster'
+  | 'needle_prism';
 
+export interface BiomorphicModuleTransform {
+  gridX: number;
+  gridY: number;
+  isDark: boolean;
+  isFinder: boolean;
+  crystalStyle: BiomorphicCrystalStyle;
+  /** 3D crystal position */
+  position3D: Vec3;
+  /** 2D canonical flat position */
+  position2D: Vec3;
+  /** Scale in 3D crystal mode (radiusX, radiusY, heightZ) */
+  scale3D: Vec3;
+  /** Scale in 2D scan mode */
+  scale2D: Vec3;
+  /** Natural orientation around Z (rad) */
+  rotationZ: number;
+  /** Natural crystal tilt angle (rad) */
+  tiltAngle: number;
+}
 
+export type CityBuildingTier =
+  | 'LANDMARK_TOWER'
+  | 'HIGH_RISE'
+  | 'MID_RISE'
+  | 'URBAN_BLOCK';
+
+export interface CityModuleTransform {
+  gridX: number;
+  gridY: number;
+  isDark: boolean;
+  isFinder: boolean;
+  tier: CityBuildingTier;
+  modelIndex: number;
+  /** 3D metropolis world position */
+  position3D: Vec3;
+  /** 2D canonical flat position */
+  position2D: Vec3;
+  /** Scale in 3D city mode (widthX, depthY, heightZ) */
+  scale3D: Vec3;
+  /** Scale in 2D scan mode */
+  scale2D: Vec3;
+  /** Street-facing yaw rotation around Z axis in radians */
+  rotationZ: number;
+  /** Cellular block zoning ID */
+  zoneId: number;
+}

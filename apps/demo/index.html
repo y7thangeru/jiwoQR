@@ -22,7 +22,7 @@
         <div class="brand">
           <span class="logo-badge">3D</span>
           <h1>JIWO<span>QR</span></h1>
-          <span class="version-tag">v0.1.0-alpha</span>
+          <span class="version-tag">v0.1.0-Fase3</span>
         </div>
         <div class="header-actions">
           <button id="btn-gyro-toggle" class="secondary-nav-btn" title="Toggle Device Orientation Tilt for mobile holographic orbit">
@@ -38,30 +38,64 @@
 
       <!-- Sidebar Controls & DNA Telemetry -->
       <aside class="control-panel">
+        <!-- 1. Payload & Quick Template Selector -->
         <div class="panel-section">
-          <label for="url-input" class="section-title">TARGET URL / PAYLOAD</label>
+          <div class="section-header-flex">
+            <label for="url-input" class="section-title">PAYLOAD & TEMPLATES</label>
+            <div class="template-tabs">
+              <button class="template-btn active" data-type="url" title="Website URL Template">URL</button>
+              <button class="template-btn" data-type="vcard" title="vCard Contact Template">vCard</button>
+              <button class="template-btn" data-type="wifi" title="Wi-Fi Network Template">Wi-Fi</button>
+            </div>
+          </div>
           <div class="input-row">
-            <input
-              type="text"
+            <textarea
               id="url-input"
-              value="https://github.com/AlbertAZ1992/every-qrcode"
+              rows="2"
               placeholder="https://your-domain.com"
               spellcheck="false"
-            />
-            <button id="btn-apply" class="primary-btn">Generate</button>
+            >https://github.com/AlbertAZ1992/every-qrcode</textarea>
+            <button id="btn-apply" class="primary-btn">Apply</button>
           </div>
           <div class="presets-row">
             <span class="preset-label">Presets:</span>
             <button class="preset-chip" data-url="https://github.com/AlbertAZ1992/every-qrcode">every-qrcode</button>
             <button class="preset-chip" data-url="https://jiwoqr.dev">jiwoqr.dev</button>
-            <button class="preset-chip" data-url="081234567890">Numeric Phone</button>
+            <button class="preset-chip" data-url="081234567890">Phone</button>
             <button class="preset-chip" data-url="JIWO-QR-CYBER-2026">Alphanumeric</button>
           </div>
         </div>
 
+        <!-- 2. QR Specs & Error Correction Level (ECC) Selector -->
         <div class="panel-section">
           <div class="section-header-flex">
-            <label class="section-title">MORPH INTERPOLATION</label>
+            <label class="section-title">ERROR CORRECTION LEVEL (ECC)</label>
+            <span id="ecc-desc-badge" class="param-badge">ECC Q (~25%)</span>
+          </div>
+          <div class="ecc-selector-grid">
+            <button class="ecc-btn" data-ecc="L" title="Level L: ~7% recovery (Highest density / compact)">
+              <span class="ecc-code">L</span>
+              <span class="ecc-pct">~7%</span>
+            </button>
+            <button class="ecc-btn" data-ecc="M" title="Level M: ~15% recovery (Standard density)">
+              <span class="ecc-code">M</span>
+              <span class="ecc-pct">~15%</span>
+            </button>
+            <button class="ecc-btn active" data-ecc="Q" title="Level Q: ~25% recovery (Recommended for 3D Relief)">
+              <span class="ecc-code">Q</span>
+              <span class="ecc-pct">~25%</span>
+            </button>
+            <button class="ecc-btn" data-ecc="H" title="Level H: ~30% recovery (Max recovery for heavy styling)">
+              <span class="ecc-code">H</span>
+              <span class="ecc-pct">~30%</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Morph Interpolation -->
+        <div class="panel-section">
+          <div class="section-header-flex">
+            <label class="section-title">GPU MORPH INTERPOLATION</label>
             <span id="morph-value" class="param-badge">3D WORLD (0.00)</span>
           </div>
           <input
@@ -74,11 +108,12 @@
             class="slider"
           />
           <div class="slider-labels">
-            <span>3D Interactive World</span>
+            <span>3D Interactive (GPU 120fps)</span>
             <span>Canonical 2D Scan</span>
           </div>
         </div>
 
+        <!-- 4. Visual Model Archetype (4 Archetypes) -->
         <div class="panel-section">
           <label class="section-title">VISUAL MODEL ARCHETYPE</label>
           <div class="model-selector">
@@ -92,12 +127,56 @@
             </button>
             <button class="model-btn" data-model="circuit">
               <span class="model-name">Circuit</span>
-              <span class="model-desc">Cybernetic PCB & Microchip</span>
+              <span class="model-desc">Cybernetic PCB & IC Package</span>
+            </button>
+            <button class="model-btn" data-model="biomorphic">
+              <span class="model-name">Biomorphic</span>
+              <span class="model-desc">Crystalline Coral & Mineral</span>
+            </button>
+            <button class="model-btn" data-model="city">
+              <span class="model-name">City Metropolis</span>
+              <span class="model-desc">Realistic 3D STL Buildings & Urban Grid</span>
             </button>
           </div>
         </div>
 
-        <!-- 3D & Print Export Toolbar -->
+        <!-- 5. Advanced Color Theme Switcher -->
+        <div class="panel-section">
+          <div class="section-header-flex">
+            <label class="section-title">COLOR THEME STUDIO</label>
+            <span id="theme-name-badge" class="param-badge">Procedural DNA</span>
+          </div>
+          <div class="theme-selector-grid">
+            <button class="theme-btn active" data-theme="auto">Auto DNA</button>
+            <button class="theme-btn" data-theme="cyber-neon">Cyber Neon</button>
+            <button class="theme-btn" data-theme="obsidian-gold">Obsidian Gold</button>
+            <button class="theme-btn" data-theme="emerald-tech">Emerald Tech</button>
+            <button class="theme-btn" data-theme="minimalist-mono">Minimalist</button>
+            <button class="theme-btn" data-theme="custom">Custom Hex</button>
+          </div>
+
+          <!-- Custom Color Picker Row (Revealed when Custom selected) -->
+          <div id="custom-color-controls" class="custom-color-controls" style="display: none;">
+            <div class="custom-color-item">
+              <label>Primary</label>
+              <input type="color" id="picker-primary" value="#00f0ff" />
+            </div>
+            <div class="custom-color-item">
+              <label>Secondary</label>
+              <input type="color" id="picker-secondary" value="#ff0055" />
+            </div>
+            <div class="custom-color-item">
+              <label>Accent</label>
+              <input type="color" id="picker-accent" value="#ffe600" />
+            </div>
+            <div class="custom-color-item">
+              <label>Background</label>
+              <input type="color" id="picker-bg" value="#05070f" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. 3D & Print Export Toolbar -->
         <div class="panel-section export-panel-section">
           <label class="section-title">EXPORT & 3D PRINT</label>
           <div class="export-grid">
@@ -120,7 +199,7 @@
           </div>
         </div>
 
-        <!-- Deterministic DNA Telemetry -->
+        <!-- 7. Deterministic DNA Telemetry -->
         <div class="panel-section dna-telemetry">
           <label class="section-title">DETERMINISTIC DNA TELEMETRY</label>
           <div class="telemetry-grid">
@@ -156,7 +235,7 @@
           </div>
         </div>
 
-        <!-- Scanability Verification Badge -->
+        <!-- 8. Scanability Verification Badge -->
         <div id="scan-badge" class="scan-status-card">
           <div class="status-indicator-dot"></div>
           <div class="status-content">
@@ -167,7 +246,6 @@
           </div>
         </div>
       </aside>
-
     </div>
     <script type="module" src="./src/main.ts"></script>
   </body>

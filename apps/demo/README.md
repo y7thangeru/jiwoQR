@@ -36,27 +36,49 @@ Aplikasi `apps/demo` berfungsi sebagai showcase dan environment pengujian terint
 - **Drag Mouse / Touch**: Memutar sudut pandang kamera 3D di sekeliling model secara bebas.
 - **Scroll Mouse**: Zoom in dan zoom out dengan batas jarak aman (*clamped camera frustum*).
 
-### 2. Input URL & Preset Cepat
-- **Input Teks Real-time**: Masukkan URL apa pun (cth: `https://github.com`, tautan portofolio, dsb.) dan tekan *Enter* atau tombol *Generate*.
+### 2. Input URL, Template Pintas & Preset
+- **Template Pembuat Pintas**: Tombol template instan untuk:
+  - **URL**: Web link standar (`https://...`).
+  - **vCard**: Kontak kartu nama digital lengkap (`BEGIN:VCARD...`).
+  - **Wi-Fi**: Konfigurasi koneksi jaringan nirkabel (`WIFI:S:MyNet;T:WPA;P:MyPass;;`).
 - **Preset Chips**: Tombol pintas untuk menguji variasi payload populer secara instan.
 
-### 3. Selector Tiga Arketipe Model
+### 3. Pemilih Level Koreksi Galat (ECC Selector)
+- Tombol pemilih level pemulihan galat ISO/IEC 18004 secara langsung:
+  - **L (~7%)**: Kerapatan data tertinggi / modul paling ringkas.
+  - **M (~15%)**: Kerapatan standar.
+  - **Q (~25%)**: Sangat direkomendasikan untuk procedural 3D relief.
+  - **H (~30%)**: Pemulihan maksimal untuk stilasi 3D ekstrim.
+
+### 4. Selector Lima Arketipe Model
 - **Architecture**: Menghasilkan kota pencakar langit cyber-brutalist dengan menara finder landmark.
 - **Globe**: Menghasilkan gundukan bola voxel 3D dual-hemisfer dengan gradien warna elevasi.
 - **Circuit**: Menghasilkan motherboard PCB mikroelektronik dengan chip QFP, resistor/kapasitor SMD, dan jalur konduktor tembaga.
+- **Biomorphic**: Menghasilkan pertumbuhan kristal mineral heksagonal, klaster geode bercahaya, dan material kaca refraktif PBR.
+- **City Metropolis**: Menghasilkan tata kota metropolitan realistis ditenagai model 3D STL dinamis dari folder `STL-for-buildingModels/` dengan kalkulasi orientasi hadap jalan (*street-facing*), zonasi blok distrik seluler, dan konsentrasi CBD pencakar langit.
 
-### 4. Kontrol Dual-Mode & Morph Scrub Slider
-- **Tombol Mode Toggle**: Beralih otomatis antara *3D World* dan *2D Scan Mode* dengan transisi halus 800ms.
-- **Morph Scrub Slider**: Menggeser posisi animasi transisi secara presisi dari $0.00$ (3D penuh) hingga $1.00$ (2D datar siap scan).
+### 5. Color Theme Studio
+- **Preset Palet Warna**:
+  - **Auto DNA**: Menghasilkan palet deterministik berbasis benih URL.
+  - **Cyber Neon**: Pendaran sian, magenta, dan kuning neon berlatar gelap pekat.
+  - **Obsidian Gold**: Emas metalik mewah di atas substrat obsidian gelap.
+  - **Emerald Tech**: Nuansa hijau zamrud bioteknologi dan matriks sirkuit.
+  - **Minimalist Mono**: Titanium monokrom elegan dengan aksen biru safir.
+  - **Custom Hex**: Color picker manual interaktif untuk warna primer, sekunder, aksen, dan latar belakang.
 
-### 5. Bilah Alat Ekspor 3D & Cetak 2D
+### 6. Kontrol Dual-Mode & GPU Morph Slider
+- **Tombol Mode Toggle**: Beralih otomatis antara *3D World* dan *2D Scan Mode* dengan transisi halus 850ms.
+- **GPU Morph Scrub Slider**: Menggeser posisi animasi transisi secara presisi dari $0.00$ (3D penuh) hingga $1.00$ (2D datar siap scan) dengan zero CPU overhead berkat kalkulasi GPU Vertex Shader 120 FPS.
+
+### 7. Bilah Alat Ekspor 3D & Cetak 2D
 - **Export GLB**: Mengunduh file `.glb` 3D scene aktif Three.js.
-- **Export STL**: Mengunduh file `.stl` biner watertight untuk software 3D printing slicer dengan ketinggian balok sesuai model 3D aktif.
+- **Export STL**: Mengunduh file `.stl` biner watertight untuk software 3D printing slicer dengan ketinggian balok sesuai model 3D aktif (`architecture`, `globe`, `circuit`, atau `biomorphic`).
 - **Export PNG**: Mengunduh file `.png` 300 DPI ultra-tajam untuk percetakan fisik.
 - **Export SVG**: Mengunduh file vector `.svg` mandiri dengan quiet zone.
 
-### 6. Sensor Giroskop Holografik (Mobile)
-- Tombol **Tilt Mode (Gyro)** mengaktifkan sensor `DeviceOrientationEvent` di ponsel untuk efek kedalaman 3D holografik saat memiringkan perangkat.
+### 8. Sensor Giroskop Holografik (iOS Safari & Android Compatible)
+- Tombol **Gyro** mengaktifkan sensor `DeviceOrientationEvent` dengan dialog izin resmi iOS 13+ Apple Safari untuk efek kedalaman 3D holografik saat memiringkan perangkat.
+
 
 ### 7. Panel Telemetri DNA Deterministik
 HUD samping menampilkan informasi rekayasa data real-time:

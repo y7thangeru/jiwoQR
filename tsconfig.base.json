@@ -11,6 +11,14 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "baseUrl": ".",
+    "paths": {
+      "@jiwoqr/core": ["packages/core/src"],
+      "@jiwoqr/math": ["packages/math/src"],
+      "@jiwoqr/renderer-webgl": ["packages/renderer-webgl/src"],
+      "@jiwoqr/exporter": ["packages/exporter/src"],
+      "@jiwoqr/react": ["packages/react/src"]
+    }
   }
 }

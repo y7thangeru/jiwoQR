@@ -12,6 +12,11 @@ import {
   interpolateGlobeMorph,
   computeCircuitModuleTransform,
   interpolateCircuitMorph,
+  computeBiomorphicModuleTransform,
+  interpolateBiomorphicMorph,
+  computeStreetFacingAngle,
+  computeCityModuleTransform,
+  interpolateCityTransform,
 } from '../src/index.js';
 
 
@@ -155,6 +160,91 @@ describe('@jiwoqr/math', () => {
       expect(at1.rotationZ).toBeCloseTo(0, 2);
     });
   });
+
+  describe('Biomorphic Projections', () => {
+    it('generates crystalline heights and monolithic finder towers', () => {
+      const finder = computeBiomorphicModuleTransform(3, 3, 29, true, true, 888, {
+        maxHeight: 4.0,
+        finderMultiplier: 2.0,
+      });
+
+      const dataCrystal = computeBiomorphicModuleTransform(12, 12, 29, true, false, 888, {
+        maxHeight: 4.0,
+        finderMultiplier: 2.0,
+      });
+
+      expect(finder.crystalStyle).toBe('geode_cluster');
+      expect(finder.scale3D.z).toBeCloseTo(8.0, 2);
+      expect(finder.scale3D.z).toBeGreaterThan(dataCrystal.scale3D.z);
+      expect(dataCrystal.scale3D.z).toBeGreaterThanOrEqual(0.4);
+      expect(dataCrystal.scale3D.z).toBeLessThanOrEqual(4.0);
+    });
+
+    it('assigns natural facet rotations and tilts to data crystals', () => {
+      const crystal = computeBiomorphicModuleTransform(7, 9, 29, true, false, 555);
+      expect(typeof crystal.rotationZ).toBe('number');
+      expect(typeof crystal.tiltAngle).toBe('number');
+      expect([
+        'hexagonal',
+        'needle_prism',
+        'geode_cluster',
+        'coral_branch',
+      ]).toContain(crystal.crystalStyle);
+    });
+
+    it('smoothly flattens 3D mineral crystals to canonical 2D modules in scan mode', () => {
+      const crystal = computeBiomorphicModuleTransform(10, 10, 29, true, false, 777);
+      const at0 = interpolateBiomorphicMorph(crystal, 0.0);
+      const at1 = interpolateBiomorphicMorph(crystal, 1.0);
+
+      expect(at0.scale.z).toBeCloseTo(crystal.scale3D.z, 2);
+      expect(at0.rotationZ).toBeCloseTo(crystal.rotationZ, 2);
+
+      // In scan mode (t = 1.0), rotation and tilt reset to 0 and scale becomes flat
+      expect(at1.scale.z).toBeCloseTo(0.02, 2);
+      expect(at1.position.z).toBeCloseTo(0.01, 2);
+      expect(at1.rotationZ).toBeCloseTo(0, 2);
+      expect(at1.tiltAngle).toBeCloseTo(0, 2);
+    });
+  });
+
+  describe('City Metropolis Projections (Model 5)', () => {
+    it('computes street-facing orientation toward open orthogonal light modules', () => {
+      // Mock grid where North neighbor (y-1) is open road (false) and others are buildings (true)
+      const isDarkSampler = (x: number, y: number) => {
+        if (x === 5 && y === 4) return false; // North is open
+        return true;
+      };
+
+      const angle = computeStreetFacingAngle(5, 5, 29, isDarkSampler, 123);
+      expect(angle).toBeCloseTo(Math.PI / 2, 2); // Facing North (+Y)
+    });
+
+    it('assigns landmark tiers to finders and CBD high-rises to center modules', () => {
+      const finder = computeCityModuleTransform(3, 3, 29, true, true, 42, 8);
+      expect(finder.tier).toBe('LANDMARK_TOWER');
+      expect(finder.scale3D.z).toBeGreaterThan(6.0);
+
+      const cbdCenter = computeCityModuleTransform(14, 14, 29, true, false, 42, 8);
+      expect(cbdCenter.tier).toBe('HIGH_RISE');
+
+      const edgeBlock = computeCityModuleTransform(27, 27, 29, true, false, 42, 8);
+      expect(edgeBlock.tier).toBe('URBAN_BLOCK');
+      expect(cbdCenter.scale3D.z).toBeGreaterThan(edgeBlock.scale3D.z);
+    });
+
+    it('smoothly flattens city buildings into canonical 2D scan modules', () => {
+      const cityModule = computeCityModuleTransform(10, 10, 29, true, false, 42, 8);
+      const at0 = interpolateCityTransform(cityModule, 0.0);
+      const at1 = interpolateCityTransform(cityModule, 1.0);
+
+      expect(at0.scale.z).toBeCloseTo(cityModule.scale3D.z, 2);
+      expect(at1.scale.z).toBeCloseTo(0.02, 2);
+      expect(at1.position.z).toBeCloseTo(0.01, 2);
+      expect(at1.rotationZ).toBeCloseTo(0, 2);
+    });
+  });
 });
+
 
 

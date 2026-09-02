@@ -1,6 +1,7 @@
-export type RenderModel = 'architecture' | 'globe' | 'circuit';
-export type RenderMode = '3d' | 'scan';
+import * as THREE from 'three';
 
+export type RenderModel = 'architecture' | 'globe' | 'circuit' | 'biomorphic' | 'city';
+export type RenderMode = '3d' | 'scan';
 
 export interface JiwoRendererOptions {
   canvas?: HTMLCanvasElement;
@@ -12,4 +13,7 @@ export interface JiwoRendererOptions {
   interactive?: boolean;
   antialias?: boolean;
   morphDuration?: number; // Duration of 3D-to-2D morph transition in ms (default 800)
+  cityModelUrls?: string[];
+  buildingGeometries?: THREE.BufferGeometry[];
 }
+

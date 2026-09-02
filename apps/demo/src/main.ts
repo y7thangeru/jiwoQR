@@ -1,5 +1,10 @@
-import { JiwoWebGLRenderer, RenderMode, RenderModel } from '@jiwoqr/renderer-webgl';
-import { JiwoQREntity } from '@jiwoqr/core';
+import {
+  JiwoWebGLRenderer,
+  RenderMode,
+  RenderModel,
+  requestDeviceOrientationPermission,
+} from '@jiwoqr/renderer-webgl';
+import { JiwoQREntity, ECCLevel, createJiwoQR, ColorPalette } from '@jiwoqr/core';
 import {
   exportGLB,
   exportSTL,
@@ -8,8 +13,9 @@ import {
   downloadFile,
 } from '@jiwoqr/exporter';
 
+// DOM Elements
 const container = document.getElementById('canvas-container') as HTMLDivElement;
-const urlInput = document.getElementById('url-input') as HTMLInputElement;
+const urlInput = document.getElementById('url-input') as HTMLTextAreaElement;
 const btnApply = document.getElementById('btn-apply') as HTMLButtonElement;
 const btnModeToggle = document.getElementById('btn-mode-toggle') as HTMLButtonElement;
 const btnGyroToggle = document.getElementById('btn-gyro-toggle') as HTMLButtonElement;
@@ -18,6 +24,17 @@ const morphSlider = document.getElementById('morph-slider') as HTMLInputElement;
 const morphValueLabel = document.getElementById('morph-value') as HTMLSpanElement;
 const presetChips = document.querySelectorAll('.preset-chip');
 const modelButtons = document.querySelectorAll<HTMLButtonElement>('.model-btn');
+const templateButtons = document.querySelectorAll<HTMLButtonElement>('.template-btn');
+const eccButtons = document.querySelectorAll<HTMLButtonElement>('.ecc-btn');
+const eccDescBadge = document.getElementById('ecc-desc-badge') as HTMLSpanElement;
+const themeButtons = document.querySelectorAll<HTMLButtonElement>('.theme-btn');
+const themeNameBadge = document.getElementById('theme-name-badge') as HTMLSpanElement;
+const customColorControls = document.getElementById('custom-color-controls') as HTMLDivElement;
+
+const pickerPrimary = document.getElementById('picker-primary') as HTMLInputElement;
+const pickerSecondary = document.getElementById('picker-secondary') as HTMLInputElement;
+const pickerAccent = document.getElementById('picker-accent') as HTMLInputElement;
+const pickerBg = document.getElementById('picker-bg') as HTMLInputElement;
 
 // Export toolbar buttons
 const btnExportGLB = document.getElementById('btn-export-glb') as HTMLButtonElement;
@@ -35,17 +52,100 @@ const dnaRoofEl = document.getElementById('dna-roof') as HTMLSpanElement;
 const paletteChipsEl = document.getElementById('palette-chips') as HTMLDivElement;
 const scanGuardDesc = document.getElementById('scan-guard-desc') as HTMLDivElement;
 
+// State
+let currentECC: ECCLevel = 'Q';
+let currentTheme = 'auto';
+
+// Preset theme definitions
+const THEME_PALETTES: Record<string, ColorPalette> = {
+  'cyber-neon': {
+    primary: '#00f0ff',
+    secondary: '#ff0055',
+    accent: '#ffe600',
+    background: '#05070f',
+    groundSubstrate: '#0b1021',
+    finderEmissive: '#00ffff',
+  },
+  'obsidian-gold': {
+    primary: '#d4af37',
+    secondary: '#aa7c11',
+    accent: '#f39c12',
+    background: '#0d0f12',
+    groundSubstrate: '#181b20',
+    finderEmissive: '#ffd700',
+  },
+  'emerald-tech': {
+    primary: '#2ecc71',
+    secondary: '#16a085',
+    accent: '#1abc9c',
+    background: '#0a1410',
+    groundSubstrate: '#0f2019',
+    finderEmissive: '#00ff88',
+  },
+  'minimalist-mono': {
+    primary: '#e0e6ed',
+    secondary: '#8492a6',
+    accent: '#3b82f6',
+    background: '#090b10',
+    groundSubstrate: '#141824',
+    finderEmissive: '#60a5fa',
+  },
+};
+
 // 1. Instantiate JiwoWebGLRenderer
 const renderer = new JiwoWebGLRenderer({
   container,
   model: 'architecture',
   mode: '3d',
-  morphDuration: 900,
+  morphDuration: 850,
 });
 
-// Load initial payload
-renderer.setData(urlInput.value);
-updateTelemetry(renderer.getEntity());
+// Helper to construct JiwoQREntity with current customizer settings
+function buildCurrentEntity(payload: string): JiwoQREntity {
+  const entity = createJiwoQR(payload, { ecc: currentECC });
+
+  // Apply theme override if not 'auto'
+  if (currentTheme in THEME_PALETTES) {
+    entity.dna.palette = { ...THEME_PALETTES[currentTheme] };
+  } else if (currentTheme === 'custom') {
+    entity.dna.palette = {
+      primary: pickerPrimary.value,
+      secondary: pickerSecondary.value,
+      accent: pickerAccent.value,
+      background: pickerBg.value,
+      groundSubstrate: pickerBg.value,
+      finderEmissive: pickerAccent.value,
+    };
+  }
+
+  return entity;
+}
+
+function applyCurrentState() {
+  const entity = buildCurrentEntity(urlInput.value);
+  renderer.setEntity(entity);
+  updateTelemetry(entity);
+}
+
+// Initial load
+applyCurrentState();
+
+// Dynamic Discovery & Preloading of Custom STL Building Models (Model 5)
+async function initBuildingModels() {
+  try {
+    const res = await fetch('/api/building-models');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.models && data.models.length > 0) {
+        console.log(`[JiwoQR] Discovered ${data.count} 3D STL building models in STL-for-buildingModels:`, data.models);
+        await renderer.loadCityModels(data.models);
+      }
+    }
+  } catch (err) {
+    console.warn('[JiwoQR] Auto-discovery of STL building models:', err);
+  }
+}
+initBuildingModels();
 
 // 2. Telemetry update function
 function updateTelemetry(entity?: JiwoQREntity) {
@@ -68,12 +168,25 @@ function updateTelemetry(entity?: JiwoQREntity) {
     dnaTowerEl.textContent = `IC: ${chip}`;
     dnaHeightEl.textContent = `PCB: ${mask} mask`;
     dnaRoofEl.textContent = `TRACE: ${trace}`;
+  } else if (currentModel === 'biomorphic') {
+    const style = dna.biomorphic?.crystalGrowthStyle?.toUpperCase() ?? 'HEXAGONAL';
+    const ior = dna.biomorphic?.refractionIndex ?? 1.55;
+    const sharp = dna.biomorphic?.facetSharpness ?? 0.8;
+    dnaTowerEl.textContent = `CRYSTAL: ${style}`;
+    dnaHeightEl.textContent = `IOR: ${ior} (sharp: ${sharp})`;
+    dnaRoofEl.textContent = `DENSITY: ${dna.biomorphic?.clusterDensity ?? 0.5}`;
+  } else if (currentModel === 'city') {
+    const zone = dna.city?.zoningArchetype?.toUpperCase() ?? 'DOWNTOWN';
+    const land = dna.city?.landmarkStyle?.toUpperCase() ?? 'TOWER';
+    const dens = dna.city?.skylineDensity ?? 0.8;
+    dnaTowerEl.textContent = `ZONE: ${zone}`;
+    dnaHeightEl.textContent = `DENSITY: ${dens} (Scale: ${dna.city?.buildingScale ?? 1.0})`;
+    dnaRoofEl.textContent = `LANDMARK: ${land}`;
   } else {
     dnaTowerEl.textContent = dna.architecture.towerArchetype.toUpperCase();
     dnaHeightEl.textContent = `${dna.architecture.maxHeight}x (var: ${dna.architecture.heightVariance})`;
     dnaRoofEl.textContent = dna.architecture.roofStyle.toUpperCase();
   }
-
 
   // Render palette chips
   paletteChipsEl.innerHTML = '';
@@ -94,33 +207,93 @@ function updateTelemetry(entity?: JiwoQREntity) {
   }
 }
 
-// 3. Handle URL Generation & Presets
-function applyUrl(url: string) {
-  urlInput.value = url;
-  renderer.setData(url);
-  updateTelemetry(renderer.getEntity());
-}
+// 3. Payload Templates & Presets
+const TEMPLATES = {
+  url: 'https://github.com/AlbertAZ1992/every-qrcode',
+  vcard: `BEGIN:VCARD\nVERSION:3.0\nN:Satria;Jiwo;;;\nFN:Jiwo Satria\nORG:JiwoQR Studio\nTEL:+6281234567890\nEMAIL:jiwo@example.com\nURL:https://jiwoqr.dev\nEND:VCARD`,
+  wifi: `WIFI:S:JiwoQR-UltraNet;T:WPA;P:SuperSecretPass2026;;`,
+};
 
-btnApply.addEventListener('click', () => {
-  if (urlInput.value.trim()) {
-    applyUrl(urlInput.value);
-  }
-});
-
-urlInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && urlInput.value.trim()) {
-    applyUrl(urlInput.value);
-  }
+templateButtons.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    templateButtons.forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    const type = btn.getAttribute('data-type') as keyof typeof TEMPLATES;
+    if (TEMPLATES[type]) {
+      urlInput.value = TEMPLATES[type];
+      applyCurrentState();
+    }
+  });
 });
 
 presetChips.forEach((chip) => {
   chip.addEventListener('click', () => {
     const url = chip.getAttribute('data-url');
-    if (url) applyUrl(url);
+    if (url) {
+      urlInput.value = url;
+      applyCurrentState();
+    }
   });
 });
 
-// Model Archetype Switcher (Architecture vs Globe vs Circuit)
+btnApply.addEventListener('click', () => {
+  if (urlInput.value.trim()) {
+    applyCurrentState();
+  }
+});
+
+// 4. ECC Selector Handlers
+const ECC_DESCRIPTIONS: Record<ECCLevel, string> = {
+  L: 'ECC L (~7% - Maximum Data Density)',
+  M: 'ECC M (~15% - Standard Density)',
+  Q: 'ECC Q (~25% - Recommended for 3D Relief)',
+  H: 'ECC H (~30% - Maximum Recovery)',
+};
+
+eccButtons.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const ecc = btn.getAttribute('data-ecc') as ECCLevel;
+    if (ecc && ecc !== currentECC) {
+      currentECC = ecc;
+      eccButtons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      eccDescBadge.textContent = ECC_DESCRIPTIONS[ecc];
+      applyCurrentState();
+    }
+  });
+});
+
+// 5. Theme Switcher Handlers
+themeButtons.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const theme = btn.getAttribute('data-theme');
+    if (theme) {
+      currentTheme = theme;
+      themeButtons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      if (theme === 'custom') {
+        customColorControls.style.display = 'grid';
+        themeNameBadge.textContent = 'Custom Hex';
+      } else {
+        customColorControls.style.display = 'none';
+        themeNameBadge.textContent = theme === 'auto' ? 'Procedural DNA' : btn.textContent || theme;
+      }
+
+      applyCurrentState();
+    }
+  });
+});
+
+[pickerPrimary, pickerSecondary, pickerAccent, pickerBg].forEach((picker) => {
+  picker?.addEventListener('input', () => {
+    if (currentTheme === 'custom') {
+      applyCurrentState();
+    }
+  });
+});
+
+// 6. Model Archetype Switcher (Architecture vs Globe vs Circuit vs Biomorphic)
 modelButtons.forEach((btn) => {
   btn.addEventListener('click', () => {
     const model = btn.getAttribute('data-model') as RenderModel;
@@ -133,7 +306,7 @@ modelButtons.forEach((btn) => {
   });
 });
 
-// 4. Mode Toggle (3D Interactive vs 2D Scan Mode)
+// 7. Mode Toggle (3D Interactive vs 2D Scan Mode)
 function updateUIForMode(mode: RenderMode, progress: number) {
   morphSlider.value = progress.toString();
 
@@ -166,14 +339,14 @@ btnModeToggle.addEventListener('click', () => {
   renderer.setMode(nextMode);
 });
 
-// 5. Morph Slider Interaction
+// 8. Morph Slider Interaction (Scrubbing GPU Uniform directly)
 morphSlider.addEventListener('input', () => {
   const progress = parseFloat(morphSlider.value);
   renderer.setMorphProgress(progress);
   updateUIForMode(progress > 0.5 ? 'scan' : '3d', progress);
 });
 
-// 6. Export Toolbar Handlers
+// 9. Export Toolbar Handlers
 btnExportGLB?.addEventListener('click', async () => {
   try {
     btnExportGLB.disabled = true;
@@ -207,7 +380,6 @@ btnExportSTL?.addEventListener('click', () => {
   }
 });
 
-
 btnExportPNG?.addEventListener('click', async () => {
   const entity = renderer.getEntity();
   if (!entity) return;
@@ -237,7 +409,7 @@ btnExportSVG?.addEventListener('click', () => {
   }
 });
 
-// 7. Device Orientation (Gyroscope Tilt)
+// 10. Device Orientation (iOS Safari & Standard Gyroscope Tilt)
 let isGyroActive = false;
 
 function onDeviceOrientation(e: DeviceOrientationEvent) {
@@ -249,20 +421,11 @@ function onDeviceOrientation(e: DeviceOrientationEvent) {
 
 btnGyroToggle?.addEventListener('click', async () => {
   if (!isGyroActive) {
-    // Check for iOS 13+ permission request
-    const DeviceOrientation = window.DeviceOrientationEvent as unknown as {
-      requestPermission?: () => Promise<'granted' | 'denied'>;
-    };
-    if (typeof DeviceOrientation !== 'undefined' && typeof DeviceOrientation.requestPermission === 'function') {
-      try {
-        const perm = await DeviceOrientation.requestPermission();
-        if (perm !== 'granted') {
-          alert('Device orientation permission denied');
-          return;
-        }
-      } catch (err) {
-        console.warn('Orientation permission error:', err);
-      }
+    // Standardized iOS 13+ and Android gyroscope permission handler
+    const granted = await requestDeviceOrientationPermission();
+    if (!granted) {
+      alert('Device orientation permission was denied.');
+      return;
     }
 
     window.addEventListener('deviceorientation', onDeviceOrientation);
@@ -277,7 +440,7 @@ btnGyroToggle?.addEventListener('click', async () => {
   }
 });
 
-// 8. Animation frame loop to sync slider when animating
+// 11. Animation frame loop to sync slider when animating
 function syncUI() {
   const progress = renderer.getMorphProgress();
   const mode = renderer.getMode();
@@ -289,4 +452,3 @@ function syncUI() {
   requestAnimationFrame(syncUI);
 }
 requestAnimationFrame(syncUI);
-

@@ -147,3 +147,29 @@ export class CameraController {
     this.camera.lookAt(0, 0, 0);
   }
 }
+
+/**
+ * Asynchronously requests DeviceOrientation permission on iOS 13+ Safari devices.
+ * Must be invoked inside a direct user-gesture event (e.g. click/touch handler).
+ */
+export async function requestDeviceOrientationPermission(): Promise<boolean> {
+  if (typeof window === 'undefined') return false;
+
+  const DeviceOrientation = window.DeviceOrientationEvent as unknown as {
+    requestPermission?: () => Promise<'granted' | 'denied'>;
+  };
+
+  if (typeof DeviceOrientation !== 'undefined' && typeof DeviceOrientation.requestPermission === 'function') {
+    try {
+      const permission = await DeviceOrientation.requestPermission();
+      return permission === 'granted';
+    } catch (err) {
+      console.warn('[JiwoQR] iOS Safari Gyroscope permission request failed:', err);
+      return false;
+    }
+  }
+
+  // Non-iOS or older browsers do not require explicit permission
+  return true;
+}
+

@@ -1,11 +1,7 @@
 import * as THREE from 'three';
 import { QRMatrix, DeterministicDNA, QRModule } from '@jiwoqr/core';
-import {
-  SpherifiedModuleTransform,
-  computeGlobeModuleTransform,
-  interpolateGlobeMorph,
-  easeInOutCubic,
-} from '@jiwoqr/math';
+import { computeGlobeModuleTransform, easeInOutCubic } from '@jiwoqr/math';
+import { attachGPUMorphShader, setupGPUMorphAttributes } from '../shaders/gpu-morph.js';
 
 export interface GlobeModelInstance {
   group: THREE.Group;
@@ -14,14 +10,7 @@ export interface GlobeModelInstance {
   getQRWorldBounds(): { width: number; height: number };
 }
 
-const COLOR_BLACK = new THREE.Color(0x000000);
 const COLOR_WHITE = new THREE.Color(0xffffff);
-
-interface GlobeModuleMetadata {
-  transform: SpherifiedModuleTransform;
-  color3D: THREE.Color;
-  isFinder: boolean;
-}
 
 export function createGlobeModel(
   matrix: QRMatrix,
@@ -81,27 +70,27 @@ export function createGlobeModel(
     flatShading: true,
   });
 
+  const morphUniforms = attachGPUMorphShader(moduleMaterial, 0);
+
   const instancedMesh = new THREE.InstancedMesh(boxGeometry, moduleMaterial, totalInstances);
   instancedMesh.name = 'GlobeVoxelMesh';
   instancedMesh.castShadow = true;
   instancedMesh.receiveShadow = true;
 
-  // DynamicDrawUsage for smooth 60 FPS morphing
-  instancedMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-  instancedMesh.instanceColor = new THREE.InstancedBufferAttribute(
-    new Float32Array(totalInstances * 3),
-    3
-  );
-  instancedMesh.instanceColor.setUsage(THREE.DynamicDrawUsage);
-  group.add(instancedMesh);
+  // 4. Precompute GPU Buffer Attributes for Mound A & Mound B
+  const positions3D = new Float32Array(totalInstances * 3);
+  const positions2D = new Float32Array(totalInstances * 3);
+  const scales3D = new Float32Array(totalInstances * 3);
+  const scales2D = new Float32Array(totalInstances * 3);
+  const colors3D = new Float32Array(totalInstances * 3);
+  const colors2D = new Float32Array(totalInstances * 3);
 
-  // 4. Precompute Transforms & Elevation Color Gradients
-  const metadata: GlobeModuleMetadata[] = [];
   const primaryColor = new THREE.Color(dna.palette.primary);
   const secondaryColor = new THREE.Color(dna.palette.secondary);
   const accentColor = new THREE.Color(dna.palette.accent);
   const rimColor = new THREE.Color(dna.palette.groundSubstrate);
   const finderColor = new THREE.Color(dna.palette.finderEmissive);
+  const tempColor = new THREE.Color();
 
   for (let i = 0; i < count; i++) {
     const { raw, isFinder } = darkModules[i];
@@ -120,97 +109,100 @@ export function createGlobeModel(
       }
     );
 
-    // Color gradient based on dome elevation (matching reference Terrain mode)
+    // Color gradient based on dome elevation
     const heightRatio = Math.min(1.0, transform.scale3D.z / maxHeight);
-    let color3D: THREE.Color;
-
     if (isFinder) {
-      // Landmark towers have distinctive gold/cream/accent highlight
-      color3D = finderColor.clone();
+      tempColor.copy(finderColor);
     } else if (heightRatio > 0.7) {
-      // High altitude / peak: accent highlight
-      color3D = primaryColor.clone().lerp(accentColor, (heightRatio - 0.7) / 0.3);
+      tempColor.copy(primaryColor).lerp(accentColor, (heightRatio - 0.7) / 0.3);
     } else if (heightRatio > 0.3) {
-      // Mid altitude: primary to secondary purple/blue terrain
-      color3D = secondaryColor.clone().lerp(primaryColor, (heightRatio - 0.3) / 0.4);
+      tempColor.copy(secondaryColor).lerp(primaryColor, (heightRatio - 0.3) / 0.4);
     } else {
-      // Low altitude near equator rim: terracotta / deep substrate tone
-      color3D = rimColor.clone().lerp(secondaryColor, heightRatio / 0.3);
+      tempColor.copy(rimColor).lerp(secondaryColor, heightRatio / 0.3);
     }
 
-    metadata.push({ transform, color3D, isFinder });
+    // --- 1. Top Hemisphere Mound A ---
+    const i3 = i * 3;
+    positions3D[i3] = transform.position3D.x;
+    positions3D[i3 + 1] = transform.position3D.y;
+    positions3D[i3 + 2] = transform.position3D.z;
+
+    scales3D[i3] = transform.scale3D.x;
+    scales3D[i3 + 1] = transform.scale3D.y;
+    scales3D[i3 + 2] = transform.scale3D.z;
+
+    positions2D[i3] = transform.position2D.x;
+    positions2D[i3 + 1] = transform.position2D.y;
+    positions2D[i3 + 2] = transform.position2D.z;
+
+    scales2D[i3] = transform.scale2D.x;
+    scales2D[i3 + 1] = transform.scale2D.y;
+    scales2D[i3 + 2] = transform.scale2D.z;
+
+    colors3D[i3] = tempColor.r;
+    colors3D[i3 + 1] = tempColor.g;
+    colors3D[i3 + 2] = tempColor.b;
+
+    // --- 2. Bottom Hemisphere Mound B ---
+    const b3 = (count + i) * 3;
+    positions3D[b3] = transform.position3D.x;
+    positions3D[b3 + 1] = transform.position3D.y;
+    positions3D[b3 + 2] = -transform.position3D.z; // Mirrored downwards
+
+    scales3D[b3] = transform.scale3D.x;
+    scales3D[b3 + 1] = transform.scale3D.y;
+    scales3D[b3 + 2] = transform.scale3D.z;
+
+    positions2D[b3] = transform.position2D.x;
+    positions2D[b3 + 1] = transform.position2D.y;
+    positions2D[b3 + 2] = -0.2; // Collapses below substrate
+
+    scales2D[b3] = 0; // Collapses to 0 scale in scan mode
+    scales2D[b3 + 1] = 0;
+    scales2D[b3 + 2] = 0;
+
+    colors3D[b3] = tempColor.r;
+    colors3D[b3 + 1] = tempColor.g;
+    colors3D[b3 + 2] = tempColor.b;
   }
 
-  const dummy = new THREE.Object3D();
-  const tempColor = new THREE.Color();
+  setupGPUMorphAttributes(
+    boxGeometry,
+    {
+      count: totalInstances,
+      positions3D,
+      positions2D,
+      scales3D,
+      scales2D,
+      colors3D,
+      colors2D,
+    },
+    instancedMesh
+  );
 
-  function applyMorph(t: number) {
-    const easedT = easeInOutCubic(t);
-    const bottomScaleMultiplier = Math.max(0, 1.0 - easedT);
-
-    for (let i = 0; i < count; i++) {
-      const item = metadata[i];
-      const { position, scale } = interpolateGlobeMorph(item.transform, t);
-
-      // --- 1. Top Hemisphere Mound A ---
-      // Extruded upwards from Z = 0 to +height
-      dummy.position.set(position.x, position.y, position.z);
-      dummy.scale.set(scale.x, scale.y, scale.z);
-      dummy.rotation.set(0, 0, 0);
-      dummy.updateMatrix();
-      instancedMesh.setMatrixAt(i, dummy.matrix);
-
-      // Color transition to pure pitch black in scan mode
-      tempColor.copy(item.color3D).lerp(COLOR_BLACK, easedT);
-      instancedMesh.setColorAt(i, tempColor);
-
-      // --- 2. Bottom Hemisphere Cloned Mound B (Flipped vertically) ---
-      // In 3D (t = 0), extruded downwards from Z = 0 to -height, meeting A at equator.
-      // In Scan Mode (t -> 1.0), collapses to scale 0 underneath the substrate plate.
-      const bottomZ = -position.z * (1.0 - easedT) - 0.2 * easedT;
-      dummy.position.set(position.x, position.y, bottomZ);
-      dummy.scale.set(
-        scale.x * bottomScaleMultiplier,
-        scale.y * bottomScaleMultiplier,
-        scale.z * bottomScaleMultiplier
-      );
-      dummy.rotation.set(0, 0, 0);
-      dummy.updateMatrix();
-      instancedMesh.setMatrixAt(count + i, dummy.matrix);
-
-      // Color for bottom clone
-      instancedMesh.setColorAt(count + i, tempColor);
-    }
-
-    instancedMesh.instanceMatrix.needsUpdate = true;
-    if (instancedMesh.instanceColor) {
-      instancedMesh.instanceColor.needsUpdate = true;
-    }
-
-    // Substrate plane is hidden in 3D mode (t = 0), and smoothly fades in to solid white as t -> 1.0
-    substrateMaterial.opacity = easedT;
-    substrateMesh.visible = easedT > 0.01;
-
-    // Lighting & shadow mitigation in scan mode
-    if (t > 0.85) {
-      instancedMesh.castShadow = false;
-      instancedMesh.receiveShadow = false;
-      moduleMaterial.roughness = 1.0;
-      moduleMaterial.metalness = 0.0;
-    } else {
-      instancedMesh.castShadow = true;
-      instancedMesh.receiveShadow = true;
-      moduleMaterial.roughness = 0.4;
-      moduleMaterial.metalness = 0.5;
-    }
-  }
-
-  applyMorph(0);
+  group.add(instancedMesh);
 
   return {
     group,
     update(morphProgress: number) {
-      applyMorph(morphProgress);
+      // GPU uniform update
+      morphUniforms.uMorphProgress.value = morphProgress;
+
+      const easedT = easeInOutCubic(morphProgress);
+      substrateMaterial.opacity = easedT;
+      substrateMesh.visible = easedT > 0.01;
+
+      if (morphProgress > 0.85) {
+        instancedMesh.castShadow = false;
+        instancedMesh.receiveShadow = false;
+        moduleMaterial.roughness = 1.0;
+        moduleMaterial.metalness = 0.0;
+      } else {
+        instancedMesh.castShadow = true;
+        instancedMesh.receiveShadow = true;
+        moduleMaterial.roughness = 0.4;
+        moduleMaterial.metalness = 0.5;
+      }
     },
     dispose() {
       substrateGeometry.dispose();

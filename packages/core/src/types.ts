@@ -81,6 +81,22 @@ export interface CircuitDNA {
   traceWidth: number;
 }
 
+export interface BiomorphicDNA {
+  crystalGrowthStyle: 'hexagonal' | 'coral_branch' | 'geode_cluster' | 'needle_prism';
+  refractionIndex: number;
+  facetSharpness: number;
+  clusterDensity: number;
+  glowIntensity: number;
+}
+
+export interface CityDNA {
+  zoningArchetype: 'downtown' | 'gridiron' | 'avenues' | 'cyber_district';
+  skylineDensity: number;
+  streetOrientationBias: number;
+  landmarkStyle: 'monumental_tower' | 'stepped_spire' | 'twin_plaza';
+  buildingScale: number;
+}
+
 export interface DeterministicDNA {
   rawHash: bigint;
   seed32: number;
@@ -89,6 +105,8 @@ export interface DeterministicDNA {
   architecture: ArchitectureDNA;
   globe: GlobeDNA;
   circuit: CircuitDNA;
+  biomorphic: BiomorphicDNA;
+  city: CityDNA;
 }
 
 /**

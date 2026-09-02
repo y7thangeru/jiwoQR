@@ -29,7 +29,7 @@ export async function exportGLB(
       {
         binary: options.binary ?? true,
         onlyVisible: options.onlyVisible ?? true,
-        animations: options.animations,
+        animations: options.animations ?? [],
       }
     );
   });
