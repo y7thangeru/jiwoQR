@@ -1,8 +1,8 @@
-# 🌐 JiwoQR: Executive & Technical Project Report (Phase 4 Milestone)
+# 🌐 JiwoQR: Executive & Technical Project Report (Phase 5 Milestone)
 
 > **Proyek**: JiwoQR — Next-Generation Procedural 3D QR Code Ecosystem  
-> **Status**: Fase 4 Selesai, 5 Arketipe Visual 3D & Optimasi Kinerja Tinggi (60-120 FPS)  
-> **Versi**: v0.1.0-Fase4  
+> **Status**: Fase 5 Selesai: Instant WebXR/AR Mobile View, Model ke-6 Origami Fold, dan Aktivasi Pipeline Native WebGPU  
+> **Versi**: v0.1.0-Fase5  
 > **Tanggal Rilis**: 2026-09-02  
 
 ---
@@ -10,74 +10,93 @@
 # 📑 PART I: EXECUTIVE & TECHNICAL REPORT
 
 ## 1. Executive Summary & Problem Solved
-JiwoQR memecahkan dilema mendasar dalam industri desain QR Code: **pertentangan antara estetika 3D interaktif visual tinggi dan keterbacaan optik kamera (*scannability*)**.
-Sebagian besar generator QR artistik konvensional berbasis difusi gambar (AI) merusak matriks Reed-Solomon Error Correction Code (ECC) sehingga sulit atau bahkan gagal dipindai oleh smartphone standar.
+JiwoQR memecahkan tantangan mendasar dalam dunia desain identitas digital dan interaksi fisik-ke-digital: **menghadirkan barcode fungsional yang tidak lagi membosankan berbentuk matriks datar 2D hitam-putih, melainkan dunia 3D prosedural holografis yang estetis, interaktif, dapat diekspor untuk 3D printing fisik, dapat dilihat langsung di dunia nyata melalui Augmented Reality (AR), namun 100% tetap dapat dipindai oleh kamera ponsel mana pun tanpa kompromi (*guaranteed scannability*)**.
 
-JiwoQR hadir dengan paradigma rekayasa grafika murni:
-1. **100% Kepatuhan ISO/IEC 18004**: Membangun matriks biner kanonikal dan menerapkan algoritma koreksi galat Reed-Solomon GF(256) level L, M, Q, dan H.
-2. **Deterministic Visual DNA**: Mengubah URL atau payload teks menjadi benih deterministik menggunakan FNV-1a 64-bit dan Mulberry32 PRNG.
-3. **Lima Arketipe Visual 3D Mandiri**:
-   - **Model 1 (`architecture`)**: Cyberpunk Brutalist Procedural Skyscraper Box Cityscape & Menara Finder.
-   - **Model 2 (`globe`)**: Spherical Geodesic Dual-Hemisphere Voxel Mound Dome & Gradien Elevasi Kontinental.
-   - **Model 3 (`circuit`)**: Cybernetic PCB Motherboard dengan IC QFP Microprocessor Finders, SMD Resistors, Solder Vias, dan Copper Traces.
+Sejak Fase 1 hingga Fase 5, arsitektur JiwoQR telah berkembang menjadi ekosistem grafika mutakhir:
+1. **100% Kepatuhan ISO/IEC 18004**: Bitstream encoder multi-mode (numeric, alphanumeric, byte) dengan deteksi otomatis, masking bitwise optimal, serta kalkulasi Galois Field GF(256) Reed-Solomon Error Correction Code (level L, M, Q, H).
+2. **Deterministic Visual DNA**: Mengonversi URL menjadi benih konsisten via FNV-1a 64-bit hashing dan PRNG Mulberry32, memastikan tampilan 3D selalu identik dan dapat direproduksi untuk URL yang sama.
+3. **Enam Arketipe Visual 3D Prosedural Mandiri**:
+   - **Model 1 (`architecture`)**: Cyber-Brutalist Skyscraper Metropolis dengan menara Finder monolitik.
+   - **Model 2 (`globe`)**: Spherical Geodesic Dual-Hemisphere Voxel Mound Dome & gradien kontinental.
+   - **Model 3 (`circuit`)**: Cybernetic PCB Motherboard dengan IC QFP Microprocessor Finders, resistor/kapasitor SMD, solder via pad, dan jalur konduktor tembaga.
    - **Model 4 (`biomorphic`)**: Crystalline Mineral Coral Growth dengan Hexagonal Prisms, Translucent PBR Refraction, dan Geode Monoliths.
    - **Model 5 (`city`)**: Realistic 3D Metropolis City Grid ditenagai Custom STL Building Models (`STL-for-buildingModels/`), Street-Facing Orientation Analysis, Cellular Block Zoning, dan Central Business District Density.
-4. **Optimasi Kinerja Ultra-Tinggi (60-120 FPS Target)**:
-   - **GPU Morph Shader Pipeline**: Seluruh 5 model, termasuk Model 5, menggunakan GPU Vertex Shader Morphing (`attachGPUMorphShader` & `setupGPUMorphAttributes`), memangkas waktu CPU per frame dari 15ms menjadi 0.001ms.
-   - **Shadow Pipeline 4x Lebih Cepat**: Shadow map texture dioptimasi ke 1024x1024 (menghemat 75% fill-rate) dengan 4-tap `PCFShadowMap` menggantikan 16-tap filter lambat.
-   - **Decimation Game-Ready Presisi**: Model STL gedung dioptimasi ke ~1.600 segitiga per gedung (total seluruh 8 file hanya 650 KB, berkurang 99.4% dari 120 MB!). Total segitiga seluruh kota QR turun drastis ke ~500.000 segitiga.
-   - **High-DPI Fill-Rate Clamping**: `devicePixelRatio` dibatasi pada 1.5x, menghemat 45% beban rasterisasi GPU pada monitor 1440p/4K tanpa mengurangi ketajaman visual.
-5. **3D Printing & Multi-Format Exporter**: Generator STL watertight manifold dengan elevasi prosedural sesuai model aktif, ekspor GLB binary, SVG vektor, dan PNG 300 DPI.
+   - **Model 6 (`origami`)**: Geometric Folded Paper / Low-Poly Origami Polyhedron dengan bayangan faset tajam (*flat shading*), tekstur washi/parchment, mahkota burung bangau (*crane wings*) pada 3 Finder Patterns, animasi pembukaan lipatan mekanis (*mechanical unfolding morph*), dan ekspor STL solid watertight manifold untuk 3D print.
+4. **Instant WebXR & Native Mobile AR View**:
+   - **Apple AR Quick Look (iOS Safari)**: Ekspor otomatis ke format biner USDZ (`generateUSDZBlob`) dan pemicu viewer AR bawaan Apple secara instan.
+   - **Google Scene Viewer (Android Chrome)**: Penyusunan intent URL ARCore bawaan (`intent://arvr.google.com/scene-viewer/1.0...`) untuk menampilkan QR 3D di atas meja kerja fisik pengguna.
+   - Tombol **"View in AR"** terintegrasi di header dan bilah ekspor studio web `apps/demo`.
+5. **IndexedDB Persistent Geometry Asset Caching**:
+   - Model STL gedung dinamis pada Model 5 disimpan ke dalam browser IndexedDB (`jiwoqr-asset-cache`), memungkinkan pemuatan instan (**< 50 ms**) saat kunjungan ulang tanpa perlu unduhan berulang atau kalkulasi desimasi vertex.
+6. **Aktivasi First-Class Pipeline Native WebGPU (`@jiwoqr/renderer-webgpu`)**:
+   - Pipeline rendering modern native W3C WebGPU tanpa ketergantungan Three.js.
+   - Shader WGSL (`architecture.wgsl.ts`) dengan Storage Buffer instanced rendering dan fungsi easing polinomial kubik (`jiwoEase`) murni di GPU.
+   - Modul helper matriks 4x4 mandiri (`mat4.ts`) untuk orbit kamera.
+   - Tombol pengalih grafis (**Engine: WebGL vs WebGPU**) di `apps/demo`.
+7. **Optimasi GPU Morphing 120 FPS**:
+   - Seluruh interpolasi transisi $3\text{D} \to 2\text{D}$ dihitung di GPU Vertex Shader, membebaskan beban CPU (overhead $< 0.001\text{ ms}$).
 
 ---
 
-## 2. Arsitektur Monorepo & Ekosistem Paket
+## 2. Matriks Komprehensif 6 Model Visual 3D
+
+| Fitur / Parameter | Model 1: Architecture | Model 2: Globe | Model 3: Circuit | Model 4: Biomorphic | Model 5: City Metropolis | Model 6: Origami Fold |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Geometri Dasar** | Box Unit Instanced | Box Voxel Mound | SMD Pins & Chips | Hexagonal Prism | Custom STL 3D Meshes | Faceted Paper Prism |
+| **Pola Finder** | Cyber Tower Monolith | Elevated Dome Center | Main IC Microchip | Glowing Geode Monolith | Civic Landmark Tower | Origami Crane Crowns |
+| **Tata Ruang / Spasial** | Coordinate Hashing | Spherical Dome Falloff | Ortho/Diag Traces | Facet & Tilt Dispersion | Street-Facing & Block Zoning | Mountain & Valley Creases |
+| **Pencahayaan & Material** | Brutalist Roughness | Gradient Elevation | Metallic PCB Mask | Translucent Refraction | Multi-Material Urban | Crisp Flat-Shaded Washi |
+| **Mekanisme Morphing** | Linear Z-Compression | Dual-Dome Flattening | Component Solder Melt | Crystal Solidification | Building Retraction | Mechanical Unfolding |
+| **3D Print Watertight STL** | Extruded Solid Blocks | Dual-Hemisphere Voxel | Stepped Component Relief | Faceted Crystal Columns | City Footprint Blocks | Closed Manifold Polyhedra |
+
+---
+
+## 3. Arsitektur Monorepo & Struktur Direktori
 
 ```
 d:/REPOS/jiwoQR/
 ├── STL-for-buildingModels/    # Repositori model 3D STL bangunan arsitektur (auto-discovered, 650 KB total)
 │   └── _raw_originals/        # Salinan cadangan file STL mentah (CAD un-decimated 120 MB)
 ├── packages/
-│   ├── core/                  # ISO/IEC 18004 encoder, Reed-Solomon, FNV-1a hasher, Mulberry32, & Visual DNA
-│   ├── math/                  # Easing, ekstrusi arsitektur, spherical mound, PCB traces, & city urban math
-│   ├── renderer-webgl/        # Three.js WebGL engine, 5 model archetypes, GPU morph shader, & BuildingModelManager
-│   ├── renderer-webgpu/       # WebGPU & WGSL pipeline interfaces
-│   ├── exporter/              # 3D print watertight STL, binary GLB, 300 DPI PNG, & SVG
+│   ├── core/                  # ISO/IEC 18004 encoder, Reed-Solomon, FNV-1a hasher, Mulberry32, & Origami DNA
+│   ├── math/                  # Easing, ekstrusi arsitektur, spherical mound, PCB traces, city & origami math
+│   ├── renderer-webgl/        # Three.js engine, 6 model archetypes, IndexedDB asset cache, GPU morph shader
+│   ├── renderer-webgpu/       # First-class native WebGPU pipeline, WGSL shaders, storage buffers & mat4 math
+│   ├── exporter/              # 3D print watertight STL, binary GLB, USDZ/AR Quick Look/Scene Viewer, 300 DPI PNG, & SVG
 │   ├── react/                 # Komponen first-class <JiwoQR /> dengan auto WebGL fallback
 │   └── web-component/         # Custom Element native <jiwo-qr> zero-framework
 └── apps/
-    └── demo/                  # Interactive Studio Playground dengan 5 visual archetypes, Theme Studio, ECC & Export
+    └── demo/                  # Interactive Studio dengan 6 visual archetypes, Engine Toggle, Mobile AR, Theme Studio & Export
 ```
 
 ---
 
-## 3. Matriks Perbandingan 5 Model Visual 3D
+## 4. Quality Assurance & Hasil Pengujian
 
-| Fitur / Parameter | Model 1: Architecture | Model 2: Globe | Model 3: Circuit | Model 4: Biomorphic | Model 5: City Metropolis |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Geometri Dasar** | Box Unit Instanced | Box Voxel Mound | SMD Pins & Chips | Hexagonal Prism | Custom STL 3D Meshes |
-| **Pola Finder** | Cyber Tower Monolith | Elevated Dome Center | Main IC Microchip | Glowing Geode Monolith | Civic Landmark Tower |
-| **Tata Ruang / Spasial** | Coordinate Hashing | Spherical Dome Falloff | Ortho/Diag Traces | Facet & Tilt Dispersion | Street-Facing & Block Zoning |
-| **Material Tipe** | Cyber Metallic PBR | Terrain Color Palette | PCB Solder Mask | Translucent Refractive | Architectural PBR |
-| **3D Printing STL** | Skyscraper Heights | Hemisphere Dome | Chip & SMD Elevation | Crystal Monoliths | Multi-Tier Urban Heights |
-| **Performa FPS** | 120 FPS (GPU VBO) | 120 FPS (GPU VBO) | 120 FPS (GPU VBO) | 120 FPS (GPU VBO) | 120 FPS (GPU VBO) |
-
----
-
-## 4. Hasil Pengujian & Jaminan Kualitas (Quality Assurance)
-
-- **Unit Test Suite**: 34/34 tests PASSED (100% success across `@jiwoqr/core`, `@jiwoqr/math`, `@jiwoqr/exporter`).
-- **Typecheck**: `tsc --noEmit` passed with 0 errors across all 7 workspace packages and demo app.
-- **Production Build**: `pnpm build` and `pnpm --filter demo build` completed with 0 errors.
+- **Unit Test Monorepo (Vitest v3.2.7)**:
+  - Total Pengujian: **40 passed (100% Lulus)**
+  - Durasi: **1.22s**
+  - Komponen Teruji:
+    - `@jiwoqr/core`: ISO/IEC 18004 matrix layout, bitstream compression, Reed-Solomon ECC, deterministic DNA (termasuk OrigamiDNA).
+    - `@jiwoqr/math`: Easing curves, extrusion, spherical projection, circuit transforms, city street-facing, dan origami unfolding math.
+    - `@jiwoqr/exporter`: Watertight binary STL export (Architecture, City, Origami polyhedra), format intent Google Scene Viewer, dan deteksi mobile AR.
+- **TypeScript Strict Verification (`pnpm typecheck`)**:
+  - 8 dari 8 paket/aplikasi workspace bebas galat (`0 errors`).
+- **Production Bundle Compilation (`pnpm build`)**:
+  - Seluruh paket dan aplikasi `apps/demo` berhasil dikompilasi ke format ES Module dan declaration types (`.d.ts`).
 
 ---
 
-# 📑 PART II: UNABRIDGED PROJECT DOCUMENTATION COMPILATION
+# 📚 PART II: UNABRIDGED REPOSITORY DOCUMENTATION
+
+Bagian ini menyatukan seluruh berkas dokumentasi markdown (`.md`) dari setiap paket dan aplikasi di seluruh repositori JiwoQR secara lengkap dan tanpa pemotongan.
 
 
 ---
 
-## 📄 File: README.md (Root README)
+
+
+## 📄 Berkas: `README.md`
 
 # 🌐 JiwoQR
 
@@ -184,23 +203,44 @@ Menyusun matriks QR menjadi motherboard sirkuit cetak (*Cybernetic PCB / Microch
 Menyusun matriks QR menjadi struktur kristal mineral dan pertumbuhan karang heksagonal (*Crystalline Mineral & Coral Growth*).
 - **Geode Monolith Finders**: Tiga Finder Patterns dimodelkan sebagai klaster kristal geodesik monolitik besar bercahaya tinggi.
 - **Hexagonal Crystal Prisms**: Modul data dirender sebagai prisma kristal heksagonal dengan sudut facet dan kemiringan natural menggunakan material translusen/refraktif PBR.
-- **Crystalline Planar Fusion**: Saat beralih ke Mode Scan ($t \to 1.0$), kristal memadat dan permukaannya merata menjadi modul hitam-putih kanonikal.
-
-### 5. Model Kota Realistis Metropolitan (`model="city"`)
+- **Crystalline Planar Fusion**: Saat beralih ke Mode Scan ($t \to 1.0$), kristal memadat dan permukaannya merata menjadi modul hitam-put### 5. Model Kota Realistis Metropolitan (`model="city"`)
 Menyusun matriks QR menjadi sebuah kota metropolitan realistis menggunakan aset model 3D kustom (`STL-for-buildingModels/*.stl`) dengan tata ruang urban cerdas:
 - **Dynamic Model Auto-Discovery**: Secara otomatis mendeteksi dan memuat semua file `.stl` di direktori `STL-for-buildingModels/`. Pengguna dapat menambah, mengurangi, atau mengganti model referensi tanpa mengubah kode sumber.
+- **IndexedDB Asset Cache**: Menyimpan geometri STL yang telah dinormalisasi ke dalam IndexedDB peramban untuk waktu pemuatan instan ($< 50\text{ ms}$).
 - **Street-Facing Orientation**: Menganalisa tetangga ortogonal sel QR untuk memutar orientasi bangunan ($0^\circ, 90^\circ, 180^\circ, 270^\circ$) agar fasad bangunan selalu menghadap ke arah jalan raya atau plaza terbuka (*light modules*).
 - **Cellular Block Zoning & CBD Density**: Pengelompokan distrik (*neighborhood zoning*) harmonis, dengan gedung pencakar langit terkonsentrasi di pusat matriks (*Central Business District*) dan menara monumental megah pada pola sudut Finder.
 - **Multi-Instanced GPU Rendering & Scan Morphing**: Setiap model bangunan di-instance secara independen pada GPU untuk performa 60+ FPS, dan merata secara mulus menjadi grid biner hitam pekat saat berpindah ke mode pemindaian.
+
+### 6. Model Origami Fold (`model="origami"`)
+Menyusun matriks QR menjadi lipatan seni kertas geometris polihedral (*Low-Poly Origami Polyhedron*):
+- **Prisma Polihedral Faset**: Modul data dirender sebagai prisma lipatan kertas dengan bayangan faset tajam (*flat shading*) dan tekstur serat kertas (*washi/cardstock*).
+- **Mahkota Derek Finder**: Tiga pola sudut Finder dirender sebagai struktur derek origami geometris (*origami crane crowns*) bertingkat.
+- **Mekanisme Pembukaan Lipatan (Unfolding)**: Saat bertransisi ke Mode Scan ($t \to 1.0$), seluruh lipatan faset membuka secara mekanis di GPU shader dan merata menjadi bidang hitam kanonikal.
+- **Watertight STL 3D Print**: Menghasilkan balok prisma bertutup miring tertutup (*closed manifold*) siap cetak 3D tanpa error non-manifold edge.
 
 ---
 
 ## ⚡ GPU Vertex Shader Morphing Pipeline (120 FPS)
 
-Pada JiwoQR Fase 3, seluruh interpolasi posisi 3D ke 2D datar dikalkulasi langsung di GPU Vertex Shader melalui uniform `uMorphProgress` ($0.0 \to 1.0$):
+Pada JiwoQR Fase 3 & 4, seluruh interpolasi posisi 3D ke 2D datar dikalkulasi langsung di GPU Vertex Shader melalui uniform `uMorphProgress` ($0.0 \to 1.0$):
 - **VBO Instanced Attributes**: Posisi 3D ($x_1, y_1, z_1$), posisi 2D ($x_0, y_0, z_0$), skala 3D/2D, rotasi Z, dan warna 3D disimpan langsung dalam buffer GPU (`aPosition3D`, `aPosition2D`, `aScale3D`, `aScale2D`, `aRotationZ3D`, `aColor3D`, `aColor2D`).
 - **Zero CPU Looping**: CPU hanya memperbarui `uMorphProgress` sekali per frame di `requestAnimationFrame`, menghilangkan iterasi per-modul dan menjaga rendering stabil di **120+ FPS**.
 
+---
+
+## 🥽 Instant WebXR & Native Mobile AR View
+
+- **Apple AR Quick Look (iOS Safari)**: Otomatis mengonversi 3D scene aktif ke blob biner USDZ dan memicu viewer AR bawaan iOS Safari tanpa perlu instalasi aplikasi pihak ketiga.
+- **Google Scene Viewer (Android Chrome)**: Menyusun skema intent ARCore bawaan Google Scene Viewer (`intent://...`) untuk memproyeksikan QR 3D ke lingkungan fisik pengguna di dunia nyata.
+- **Cross-Platform Auto-Detection**: Fungsi `detectARCapabilities()` dan `launchARView()` memilih jalur AR terbaik untuk setiap sistem operasi secara otomatis.
+
+---
+
+## ⚡ First-Class Native WebGPU Render & Compute Pipeline
+
+- **W3C WebGPU Direct Pipeline**: Paket `@jiwoqr/renderer-webgpu` menyajikan renderer native murni tanpa Three.js berbasis WGSL compute dan vertex shader.
+- **Storage Buffer Instancing**: Modul QR dikemas dalam Float32Array 96-byte terarah ke GPU Storage Buffer.
+- **Dual Engine Toggle di Studio**: Beralih instan antara WebGL 2.0 dan WebGPU Engine di `apps/demo`.
 
 ---
 
@@ -222,8 +262,9 @@ Pada JiwoQR Fase 3, seluruh interpolasi posisi 3D ke 2D datar dikalkulasi langsu
 Paket `@jiwoqr/exporter` memungkinkan hasil pembuatan QR 3D diubah menjadi aset fisik dan digital:
 1. **Binary STL (`exportSTL`)**: Menghasilkan file `.stl` siap cetak 3D untuk slicer (Cura, PrusaSlicer, Bambu Studio, OrcaSlicer) dengan elevasi balok data prosedural sesuai model 3D aktif.
 2. **Binary GLB (`exportGLB`)**: Mengekspor seluruh Three.js Scene ke format standar `.glb` lengkap dengan geometri instanced dan material PBR.
-3. **Print-Ready PNG 300 DPI (`exportPNG`)**: Merender gambar raster beresolusi ultra-tinggi ($2048\times2048+$) tanpa anti-aliasing kabur untuk kebutuhan cetak kartu nama, stiker, dan kemasan produk.
-4. **Vector SVG (`exportSVG`)**: Format vektor murni yang dapat di-scale tak terbatas tanpa kehilangan ketajaman.
+3. **USDZ & Mobile AR (`generateUSDZBlob` & `launchARView`)**: Generator blob USDZ dan pemicu AR Quick Look / Scene Viewer otomatis.
+4. **Print-Ready PNG 300 DPI (`exportPNG`)**: Merender gambar raster beresolusi ultra-tinggi ($2048\times2048+$) tanpa anti-aliasing kabur untuk kebutuhan cetak kartu nama, stiker, dan kemasan produk.
+5. **Vector SVG (`exportSVG`)**: Format vektor murni yang dapat di-scale tak terbatas tanpa kehilangan ketajaman.
 
 ---
 
@@ -247,12 +288,12 @@ jiwoQR/
 │   └── demo/                      # Interactive 3D QR Studio (Vite + TS)
 ├── packages/
 │   ├── core/                      # Multi-mode encoder, RS ECC, DNA generator
-│   ├── math/                      # Vektor, easing, ekstrusi, spherical & circuit projections
-│   ├── renderer-webgl/            # Three.js engine, models (Architecture, Globe, Circuit), fallback
-│   ├── exporter/                  # 3D mesh (GLB, watertight STL) & 2D print (SVG, PNG 300 DPI)
+│   ├── math/                      # Vektor, easing, ekstrusi, spherical, circuit & origami projections
+│   ├── renderer-webgl/            # Three.js engine, 6 models, IndexedDB cache, GPU morph, fallback
+│   ├── renderer-webgpu/           # First-class native WebGPU pipeline & WGSL shader engine
+│   ├── exporter/                  # 3D mesh (GLB, watertight STL), USDZ/AR, & 2D print (SVG, PNG 300 DPI)
 │   ├── react/                     # Komponen wrapper <JiwoQR /> untuk React dengan WebGL fallback
-│   ├── web-component/             # Native Custom Element <jiwo-qr> dengan WebGL fallback
-│   └── renderer-webgpu/           # Scaffolding & type definition WebGPU masa depan
+│   └── web-component/             # Native Custom Element <jiwo-qr> dengan WebGL fallback
 ├── package.json                   # Root package manifest & scripts
 ├── pnpm-workspace.yaml            # Konfigurasi workspace monorepo
 ├── tsconfig.base.json             # Konfigurasi TypeScript global
@@ -493,10 +534,1735 @@ Untuk dokumentasi teknis mendalam per paket, silakan kunjungi:
 
 Proyek ini berada di bawah lisensi MIT. Silakan buka *Issues* atau ajukan *Pull Requests* untuk mendiskusikan peningkatan fitur dan optimasi rendering.
 
+---
+
+
+
+## 📄 Berkas: `packages/core/README.md`
+
+# 🧬 @jiwoqr/core
+
+> **Modul Inti Generator QR & DNA Visual Deterministik**  
+> *Enkoder bitstream multi-mode QR murni TypeScript sesuai ISO/IEC 18004, kompresi numerik & alfanumerik, kalkulasi Galois Field Reed-Solomon ECC, serta generator DNA prosedural berbasis FNV-1a 64-bit dan Mulberry32 PRNG tanpa dependensi runtime pihak ketiga.*
+
+[![Package: @jiwoqr/core](https://img.shields.io/badge/Package-%40jiwoqr%2Fcore-blue.svg)](file:///d:/REPOS/jiwoQR/packages/core)
+[![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero-brightgreen.svg)](file:///d:/REPOS/jiwoQR/packages/core/package.json)
+[![TypeScript Strict](https://img.shields.io/badge/TypeScript-Strict-blue.svg)](file:///d:/REPOS/jiwoQR/packages/core/tsconfig.json)
 
 ---
 
-## 📄 File: update_tracker.md (Update Tracker)
+## 📖 Daftar Isi
+
+- [Gambaran Umum](#-gambaran-umum)
+- [Arsitektur Modul](#-arsitektur-modul)
+  - [1. Hashing & Normalisasi Input (`src/dna/hasher.ts`)](#1-hashing--normalisasi-input-srcdnahasherts)
+  - [2. Mulberry32 PRNG (`src/dna/prng.ts`)](#2-mulberry32-prng-srcdnaprngts)
+  - [3. Generator DNA Deterministik & Arketipe Circuit (`src/dna/generator.ts`)](#3-generator-dna-deterministik--arketipe-circuit-srcdnageneratorts)
+  - [4. Reed-Solomon Error Correction (`src/qr/reed-solomon.ts`)](#4-reed-solomon-error-correction-srcqrreed-solomonts)
+  - [5. ISO/IEC 18004 Multi-Mode Matrix Encoder (`src/qr/encoder.ts`)](#5-isoiec-18004-multi-mode-matrix-encoder-srcqrencoderts)
+- [Struktur Tipe Data & Interface](#-struktur-tipe-data--interface)
+- [Panduan Penggunaan API](#-panduan-penggunaan-api)
+  - [Fungsi Utama: `createJiwoQR`](#fungsi-utama-createjiwoqr)
+  - [Enkoding Matriks QR Multi-Mode: `encodeQR`](#enkoding-matriks-qr-multi-mode-encodeqr)
+  - [Pembangkitan DNA Prosedural: `generateDNA`](#pembangkitan-dna-prosedural-generatedna)
+- [Pengujian Unit](#-pengujian-unit)
+
+---
+
+## 🌟 Gambaran Umum
+
+Paket `@jiwoqr/core` adalah fondasi logika dari seluruh ekosistem JiwoQR. Paket ini dirancang dengan prinsip:
+- **Zero Runtime Dependencies**: Ditulis murni dalam TypeScript standar tanpa ketergantungan pada library pihak ketiga.
+- **Kepatuhan Spesifikasi Standar**: Mengikuti spesifikasi resmi **ISO/IEC 18004** untuk encoding multi-mode (Numeric, Alphanumeric, Byte), Reed-Solomon Error Correction Code (ECC), masking bitwise optimal, serta margin wajib 4 modul *Quiet Zone*.
+- **Deterministik Penuh**: Mengonversi setiap input string/URL menjadi benih acak (*seed*) 64-bit yang konsisten, menghasilkan palet warna, siluet arsitektur, parameter globe, dan konfigurasi PCB circuit yang selalu identik untuk input yang sama.
+
+---
+
+## 🏗️ Arsitektur Modul
+
+```
+packages/core/src/
+├── dna/
+│   ├── hasher.ts          # Hashing FNV-1a 64-bit & normalisasi URL
+│   ├── prng.ts            # Mulberry32 Pseudo-Random Number Generator
+│   └── generator.ts       # Pembangkitan palet warna, arsitektur, globe & circuit DNA
+├── qr/
+│   ├── tables.ts          # Tabel kapasitas ISO/IEC 18004, alignment, & format bits
+│   ├── reed-solomon.ts    # Aritmatika Galois Field GF(256) & pembagian polinomial
+│   └── encoder.ts         # Multi-mode bitstream encoder, 8 mask evaluation, matrix layout
+├── types.ts               # Interface TypeScript publik
+└── index.ts               # Entry point ekspor publik
+```
+
+---
+
+### 1. Hashing & Normalisasi Input (`src/dna/hasher.ts`)
+
+#### Normalisasi URL (`normalizeInput`)
+Untuk mencegah perbedaan visual yang tidak diinginkan akibat variasi penulisan kecil pada URL (seperti huruf kapital pada domain atau port default), fungsi `normalizeInput` melakukan standardisasi:
+- Mengubah skema protokol (`http://`, `https://`) dan hostname menjadi huruf kecil (*lowercase*).
+- Menghapus port standar (`:80`, `:443`).
+- Menghilangkan *trailing slash* yang berlebihan pada root path.
+
+#### Algoritma FNV-1a 64-bit (`fnv1a64`)
+```typescript
+const FNV_OFFSET_BASIS = 0xcbf29ce484222325n;
+const FNV_PRIME = 0x100000001b3n;
+
+export function fnv1a64(input: string): bigint {
+  let hash = FNV_OFFSET_BASIS;
+  for (let i = 0; i < input.length; i++) {
+    hash ^= BigInt(input.charCodeAt(i));
+    hash = (hash * FNV_PRIME) & 0xffffffffffffffffn;
+  }
+  return hash;
+}
+```
+
+---
+
+### 2. Mulberry32 PRNG (`src/dna/prng.ts`)
+
+Menggunakan algoritma **Mulberry32** dengan konversi aman dari benih 64-bit `BigInt` ke `uint32` melalui `BigInt.asUintN(32, seed)`.
+
+---
+
+### 3. Generator DNA Deterministik & Arketipe Circuit (`src/dna/generator.ts`)
+
+Membangkitkan entitas `DeterministicDNA` yang mengatur seluruh karakteristik visual renderer 3D:
+
+1. **Palet Warna Harmonis**: Pilihan tema (*cyber, neon, brutalist, synthwave, obsidian, solar, emerald*).
+2. **Karakteristik Arsitektur**: `maxHeight`, `heightVariance`, `roofStyle` (`flat`, `stepped`, `sloped`, `spire`), dan `towerArchetype` (`monolith`, `citadel`, `obelisk`, `pagoda`).
+3. **Karakteristik Globe**: `continentElevation`, `oceanDepth`, `satelliteCount`, dan `rotationSpeed`.
+4. **Karakteristik Circuit (`CircuitDNA`)**:
+   - `traceStyle`: Jalur tembaga (`ortho-45` sudut 45 derajat, `manhattan` sudut 90 derajat, `curved`).
+   - `chipPackage`: Tipe kemasan IC mikroprosesor finder (`QFP`, `BGA`, `DIP`, `SOP`).
+   - `solderMaskColor`: Warna lapisan pelindung PCB (`green`, `black`, `blue`, `red`, `purple`).
+   - `componentDensity`: Kepadatan resistor/kapasitor SMD.
+   - `viaDensity`: Kepadatan via pad solder emas.
+   - `traceWidth`: Lebar jalur konduktor.
+5. **Karakteristik Biomorphic (`BiomorphicDNA`)**:
+   - `crystalGrowthStyle`: Gaya pertumbuhan prisma kristal (`hexagonal`, `needle_prism`, `geode_cluster`, `coral_branch`).
+   - `refractionIndex`: Indeks bias optik mineral ($1.33$ hingga $1.72$).
+   - `facetSharpness`: Ketajaman facet prisma kristal.
+   - `clusterDensity`: Kepadatan formasi kristal geodesik.
+   - `glowIntensity`: Intensitas pendaran monolit finder kristal.
+6. **Karakteristik Kota Metropolis (`CityDNA`)**:
+   - `zoningArchetype`: Gaya zoning distrik perkotaan (`commercial`, `residential`, `civic`, `industrial`, `mixed`).
+   - `skylineDensity`: Kepadatan menara pencakar langit di pusat distrik CBD.
+   - `streetOrientationBias`: Kecenderungan rotasi fasad gedung menghadap jalan raya terbuka (*orthogonal 4-way analysis*).
+   - `landmarkStyle`: Bentuk dan elevasi menara sudut monumental (*spire*, *obelisk*, *citadel*).
+   - `buildingScale`: Proporsi skala gedung relatif terhadap modul QR.
+7. **Karakteristik Origami Fold (`OrigamiDNA`)**:
+   - `foldStyle`: Gaya lipatan kertas geometris (`mountain`, `valley`, `diagonal_pyramid`, `crane_wing`).
+   - `creaseSharpness`: Ketajaman lipatan faset segitiga ($0.50$ hingga $0.95$).
+   - `paperWeight`: Tekstur bobot kertas (`washi`, `heavy_cardstock`, `metallic_foil`).
+   - `unfoldPattern`: Pola pembukaan mekanis saat morphing (`radial_spiral`, `mechanical_flatten`, `diagonal_split`).
+   - `facetAngle`: Sudut faset lipatan kertas ($25.0^\circ$ hingga $55.0^\circ$).
+
+---
+
+### 4. Reed-Solomon Error Correction (`src/qr/reed-solomon.ts`)
+
+Perhitungan Galois Field $\text{GF}(2^{8})$ berbasis polinomial primitif $P(x) = x^8 + x^4 + x^3 + x^2 + 1$ (285):
+- Tabel eksponensial (`EXP_TABLE`) dan logaritma (`LOG_TABLE`) 256 entri.
+- Fungsi `gfMul(x, y)` untuk perkalian Galois Field.
+- Pembangkit polinomial generator $g(x) = \prod_{i=0}^{n-1} (x - \alpha^i)$.
+- Pembagian polinomial modulo $g(x)$ untuk menghasilkan deretan *codeword* koreksi galat.
+
+---
+
+### 5. ISO/IEC 18004 Multi-Mode Matrix Encoder (`src/qr/encoder.ts`)
+
+Mendukung deteksi dan kompresi bitstream otomatis:
+1. **Mode Numeric (Mode Indicator `0001`)**:
+   - Memadatkan 3 digit angka (`0-9`) ke dalam 10 bit, 2 digit ke 7 bit, dan 1 digit ke 4 bit.
+   - Mengurangi ukuran versi QR secara signifikan untuk nomor telepon, ID numerik, atau kode OTP.
+2. **Mode Alphanumeric (Mode Indicator `0010`)**:
+   - Mendukung 45 karakter: `0-9`, `A-Z`, spasi, `$`, `%`, `*`, `+`, `-`, `.`, `/`, `:`.
+   - Memadatkan 2 karakter ke dalam 11 bit dengan formula: $V = c_1 \times 45 + c_2$.
+3. **Mode Byte (Mode Indicator `0100`)**:
+   - 8-bit byte stream untuk URL, string campuran, dan karakter UTF-8.
+4. **Auto-Mode Detection (`detectQRMode`)**:
+   - Memilih mode terpadat secara otomatis jika opsi `mode: 'auto'` digunakan.
+5. **Evaluasi 8 Pola Masking & Format Info BCH**:
+   - Menghitung penalti $N_1, N_2, N_3, N_4$ untuk memilih mask terbaik.
+   - Menambahkan format info 15-bit berpelindung BCH $(15, 5)$.
+6. **Margin 4 Modul Quiet Zone & Tag Semantik Modul**.
+
+---
+
+## 📐 Struktur Tipe Data & Interface
+
+```typescript
+export type ECCLevel = 'L' | 'M' | 'Q' | 'H';
+
+export type QRMode = 'numeric' | 'alphanumeric' | 'byte';
+export type QRModeOption = 'auto' | QRMode;
+
+export type ModuleType =
+  | 'FINDER'
+  | 'FINDER_SEPARATOR'
+  | 'ALIGNMENT'
+  | 'TIMING'
+  | 'DARK'
+  | 'FORMAT'
+  | 'VERSION'
+  | 'DATA'
+  | 'QUIET';
+
+export interface QRModule {
+  x: number;
+  y: number;
+  isDark: boolean;
+  type: ModuleType;
+}
+
+export interface QRMatrix {
+  size: number;
+  version: number;
+  ecc: ECCLevel;
+  quietZone: number;
+  totalSize: number;
+  grid: QRModule[][];
+  get(x: number, y: number): QRModule | undefined;
+}
+
+export interface CircuitDNA {
+  traceStyle: 'orthogonal' | 'diagonal' | 'curved';
+  chipPackage: 'qfp' | 'bga' | 'soic';
+  solderMaskColor: 'green' | 'black' | 'blue' | 'purple';
+  componentDensity: number;
+  viaDensity: number;
+  traceWidth: number;
+}
+
+export interface BiomorphicDNA {
+  crystalGrowthStyle: 'hexagonal' | 'coral_branch' | 'geode_cluster' | 'needle_prism';
+  refractionIndex: number;
+  facetSharpness: number;
+  clusterDensity: number;
+  glowIntensity: number;
+}
+
+export interface DeterministicDNA {
+  rawHash: bigint;
+  seed32: number;
+  normalizedUrl: string;
+  palette: ColorPalette;
+  architecture: ArchitectureDNA;
+  globe: GlobeDNA;
+  circuit: CircuitDNA;
+  biomorphic: BiomorphicDNA;
+}
+
+export interface EncodeOptions {
+  ecc?: ECCLevel;
+  minVersion?: number;
+  maxVersion?: number;
+  quietZone?: number;
+  mode?: QRModeOption;
+}
+```
+
+---
+
+## 💻 Panduan Penggunaan API
+
+### Fungsi Utama: `createJiwoQR`
+
+```typescript
+import { createJiwoQR } from '@jiwoqr/core';
+
+const entity = createJiwoQR('https://jiwoqr.dev', {
+  ecc: 'Q',        // Level ECC (default: 'Q')
+  quietZone: 4,    // Margin quiet zone (default: 4)
+  mode: 'auto',    // Deteksi mode bitstream otomatis
+});
+
+console.log('QR Version:', entity.matrix.version);
+console.log('Circuit Mask:', entity.dna.circuit.solderMaskColor);
+console.log('Chip Package:', entity.dna.circuit.chipPackage);
+```
+
+---
+
+### Enkoding Matriks QR Multi-Mode: `encodeQR`
+
+```typescript
+import { encodeQR } from '@jiwoqr/core';
+
+// 1. Numerik: menghasilkan versi QR lebih kecil
+const numMatrix = encodeQR('0812345678901234', { mode: 'numeric' });
+
+// 2. Alfanumerik
+const alphaMatrix = encodeQR('HTTP://JIWOQR.DEV/CODE123', { mode: 'alphanumeric' });
+```
+
+---
+
+## 🧪 Pengujian Unit
+
+```bash
+pnpm test
+```
+Test suite memverifikasi akurasi packing bitstream numeric/alphanumeric, deteksi mode otomatis, perhitungan Reed-Solomon, serta stabilitas deterministik `CircuitDNA`.
+
+---
+
+
+
+## 📄 Berkas: `packages/math/README.md`
+
+# 📐 @jiwoqr/math
+
+> **Fondasi Matematika Grafika, Easing & Proyeksi Spasial 3D**  
+> *Transformasi vektor 3D, kurva interpolasi cubic easing, proyeksi ekstrusi arsitektur brutalist, pemetaan dual-hemisphere voxel mound dome, serta kalkulasi komponen sirkuit PCB untuk transisi mulus 3D ke 2D scan mode.*
+
+[![Package: @jiwoqr/math](https://img.shields.io/badge/Package-%40jiwoqr%2Fmath-blue.svg)](file:///d:/REPOS/jiwoQR/packages/math)
+[![TypeScript Strict](https://img.shields.io/badge/TypeScript-Strict-blue.svg)](file:///d:/REPOS/jiwoQR/packages/math/tsconfig.json)
+
+---
+
+## 📖 Daftar Isi
+
+- [Gambaran Umum](#-gambaran-umum)
+- [Arsitektur Modul](#-arsitektur-modul)
+- [Fungsi Interpolasi & Easing (`src/easing.ts`)](#-fungsi-interpolasi--easing-srceasingts)
+- [Proyeksi Ekstrusi Arsitektur (`src/projections/extrusion.ts`)](#-proyeksi-ekstrusi-arsitektur-srcprojectionsextrusionts)
+- [Proyeksi Spherical & Voxel Mound Dome (`src/projections/spherical.ts`)](#-proyeksi-spherical--voxel-mound-dome-srcprojectionssphericalts)
+- [Proyeksi Komponen Sirkuit PCB (`src/projections/circuit.ts`)](#-proyeksi-komponen-sirkuit-pcb-srcprojectionscircuitts)
+- [Proyeksi Mineral & Karang Biomorphic (`src/projections/biomorphic.ts`)](#-proyeksi-mineral--karang-biomorphic-srcprojectionsbiomorphicts)
+- [Struktur Interface & Tipe Data](#-struktur-interface--tipe-data)
+- [Contoh Penggunaan API](#-contoh-penggunaan-api)
+- [Pengujian Unit](#-pengujian-unit)
+
+---
+
+## 🌟 Gambaran Umum
+
+Paket `@jiwoqr/math` menyediakan fungsi-fungsi kalkulasi geometris dan transformasi spasial deterministik yang digunakan oleh engine renderer WebGL JiwoQR. Paket ini bertanggung jawab memastikan:
+1. **Determinisme Geometris**: Transformasi setiap modul QR (posisi, rotasi, skala) dihitung murni secara matematis dari koordinat grid dan benih PRNG tanpa bergantung pada state global Three.js.
+2. **Keterbacaan Optik 100%**: Menjamin bahwa saat parameter morfisme $t \to 1.0$, seluruh modul $3\text{D}$ bertransformasi tepat pada posisi kanonikal grid $2\text{D}$ dengan ketinggian mendekati nol ($Z \approx 0.02$).
+
+---
+
+## 🏗️ Arsitektur Modul
+
+```
+packages/math/src/
+├── easing.ts                  # lerp, lerpVec3, easeInOutCubic, smoothstep
+├── projections/
+│   ├── extrusion.ts           # Ekstrusi ketinggian & transisi 3D-ke-2D Arsitektur
+│   ├── spherical.ts           # Cube-to-sphere, UV-to-sphere & Voxel Dome Mound
+│   ├── circuit.ts             # Transformasi IC chip, SMD resistor, via pad, & trace
+│   ├── biomorphic.ts          # Transformasi prisma kristal heksagonal, pilar geodesik & karang
+│   ├── city.ts                # Kalkulasi orientasi hadap jalan (street-facing), cellular zoning & CBD gradient
+│   └── origami.ts             # Transformasi lipatan kertas origami, mountain/valley creases, & pembukaan mekanis
+├── types.ts                   # Vec2, Vec3, transforms untuk semua 6 arketipe
+└── index.ts                   # Ekspor publik
+```
+
+---
+
+## 📈 Fungsi Interpolasi & Easing (`src/easing.ts`)
+
+### 1. Linear Interpolation (`lerp` & `lerpVec3`)
+$$\text{lerp}(a, b, t) = a + (b - a) \times t$$
+
+### 2. Cubic Ease-In-Out (`easeInOutCubic`)
+$$f(t) = \begin{cases} 4t^3 & \text{jika } t < 0.5 \\ 1 - \frac{(-2t + 2)^3}{2} & \text{jika } t \ge 0.5 \end{cases}$$
+
+---
+
+## 🏙️ Proyeksi Ekstrusi Arsitektur (`src/projections/extrusion.ts`)
+
+Pada model Arsitektur, setiap modul gelap QR code diekstrusi ke sumbu $+Z$:
+1. **Modul Finder**: $H_{\text{finder}} = H_{\text{max}} \times 1.75$ sebagai *landmark towers*.
+2. **Modul Data**: $H_{\text{data}} = H_{\text{min}} + (H_{\text{max}} - H_{\text{min}}) \times \text{noise}(x, y, \text{seed})$.
+3. **Interpolasi 3D-ke-2D (`interpolateExtrusion`)**: Berkurang secara mulus menuju $Z = 0.01$ dan $S_z = 0.02$.
+
+---
+
+## 🌍 Proyeksi Spherical & Voxel Mound Dome (`src/projections/spherical.ts`)
+
+Formula medan elevasi kubah bola simetris:
+$$H(x, y) = H_{\text{max}} \times \sqrt{\max\left(0, 1 - \left(\frac{\text{dist}(x, y)}{R_{\text{max}}}\right)^2\right)}$$
+- **Top Mound A**: Menempel di $Z = 0$ diekstrusi ke $+Z$.
+- **Bottom Mound B**: Menempel di $Z = 0$ diekstrusi ke $-Z$.
+- Pertemuan kedua kubah membentuk bola voxel padu tanpa pelat pembelah di mode 3D.
+
+---
+
+## 🔌 Proyeksi Komponen Sirkuit PCB (`src/projections/circuit.ts`)
+
+Menentukan jenis dan orientasi komponen elektronik mikro pada modul QR:
+1. **Pola Finder**: Diberi tipe `chip` (paket IC QFP dengan pin logam).
+2. **Modul Data**: Secara deterministik dibagi menjadi:
+   - `smd_resistor`: Balok resistor dengan tutup solder perak.
+   - `smd_capacitor`: Balok kapasitor keramik cokelat muda.
+   - `via_pad`: Silinder solder via pad emas.
+   - `trace`: Jalur konduktor tembaga dengan sudut 45 atau 90 derajat.
+3. **Interpolasi Morphing (`interpolateCircuitMorph`)**:
+   - Memutar orientasi komponen kembali ke sudut $\text{Rot} = (0, 0, 0)$.
+   - Meratakan tinggi modul $S_z \to 0.02$ tepat di atas pelat solder mask.
+
+---
+
+## 💎 Proyeksi Mineral & Karang Biomorphic (`src/projections/biomorphic.ts`)
+
+Mengalkulasi pertumbuhan kristal mineral prisma heksagonal dan formasi karang:
+1. **Pola Finder**: Dimodelkan sebagai klaster monolitik kristal geodesik bercahaya tinggi ($H_{\text{finder}} = H_{\text{max}} \times 1.85$).
+2. **Modul Data**: Memiliki gaya pertumbuhan deterministik (`hexagonal`, `needle_prism`, `geode_cluster`, `coral_branch`) dengan variasi sudut facet $\theta_{\text{rot}}$ dan kemiringan organik $\phi_{\text{tilt}}$.
+3. **Interpolasi Morphing (`interpolateBiomorphicMorph`)**:
+   - Merotasikan kristal kembali tegak lurus ($\theta_{\text{rot}} \to 0, \phi_{\text{tilt}} \to 0$).
+   - Menurunkan ketinggian $S_z \to 0.02$ tepat di atas pelat dasar.
+
+---
+
+## 🏙️ Proyeksi Tata Kota Metropolis (`src/projections/city.ts`)
+
+Mengalkulasi parameter urban planning deterministik untuk model Kota Realistis (Model 5):
+1. **Orientasi Hadap Jalan (`computeStreetFacingAngle`)**:
+   - Menganalisa 4 tetangga ortogonal sel QR $(x \pm 1, y \pm 1)$.
+   - Jika 1 sisi terbuka (modul terang = jalan raya), bangunan berotasi menghadap jalan tersebut ($0^\circ, 90^\circ, 180^\circ, 270^\circ$).
+   - Jika berada di sudut pertemuan 2 jalan (corner lot), bangunan berotasi diagonal $45^\circ$ atau sejajar koridor utama.
+2. **Cellular Block Zoning & CBD Gradient (`computeCityModuleTransform`)**:
+   - Membagi matriks QR ke dalam blok seluler $3\times3$ atau $4\times4$ agar gedung-gedung bertetangga memiliki keharmonisan arsitektur.
+   - Mengalkulasi jarak radial ke pusat matriks ($c_x, c_y$); sel di dekat pusat (*Central Business District*) memiliki probabilitas tinggi menjadi pencakar langit megah (*High-Rise*), sedangkan tepi matriks menjadi blok residensial/komersial menengah (*Mid-Rise / Urban Block*).
+   - Tiga sudut Finder Pattern dimodelkan sebagai menara *Civic Landmark* monumental dengan elevasi $2.2\times$.
+3. **Interpolasi Morphing (`interpolateCityTransform`)**:
+   - Memutar orientasi yaw kembali ke $0^\circ$.
+   - Mengompresi ketinggian bangunan $S_z \to 0.02$ dan melebarkan dimensi horizontal ke ukuran penuh modul untuk pemindaian instan.
+
+---
+
+## 📄 Proyeksi Origami Paper Folds & Pembukaan Mekanis (`src/projections/origami.ts`)
+
+Mengalkulasi parameter lipatan kertas geometris dan mekanisme pembukaan lipatan (*unfolding*) untuk Model 6 (Origami):
+1. **Gaya Lipatan Kertas (`OrigamiFoldStyle`)**:
+   - `mountain`: Puncak lipatan cembung tajam dengan sudut kemiringan $28^\circ \dots 52^\circ$.
+   - `valley`: Lembah lipatan cekung simetris.
+   - `diagonal_pyramid`: Lipatan piramida bersudut empat dengan 8 faset segitiga.
+   - `crane_wing`: Mahkota derek origami bersusun untuk 3 Finder Patterns ($H_{\text{finder}} = H_{\text{max}} \times 2.0$, ketajaman faset $0.95$).
+2. **Orientasi Crease Ortogonal & Diagonal**:
+   - Sudut rotasi $Z$ dihitung deterministik: $[0, \frac{\pi}{4}, \frac{\pi}{2}, \frac{3\pi}{4}]$.
+3. **Mekanisme Unfolding (`calculateOrigamiUnfold`)**:
+   - Saat $t \to 1.0$, sudut lipatan $\theta_{\text{fold}} \to 0$ dan rotasi $Z \to 0$.
+   - Ketinggian $Z$ mengompresi ke bidang datar kanonikal $S_z = 0.01$ dan modul melebar ke $1.0\times1.0$ untuk pemindaian instan.
+
+---
+
+## 📐 Struktur Interface & Tipe Data
+
+```typescript
+export type BiomorphicCrystalStyle =
+  | 'hexagonal'
+  | 'coral_branch'
+  | 'geode_cluster'
+  | 'needle_prism';
+
+export interface BiomorphicModuleTransform {
+  gridX: number;
+  gridY: number;
+  isDark: boolean;
+  isFinder: boolean;
+  crystalStyle: BiomorphicCrystalStyle;
+  position3D: Vec3;
+  position2D: Vec3;
+  scale3D: Vec3;
+  scale2D: Vec3;
+  rotationZ: number;
+  tiltAngle: number;
+}
+```
+
+---
+
+## 💻 Contoh Penggunaan API
+
+```typescript
+import {
+  computeCircuitModuleTransform,
+  interpolateCircuitMorph,
+} from '@jiwoqr/math';
+
+// Menghitung transformasi sirkuit PCB untuk modul
+const transform = computeCircuitModuleTransform(
+  8,     // gridX
+  12,    // gridY
+  29,    // totalGridSize
+  true,  // isDark
+  false, // isFinder
+  98765  // seed32
+);
+
+console.log('Tipe Komponen:', transform.componentType); // 'smd_resistor' | 'via_pad' | etc.
+
+// Interpolasi saat morphing ke scan mode
+const current = interpolateCircuitMorph(transform, 0.8);
+```
+
+---
+
+## 🧪 Pengujian Unit
+
+```bash
+pnpm test
+```
+Memverifikasi batas kurva easing, proyeksi ekstrusi arsitektur, radial falloff gundukan bola, serta akurasi penempatan komponen circuit PCB.
+
+---
+
+
+
+## 📄 Berkas: `packages/renderer-webgl/README.md`
+
+# 🎨 @jiwoqr/renderer-webgl
+
+> **Engine Visualisasi 3D WebGL / Three.js Kinerja Tinggi**  
+> *Instanced rendering 60 FPS, arketipe visual Arsitektur, Globe & Circuit PCB, kontrol kamera orbit & sensor giroskop, sistem mitigasi pencahayaan & bayangan, serta graceful fallback ke 2D Canvas.*
+
+[![Package: @jiwoqr/renderer-webgl](https://img.shields.io/badge/Package-%40jiwoqr%2Frenderer--webgl-blue.svg)](file:///d:/REPOS/jiwoQR/packages/renderer-webgl)
+[![Three.js](https://img.shields.io/badge/Three.js-r174-black.svg?logo=three.js)](https://threejs.org/)
+[![TypeScript Strict](https://img.shields.io/badge/TypeScript-Strict-blue.svg)](file:///d:/REPOS/jiwoQR/packages/renderer-webgl/tsconfig.json)
+
+---
+
+## 📖 Daftar Isi
+
+- [Gambaran Umum](#-gambaran-umum)
+- [Arsitektur Modul](#-arsitektur-modul)
+- [Kelas Utama: `JiwoWebGLRenderer`](#-kelas-utama-jiwowebglrenderer)
+  - [Konfigurasi & Inisialisasi](#konfigurasi--inisialisasi)
+  - [Metode & Siklus Hidup (Lifecycle)](#metode--siklus-hidup-lifecycle)
+- [Model Visual 3D](#-model-visual-3d)
+  - [1. Model Arsitektur (`src/models/architecture.ts`)](#1-model-arsitektur-srcmodelsarchitecturets)
+  - [2. Model Bola Voxel (`src/models/globe.ts`)](#2-model-bola-voxel-srcmodelsglobets)
+  - [3. Model Sirkuit Elektronik (`src/models/circuit.ts`)](#3-model-sirkuit-elektronik-srcmodelscircuitts)
+  - [4. Model Biomorphic Crystalline (`src/models/biomorphic.ts`)](#4-model-biomorphic-crystalline-srcmodelsbiomorphicts)
+- [GPU Vertex Shader Morphing Pipeline (`src/shaders/gpu-morph.ts`)](#-gpu-vertex-shader-morphing-pipeline-srcshadersgpu-morphts)
+- [Sistem Kamera, Orbit & Giroskop Mobile (iOS Safari Compatible)](#-sistem-kamera-orbit--giroskop-mobile-ios-safari-compatible)
+- [Sistem Mitigasi Pencahayaan & Bayangan untuk Pemindaian Optik](#-sistem-mitigasi-pencahayaan--bayangan-untuk-pemindaian-optik)
+- [Zero-WebGL Graceful Fallback (`src/fallback/`)](#-zero-webgl-graceful-fallback-srcfallback)
+- [Optimasi Performa Rendering](#-optimasi-performa-rendering)
+- [Contoh Kode Integrasi](#-contoh-kode-integrasi)
+
+---
+
+## 🌟 Gambaran Umum
+
+Paket `@jiwoqr/renderer-webgl` bertanggung jawab mengubah struktur semantik data QR dari `@jiwoqr/core` dan kalkulasi spasial dari `@jiwoqr/math` menjadi pemandangan 3D interaktif yang menakjubkan menggunakan **Three.js**.
+
+Keunggulan utama:
+- **GPU-Accelerated 120 FPS Vertex Shader Morphing**: Melakukan kalkulasi interpolasi morphing $3\text{D} \to 2\text{D}$ langsung di GPU Vertex Shader melalui uniform `uMorphProgress` dan instanced buffer attributes (`aPosition3D`, `aPosition2D`, `aScale3D`, `aScale2D`, `aRotationZ3D`, `aColor3D`, `aColor2D`), menghilangkan beban loop per-modul di CPU.
+- **Empat Arketipe Visual**: Architecture (kota brutalist), Globe (kubah bola voxel mound), Circuit (papan PCB microchip), dan Biomorphic (pertumbuhan kristal mineral heksagonal).
+- **iOS 13+ Safari Gyroscope Permission**: Utilitas asynchronous terstandar untuk otorisasi sensor gerak pada perangkat Apple dan Android.
+- **Graceful Fallback**: Deteksi otomatis kapabilitas WebGL dengan fallback mulus ke Canvas 2D murni.
+
+---
+
+## 🏗️ Arsitektur Modul
+
+```
+packages/renderer-webgl/src/
+├── fallback/
+│   └── fallback.ts            # Deteksi WebGL & canvas 2D fallback renderer
+├── shaders/
+│   └── gpu-morph.ts           # Hook shader Three.js untuk interpolasi posisi, rotasi, & warna di GPU
+├── models/
+│   ├── architecture.ts        # Model 1: Kota skyscraper cyber-brutalist & menara finder
+│   ├── globe.ts               # Model 2: Dual-hemisphere voxel mound dome & gradien elevasi
+│   ├── circuit.ts             # Model 3: PCB board, chip QFP, SMD components, via & traces
+│   ├── biomorphic.ts          # Model 4: Kristal mineral heksagonal, geode bercahaya & refraksi PBR
+│   ├── city.ts                # Model 5: Kota metropolitan realistis (multi-STL instances, street-facing)
+│   └── building-manager.ts    # Asset loader & normalizer model STL 3D dinamis
+├── scene/
+│   └── camera-controller.ts   # Orbit drag 3D, sensor giroskop iOS/Android, & auto-alignment
+├── types.ts                   # Interface opsi renderer & model types
+├── renderer.ts                # Kelas utama JiwoWebGLRenderer & render loop
+└── index.ts                   # Ekspor publik
+```
+
+---
+
+## 🚀 Kelas Utama: `JiwoWebGLRenderer`
+
+### Konfigurasi & Inisialisasi
+
+```typescript
+import { JiwoWebGLRenderer, JiwoRendererOptions } from '@jiwoqr/renderer-webgl';
+
+const renderer = new JiwoWebGLRenderer({
+  container: document.getElementById('canvas-container')!,
+  model: 'circuit',     // 'architecture' | 'globe' | 'circuit'
+  mode: '3d',           // '3d' | 'scan'
+  morphDuration: 800,   // Durasi animasi perpindahan mode (ms)
+  antialias: true,
+});
+```
+
+### Metode & Siklus Hidup (Lifecycle)
+
+| Metode | Deskripsi |
+| :--- | :--- |
+| `setData(payload: string)` | Menghitung DNA & matriks QR baru dari string/URL, lalu membangun ulang model 3D secara reaktif. |
+| `setEntity(entity: JiwoQREntity)` | Memuat entitas `JiwoQREntity` yang sudah dihitung sebelumnya. |
+| `setModel(model: RenderModel)` | Mengganti arketipe visual (`'architecture'`, `'globe'`, `'circuit'`). |
+| `getModel(): RenderModel` | Mengambil arketipe model yang sedang aktif. |
+| `setMode(mode: RenderMode)` | Memulai animasi transisi mulus antara `'3d'` dan `'scan'` mode. |
+| `getMode(): RenderMode` | Mengambil mode yang sedang aktif (`'3d'` atau `'scan'`). |
+| `setMorphProgress(progress: number)` | Mengatur progress morphing secara manual ($0.0 = 3\text{D}$, $1.0 = \text{Scan}$). |
+| `getMorphProgress(): number` | Mengambil nilai progress morphing saat ini. |
+| `getScene(): THREE.Scene` | Mengambil referensi THREE.Scene aktif (berguna untuk eksportir GLB). |
+| `getCameraController(): CameraController` | Mengambil instance pengontrol kamera. |
+| `resize(width: number, height: number)` | Menyesuaikan rasio aspek kamera dan ukuran viewport WebGL. |
+| `dispose()` | Menghentikan render loop, memutuskan ResizeObserver, menghapus event listener, dan membersihkan memori GPU. |
+
+---
+
+## 🏛️ Model Visual 3D
+
+### 1. Model Arsitektur (`src/models/architecture.ts`)
+- Membentuk kota bertingkat dari blok-blok instanced box (`BoxGeometry(1, 1, 1)`).
+- Menara Finder diekstrusi hingga $1.75\times$ tinggi maksimum dengan warna pendaran emisif khusus (`finderEmissive`).
+- Dilengkapi pelat dasar (*ground substrate plate*) yang menutupi area matriks QR beserta zona tenang 4 modul.
+
+### 2. Model Bola Voxel (`src/models/globe.ts`)
+- Membentuk gundukan voxel 3D dual-hemisfer (Kubah A di $+Z$ dan Kubah B di $-Z$).
+- Gradasi warna kontinental dari terracotta di ekuator ke biru/ungu di tengah dan emas di puncak.
+- Pelat ekuator $Z = 0$ disembunyikan di mode 3D agar bola tampak melayang utuh, dan memudar masuk saat bertransisi ke Mode Scan.
+
+### 3. Model Sirkuit Elektronik (`src/models/circuit.ts`)
+- Menampilkan motherboard PCB lengkap dengan lapisan solder mask (hijau, hitam, biru, ungu).
+- Tiga pola finder dirender sebagai chip mikroprosesor IC QFP dengan pin logam.
+- Modul data dirender sebagai komponen SMD (resistor, kapasitor, gold via pads, dan copper traces).
+- Seluruh komponen melebur rata menjadi modul biner 2D hitam pekat di atas pelat putih saat beralih ke Mode Scan.
+
+### 4. Model Biomorphic Crystalline (`src/models/biomorphic.ts`)
+- **Tema:** *Crystalline Mineral & Coral Growth*.
+- Modul QR dirender sebagai prisma kristal heksagonal (`CylinderGeometry(0.46, 0.54, 1.0, 6)`) dengan orientasi facet dan kemiringan deterministik.
+- Pola Finder dimodelkan sebagai klaster kristal geodesik monolitik besar bercahaya tinggi.
+- Material menggunakan `MeshPhysicalMaterial` dengan sifat translusen/refraktif (`transmission: 0.35`, `ior: 1.55`, `clearcoat: 0.75`).
+- Saat beralih ke Mode Scan ($t \to 1.0$), kristal memadat dan permukaannya merata menjadi modul hitam-putih kanonikal.
+
+### 5. Model Kota Realistis Metropolitan (`src/models/city.ts` & `src/models/building-manager.ts`)
+- **Tema:** *Realistic 3D Metropolis City Grid with Dynamic Custom STL Building Models*.
+- **Dynamic Asset Auto-Discovery (`BuildingModelManager`)**: Memuat semua model `.stl` dari `STL-for-buildingModels/` secara asinkronus, menormalisasi titik pusat $(0,0)$ dan fondasi dasar pada $Z = 0$, serta mengatur ukuran horizontal menjadi $0.92$ unit untuk ruang gang (*alleyways*) yang rapih.
+- **IndexedDB Asset Cache**: Menyimpan geometri STL yang telah dinormalisasi dan didesimasi ke dalam browser `IndexedDB`. Jika model gedung pernah diunduh sebelumnya, muat instan langsung dari IndexedDB ($< 50\text{ ms}$).
+- **Street-Facing Orientation**: Menganalisa 4 tetangga ortogonal setiap sel untuk memutar orientasi bangunan ($0^\circ, 90^\circ, 180^\circ, 270^\circ$) agar selalu menghadap ke jalan raya terbuka.
+- **Cellular Block Zoning & CBD Gradient**: Pengelompokan lot bangunan dalam distrik harmonis dengan pencakar langit terkonsentrasi di pusat kota (*Central Business District*) dan menara monumental di 3 sudut Finder.
+- **Multi-Geometry Instanced Rendering**: Menggunakan `THREE.InstancedMesh` per model STL unik dengan `DynamicDrawUsage` untuk rendering GPU 60+ FPS.
+
+### 6. Model Origami Fold (`src/models/origami.ts`)
+
+- **Tema:** *Geometric Folded Paper / Low-Poly Origami Polyhedron*.
+- **Visual:** Modul data gelap dirender sebagai prisma polihedral lipatan kertas miring dengan pencahayaan faset tajam (*flat shading*) dan tekstur serat kertas (*washi/parchment*).
+- **Struktur Finder Patterns:** Tiga Finder Patterns dirender sebagai struktur mahkota derek geometris (*origami crane crowns*) bertingkat dengan sayap terlipat bersudut.
+- **Mekanisme Morphing:** Saat $t \to 1.0$, lipatan kertas membuka (*unfolds*) secara mekanis di GPU shader dan faset-faset segitiga merata menjadi bidang 2D hitam solid.
+
+---
+
+## ⚡ GPU Vertex Shader Morphing Pipeline (`src/shaders/gpu-morph.ts`)
+
+Pada Fase 3, seluruh interpolasi spasial dan warna modul dipindahkan dari CPU ke **GPU Vertex Shader**:
+1. **Instanced Buffer Attributes**: Posisi target 3D ($x_1, y_1, z_1$) dan 2D ($x_0, y_0, z_0$), skala 3D/2D, sudut rotasi Z, dan warna 3D disimpan langsung dalam VBO GPU:
+   - `aPosition3D`, `aPosition2D`
+   - `aScale3D`, `aScale2D`
+   - `aRotationZ3D`
+   - `aColor3D`, `aColor2D`
+2. **Zero-Looping CPU Execution**: Pada setiap frame (`requestAnimationFrame`), CPU hanya memperbarui nilai uniform:
+   ```typescript
+   morphUniforms.uMorphProgress.value = morphProgress;
+   ```
+3. **Hasil Efisiensi**: Penggunaan CPU per frame turun dari $\sim 3\text{ ms}$ menjadi $< 0.01\text{ ms}$, mempertahankan framerate stabil **120 FPS / 144 FPS** pada layar ProMotion dan perangkat mobile.
+
+---
+
+## 🎥 Sistem Kamera, Orbit & Giroskop Mobile (iOS Safari Compatible)
+
+- **Orbit Mouse/Touch**: Rotasi bebas dengan redaman inersia $0.05$.
+- **iOS 13+ Safari Permission Handling**:
+  ```typescript
+  import { requestDeviceOrientationPermission } from '@jiwoqr/renderer-webgl';
+
+  btnGyro.addEventListener('click', async () => {
+    const granted = await requestDeviceOrientationPermission();
+    if (granted) {
+      window.addEventListener('deviceorientation', (e) => {
+        if (e.gamma !== null && e.beta !== null) {
+          renderer.getCameraController().applyGyroTilt(e.gamma, e.beta);
+        }
+      });
+    }
+  });
+  ```
+- **Auto-Alignment Scan Mode**: Kamera otomatis berpindah tegak lurus ke posisi $(0, 0, Z)$ tepat menghadap QR.
+
+---
+
+## 💡 Sistem Mitigasi Pencahayaan & Bayangan untuk Pemindaian Optik
+
+Saat bertransisi ke Mode Scan ($t > 0.85$):
+- Bayangan directional dinonaktifkan (`castShadow = false`).
+- Ambient light dinaikkan menjadi $1.0\times$.
+- Material dialihkan dari PBR glossy menjadi matte diffuse murni.
+
+---
+
+## 🛡️ Zero-WebGL Graceful Fallback (`src/fallback/`)
+
+Menyediakan fungsi utility untuk browser tanpa WebGL:
+
+```typescript
+import { isWebGLSupported, render2DFallbackCanvas } from '@jiwoqr/renderer-webgl';
+
+if (!isWebGLSupported()) {
+  const canvas = document.createElement('canvas');
+  render2DFallbackCanvas(canvas, matrix, {
+    size: 400,
+    darkColor: '#000000',
+    lightColor: '#ffffff',
+  });
+  container.appendChild(canvas);
+}
+```
+
+---
+
+## 💻 Contoh Kode Integrasi
+
+```typescript
+import { JiwoWebGLRenderer } from '@jiwoqr/renderer-webgl';
+
+const renderer = new JiwoWebGLRenderer({
+  container: document.getElementById('app')!,
+  model: 'circuit',
+  mode: '3d',
+});
+
+renderer.setData('https://jiwoqr.dev');
+```
+
+---
+
+
+
+## 📄 Berkas: `packages/renderer-webgpu/README.md`
+
+# ⚡ @jiwoqr/renderer-webgpu
+
+> **Pipeline WebGPU Native & WGSL Shader Engine Generasi Mendatang**  
+> *Arsitektur rendering native WebGPU untuk generator QR 3D JiwoQR berbasis W3C WebGPU API, WGSL vertex/compute shaders, storage buffer instanced rendering, dan zero-CPU morph interpolation 120 FPS.*
+
+[![Package: @jiwoqr/renderer-webgpu](https://img.shields.io/badge/Package-%40jiwoqr%2Frenderer--webgpu-blue.svg)](file:///d:/REPOS/jiwoQR/packages/renderer-webgpu)
+[![WebGPU](https://img.shields.io/badge/Standard-W3C%20WebGPU-brightgreen.svg)](https://www.w3.org/TR/webgpu/)
+[![Status: Active Pipeline](https://img.shields.io/badge/Status-First--Class%20Pipeline-success.svg)](file:///d:/REPOS/jiwoQR/packages/renderer-webgpu)
+
+---
+
+## 📖 Daftar Isi
+
+- [Gambaran Umum](#-gambaran-umum)
+- [Arsitektur Pipeline Native WebGPU](#-arsitektur-pipeline-native-webgpu)
+- [Fitur Utama](#-fitur-utama)
+- [Panduan Penggunaan (`JiwoWebGPURenderer`)](#-panduan-penggunaan-jiwowebgpurenderer)
+- [Spesifikasi Shader WGSL](#-spesifikasi-shader-wgsl)
+- [Struktur Tipe Data & Interface](#-struktur-tipe-data--interface)
+- [Roadmap Perkembangan](#-roadmap-perkembangan)
+
+---
+
+## 🌟 Gambaran Umum
+
+Paket `@jiwoqr/renderer-webgpu` adalah mesin rendering hardware-accelerated first-class yang beroperasi langsung di atas W3C WebGPU API murni tanpa ketergantungan library pihak ketiga. Seluruh interpolasi $t \in [0.0 \dots 1.0]$ untuk perubahan arketipe 3D menuju QR scan 2D dihitung secara langsung di dalam GPU Vertex Shader memanfaatkan **Storage Buffer** dan fungsi easing polinomial kubik native WGSL.
+
+---
+
+## 🚀 Arsitektur Pipeline Native WebGPU
+
+```mermaid
+graph TD
+    Matrix["QR Matrix & Visual DNA (@jiwoqr/core)"]
+    StorageBuffer["GPU Storage Buffer (pos3D, pos2D, scale3D, scale2D, color3D, color2D)"]
+    UniformBuffer["GPU Uniform Buffer (MVP Matrix, morphProgress, time)"]
+    WGSL["WGSL Vertex Shader (vs_main: jiwoEase + morph mix + 3D orbit)"]
+    RenderPass["WebGPU Render Pass (GPURenderPipeline + Depth24plus + Diffuse Lighting)"]
+    Canvas["HTMLCanvasElement (GPUCanvasContext)"]
+
+    Matrix --> StorageBuffer
+    Matrix --> UniformBuffer
+    StorageBuffer --> WGSL
+    UniformBuffer --> WGSL
+    WGSL --> RenderPass
+    RenderPass --> Canvas
+```
+
+Keuntungan arsitektur WebGPU:
+1. **Parallel Morph Interpolation**: Perhitungan posisi morphing ribuan modul QR dihitung secara paralel di GPU.
+2. **Storage Buffer Instancing**: Seluruh matriks dan atribut warna ditransmisikan dalam struktur packed float32 96-byte terarah.
+3. **Zero-CPU Overhead**: CPU hanya memperbarui uniform time dan morphProgress ($< 0.001\text{ ms}$).
+
+---
+
+## 💻 Panduan Penggunaan (`JiwoWebGPURenderer`)
+
+### 1. Inisialisasi & Rendering Native WebGPU
+
+```typescript
+import { JiwoWebGPURenderer, isWebGPUSupported } from '@jiwoqr/renderer-webgpu';
+
+if (isWebGPUSupported()) {
+  const container = document.getElementById('canvas-container')!;
+  
+  // Inisialisasi renderer native WebGPU
+  const renderer = new JiwoWebGPURenderer({
+    container,
+    powerPreference: 'high-performance',
+    morphDuration: 800,
+  });
+
+  // Muat URL atau payload QR
+  renderer.setData('https://jiwoqr.dev');
+
+  // Transisi halus ke mode pemindaian 2D
+  renderer.setMode('scan');
+} else {
+  console.warn('WebGPU tidak didukung, gunakan @jiwoqr/renderer-webgl');
+}
+```
+
+---
+
+## ⚡ Spesifikasi Shader WGSL
+
+File shader `packages/renderer-webgpu/src/shaders/architecture.wgsl.ts` mengekspor pipeline shader terpadu:
+
+```wgsl
+struct Uniforms {
+  mvpMatrix: mat4x4<f32>,
+  morphProgress: f32,
+  time: f32,
+  pad0: f32,
+  pad1: f32,
+};
+
+struct ModuleInstance {
+  pos3D: vec4<f32>,
+  pos2D: vec4<f32>,
+  scale3D: vec4<f32>,
+  scale2D: vec4<f32>,
+  color3D: vec4<f32>,
+  color2D: vec4<f32>,
+};
+
+@group(0) @binding(0) var<uniform> uniforms: Uniforms;
+@group(0) @binding(1) var<storage, read> instances: array<ModuleInstance>;
+```
+
+---
+
+## 📐 Struktur Tipe Data & Interface
+
+```typescript
+export type WebGPUPowerPreference = 'low-power' | 'high-performance';
+export type WebGPURenderModel = 'architecture';
+
+export interface WebGPURendererOptions {
+  canvas?: HTMLCanvasElement;
+  container?: HTMLElement;
+  device?: unknown;
+  powerPreference?: WebGPUPowerPreference;
+  morphDuration?: number;
+  model?: WebGPURenderModel;
+}
+
+export interface WebGPURendererPipeline {
+  initialize(options: { canvas: HTMLCanvasElement; powerPreference?: WebGPUPowerPreference; device?: unknown }): Promise<void>;
+  dispose(): void;
+}
+```
+
+---
+
+## 🗺️ Roadmap Perkembangan
+
+- [x] **Fase 1**: Definisi tipe data dasar dan fungsi deteksi fitur WebGPU (`isWebGPUSupported`).
+- [x] **Fase 2**: Implementasi WGSL vertex & fragment shader untuk interpolasi 3D-ke-2D real-time model Architecture.
+- [x] **Fase 3**: Integrasi Storage Buffer instancing, depth testing 24-bit, orbit camera matrix math mandiri (`mat4.ts`), dan toggle engine di `apps/demo`.
+- [ ] **Fase 4**: Perluasan arketipe WGSL shader untuk Model 2-6 (`globe`, `circuit`, `biomorphic`, `city`, `origami`).
+- [ ] **Fase 5**: Compute pass untuk dynamic raymarching dan soft shadows di WebGPU.
+
+---
+
+
+
+## 📄 Berkas: `packages/exporter/README.md`
+
+# 🖨️ @jiwoqr/exporter
+
+> **Mesin Ekspor Mesh 3D Cetak & Raster/Vektor Cetak Resolusi Tinggi**  
+> *Generator berkas biner STL watertight/manifold untuk 3D printing dengan elevasi prosedural sesuai model 3D aktif, konverter Three.js ke GLB biner, serta eksportir SVG vektor & PNG 300 DPI ultra-tajam.*
+
+[![Package: @jiwoqr/exporter](https://img.shields.io/badge/Package-%40jiwoqr%2Fexporter-blue.svg)](file:///d:/REPOS/jiwoQR/packages/exporter)
+[![3D Print Ready](https://img.shields.io/badge/3D%20Print-Binary%20STL%20Watertight-brightgreen.svg)](file:///d:/REPOS/jiwoQR/packages/exporter)
+[![TypeScript Strict](https://img.shields.io/badge/TypeScript-Strict-blue.svg)](file:///d:/REPOS/jiwoQR/packages/exporter/tsconfig.json)
+
+---
+
+## 📖 Daftar Isi
+
+- [Gambaran Umum](#-gambaran-umum)
+- [Fitur Utama](#-fitur-utama)
+- [Arsitektur Modul](#-arsitektur-modul)
+- [Panduan Ekspor Berkas](#-panduan-ekspor-berkas)
+  - [1. Ekspor 3D Print Watertight STL (`exportSTL`)](#1-ekspor-3d-print-watertight-stl-exportstl)
+  - [2. Ekspor 3D Scene Binary GLB (`exportGLB`)](#2-ekspor-3d-scene-binary-glb-exportglb)
+  - [3. Ekspor Vektor SVG Mandiri (`exportSVG`)](#3-ekspor-vektor-svg-mandiri-exportsvg)
+  - [4. Ekspor Raster 300 DPI PNG (`exportPNG`)](#4-ekspor-raster-300-dpi-png-exportpng)
+  - [5. Helper Download Otomatis (`downloadFile`)](#5-helper-download-otomatis-downloadfile)
+- [Struktur Tipe Data & Interface](#-struktur-tipe-data--interface)
+- [Pengujian Unit](#-pengujian-unit)
+
+---
+
+## 🌟 Gambaran Umum
+
+Paket `@jiwoqr/exporter` menjembatani dunia virtual 3D JiwoQR dengan manufaktur fisik (3D printing, laser cutting, sablon kartu nama) dan integrasi aset digital 3D game/animasi.
+
+Setiap berkas mesh `.stl` yang dihasilkan dihitung secara presisi dengan topologi tertutup (*closed manifold geometry*) dengan normal segitiga menghadap ke luar (*Counter-Clockwise/CCW winding order*), sehingga siap dimasukkan langsung ke software *slicer* (Cura, PrusaSlicer, Bambu Studio, OrcaSlicer) tanpa error *non-manifold edge*.
+
+---
+
+## ✨ Fitur Utama
+
+- **Watertight Solid Binary STL**: Menghasilkan pelat substrate dasar padu ($W \times H \times T_{\text{base}}$) dan balok modul data timbul. Elevasi balok dapat mengikuti arketipe 3D aktif (`architecture` pencakar langit bertingkat, `globe` kubah bola, `circuit` chip SMD, `biomorphic` pilar kristal, `city` blok kota metropolitan bertingkat, `origami` prisma polihedral lipatan kertas miring, atau `flat` standar).
+- **Native AR Quick Look (iOS) & Scene Viewer (Android)**: Mengekspor scene Three.js aktif ke blob USDZ biner untuk memicu AR Quick Look asli pada iOS Safari, atau menyusun intent URL Google Scene Viewer untuk preview AR instan pada Chrome Android.
+- **Three.js Binary GLB**: Mengonversi `THREE.Scene` aktif ke file `.glb` biner dengan mempertahankan material PBR, instance mesh, dan warna vertex.
+- **300 DPI Print-Ready PNG**: Merender QR code kanonikal beresolusi ultra-tinggi ($2048\times2048+$) dengan anti-aliasing dinonaktifkan untuk mencegah pendaran piksel buram pada kemasan fisik.
+- **Vektor SVG Skalabel**: Format SVG mandiri dengan batas 4 modul quiet zone dan opsi radius sudut (*rounded corners*).
+- **Cross-Browser Downloader**: Fungsi `downloadFile()` untuk memicu unduhan file instan di peramban.
+
+---
+
+## 🏗️ Arsitektur Modul
+
+```
+packages/exporter/src/
+├── stl.ts                     # Binary watertight STL generator (Architecture, City, Origami, Flat)
+├── glb.ts                     # Three.js GLTFExporter wrapper untuk GLB binary
+├── usdz.ts                    # USDZ exporter, iOS AR Quick Look & Android Scene Viewer intent
+├── svg.ts                     # Standalone SVG vector generator
+├── png.ts                     # 300 DPI high-res canvas-to-blob raster generator
+├── utils.ts                   # downloadFile() blob URL browser helper
+├── types.ts                   # Interface opsi ekspor (STLExportOptions, ARLaunchOptions, dsb.)
+└── index.ts                   # Ekspor publik
+```
+
+---
+
+## 💻 Panduan Ekspor Berkas
+
+### 1. Ekspor 3D Print Watertight STL (`exportSTL`)
+
+```typescript
+import { createJiwoQR } from '@jiwoqr/core';
+import { exportSTL, downloadFile } from '@jiwoqr/exporter';
+
+const entity = createJiwoQR('https://jiwoqr.dev');
+
+// Menghasilkan buffer STL dengan elevasi kertas origami bersudut
+const stlBuffer = exportSTL(entity.matrix, entity.dna, {
+  model: 'origami',     // 'architecture' | 'globe' | 'circuit' | 'biomorphic' | 'city' | 'origami' | 'flat'
+  moduleSize: 2.0,      // 2mm per modul
+  baseThickness: 2.0,   // 2mm pelat dasar
+  maxHeight: 6.0,       // Ketinggian puncak mahkota lipatan
+});
+
+downloadFile(stlBuffer, 'jiwo-qr-origami-3dprint.stl', 'application/sla');
+```
+
+---
+
+### 2. Ekspor 3D Scene Binary GLB (`exportGLB`)
+
+```typescript
+import { JiwoWebGLRenderer } from '@jiwoqr/renderer-webgl';
+import { exportGLB, downloadFile } from '@jiwoqr/exporter';
+
+const renderer = new JiwoWebGLRenderer({ container, model: 'globe' });
+renderer.setData('https://jiwoqr.dev');
+
+// Ekspor scene 3D aktif
+const glbBuffer = await exportGLB(renderer.getScene(), { binary: true });
+downloadFile(glbBuffer, 'jiwo-globe-scene.glb', 'model/gltf-binary');
+```
+
+---
+
+### 3. Instant Mobile AR Preview (`launchARView` & `generateUSDZBlob`)
+
+```typescript
+import { launchARView, generateUSDZBlob, detectARCapabilities } from '@jiwoqr/exporter';
+
+// Deteksi kemampuan AR perangkat
+const { isIOS, isAndroid, isARAvailable } = detectARCapabilities();
+
+// Memicu AR Quick Look di iOS Safari atau Google Scene Viewer di Android
+await launchARView({
+  scene: renderer.getScene(),
+  modelName: renderer.getModel(),
+  title: 'JiwoQR 3D Holographic Model',
+});
+```
+
+---
+
+### 4. Ekspor Vektor SVG Mandiri (`exportSVG`)
+
+```typescript
+import { encodeQR } from '@jiwoqr/core';
+import { exportSVG, downloadFile } from '@jiwoqr/exporter';
+
+const matrix = encodeQR('https://jiwoqr.dev');
+const svgString = exportSVG(matrix, {
+  size: 512,
+  darkColor: '#000000',
+  lightColor: '#ffffff',
+  borderRadius: 0.1, // modul agak membulat
+});
+
+downloadFile(svgString, 'jiwo-qr.svg', 'image/svg+xml');
+```
+
+---
+
+### 5. Ekspor Raster 300 DPI PNG (`exportPNG`)
+
+```typescript
+import { encodeQR } from '@jiwoqr/core';
+import { exportPNG, downloadFile } from '@jiwoqr/exporter';
+
+const matrix = encodeQR('https://jiwoqr.dev');
+const pngBlob = await exportPNG(matrix, {
+  size: 2048,          // Resolusi 2048x2048 piksel
+  darkColor: '#000000',
+  lightColor: '#ffffff',
+});
+
+downloadFile(pngBlob, 'jiwo-qr-300dpi.png', 'image/png');
+```
+
+---
+
+## 📐 Struktur Tipe Data & Interface
+
+```typescript
+export type STLArchetypeModel =
+  | 'architecture'
+  | 'globe'
+  | 'circuit'
+  | 'biomorphic'
+  | 'city'
+  | 'origami'
+  | 'flat';
+
+export interface STLExportOptions {
+  model?: STLArchetypeModel;
+  moduleSize?: number;     // Ukuran fisik modul (mm) - default: 2.0
+  baseThickness?: number;  // Ketebalan pelat dasar (mm) - default: 2.0
+  moduleHeight?: number;   // Ketinggian timbul modul (mm) - default: 2.0
+  maxHeight?: number;      // Ketinggian fitur tertinggi 3D (mm)
+  padding?: number;
+}
+
+export interface USDZExportOptions {
+  animations?: THREE.AnimationClip[];
+  maxTextureSize?: number;
+}
+
+export interface ARCapabilities {
+  isIOS: boolean;
+  isAndroid: boolean;
+  isARAvailable: boolean;
+}
+
+export interface ARLaunchOptions {
+  scene: THREE.Object3D | THREE.Scene;
+  glbUrl?: string;
+  modelName?: string;
+  title?: string;
+}
+
+export interface GLBExportOptions {
+  binary?: boolean;
+  animations?: THREE.AnimationClip[];
+  onlyVisible?: boolean;
+}
+```
+
+---
+
+## 🧪 Pengujian Unit
+
+```bash
+pnpm test
+```
+Verifikasi unit test memeriksa kebenaran header 80-byte STL biner, perhitungan jumlah segitiga, manifold watertightness model Origami, format intent Google Scene Viewer, dan deteksi kapabilitas mobile AR.
+
+---
+
+
+
+## 📄 Berkas: `packages/react/README.md`
+
+# ⚛️ @jiwoqr/react
+
+> **Komponen React Siap Pakai untuk Generator QR Prosedural 3D JiwoQR**  
+> *Integrasi mulus ke ekosistem React 18, React 19, Next.js (App Router & Pages Router), serta Vite dengan sinkronisasi props reaktif dan pembersihan memori otomatis.*
+
+[![Package: @jiwoqr/react](https://img.shields.io/badge/Package-%40jiwoqr%2Freact-blue.svg)](file:///d:/REPOS/jiwoQR/packages/react)
+[![React](https://img.shields.io/badge/React-18%20%2F%2019-61dafb.svg?logo=react)](https://react.dev/)
+[![TypeScript Strict](https://img.shields.io/badge/TypeScript-Strict-blue.svg)](file:///d:/REPOS/jiwoQR/packages/react/tsconfig.json)
+
+---
+
+## 📖 Daftar Isi
+
+- [Gambaran Umum](#-gambaran-umum)
+- [Instalasi](#-instalasi)
+- [Referensi Props & Tipe Data](#-referensi-props--tipe-data)
+- [Contoh Penggunaan Dasar](#-contoh-penggunaan-dasar)
+- [Integrasi Framework](#-integrasi-framework)
+  - [1. Next.js App Router (SSR-Safe Dynamic Import)](#1-nextjs-app-router-ssr-safe-dynamic-import)
+  - [2. Next.js Pages Router](#2-nextjs-pages-router)
+  - [3. Vite + React + Tailwind CSS](#3-vite--react--tailwind-css)
+- [Manajemen Siklus Hidup & Sinkronisasi Props](#-manajemen-siklus-hidup--sinkronisasi-props)
+
+---
+
+## 🌟 Gambaran Umum
+
+Paket `@jiwoqr/react` menyediakan komponen `<JiwoQR />` yang membungkus engine `@jiwoqr/renderer-webgl` ke dalam paradigma deklaratif React. 
+
+Fitur utama:
+- **Sinkronisasi Props Reaktif**: Setiap perubahan prop `value`, `model`, atau `mode` secara otomatis memicu pembaruan canvas tanpa perlu me-reload keseluruhan instance Three.js.
+- **Pencegahan Memory Leak**: Instance renderer dan WebGL context dibersihkan secara otomatis (`renderer.dispose()`) saat komponen di-unmount.
+- **Dukungan SSR Aman**: Kompatibel dengan arsitektur SSR Next.js melalui dynamic import.
+
+---
+
+## 📦 Instalasi
+
+Tambahkan paket ke proyek React Anda:
+
+```bash
+pnpm add @jiwoqr/react @jiwoqr/renderer-webgl three
+# atau
+npm install @jiwoqr/react @jiwoqr/renderer-webgl three
+# atau
+yarn add @jiwoqr/react @jiwoqr/renderer-webgl three
+```
+
+---
+
+## 📐 Referensi Props & Tipe Data
+
+```typescript
+import { RenderModel, RenderMode } from '@jiwoqr/renderer-webgl';
+
+export interface JiwoQRProps {
+  /** Target URL atau teks string yang akan di-encode ke matriks QR */
+  value: string;
+
+  /** Arketipe visual 3D ('architecture' | 'globe' | 'circuit' | 'biomorphic' | 'city' | 'origami') - Default: 'architecture' */
+  model?: RenderModel;
+
+
+  /** Mode tampilan ('3d' dunia interaktif | 'scan' 2D datar) - Default: '3d' */
+  mode?: RenderMode;
+
+  /** Durasi animasi transisi morphing dalam milidetik - Default: 800 */
+  morphDuration?: number;
+
+  /** Kelas CSS tambahan pada elemen pembungkus */
+  className?: string;
+
+  /** Gaya inline CSS tambahan pada elemen pembungkus */
+  style?: React.CSSProperties;
+}
+```
+
+---
+
+## 💻 Contoh Penggunaan Dasar
+
+```tsx
+import React, { useState } from 'react';
+import { JiwoQR } from '@jiwoqr/react';
+
+export function App() {
+  const [url, setUrl] = useState('https://jiwoqr.dev');
+  const [model, setModel] = useState<'architecture' | 'globe'>('architecture');
+  const [mode, setMode] = useState<'3d' | 'scan'>('3d');
+
+  return (
+    <div style={{ maxWidth: 600, margin: '0 auto', fontFamily: 'sans-serif' }}>
+      <h1>JiwoQR React Demo</h1>
+
+      {/* Input URL */}
+      <input
+        type="text"
+        value={url}
+        onChange={(e) => setUrl(e.target.value)}
+        style={{ width: '100%', padding: '8px 12px', marginBottom: 12 }}
+      />
+
+      {/* Viewport 3D QR Code */}
+      <div style={{ width: '100%', height: 450, borderRadius: 12, overflow: 'hidden' }}>
+        <JiwoQR
+          value={url}
+          model={model}
+          mode={mode}
+          morphDuration={800}
+        />
+      </div>
+
+      {/* Kontrol Interaktif */}
+      <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
+        <button onClick={() => setModel(m => m === 'architecture' ? 'globe' : 'architecture')}>
+          Model: {model.toUpperCase()}
+        </button>
+        <button onClick={() => setMode(m => m === '3d' ? 'scan' : '3d')}>
+          Mode: {mode.toUpperCase()}
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## 🛠️ Integrasi Framework
+
+### 1. Next.js App Router (SSR-Safe Dynamic Import)
+
+Karena Three.js dan WebGL membutuhkan objek global `window` dan DOM `HTMLCanvasElement`, gunakan dynamic import dengan `ssr: false`:
+
+```tsx
+// app/components/ClientJiwoQR.tsx
+'use client';
+
+import dynamic from 'next/dynamic';
+
+export const ClientJiwoQR = dynamic(
+  () => import('@jiwoqr/react').then((mod) => mod.JiwoQR),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex items-center justify-center bg-slate-900 text-cyan-400">
+        Memuat Engine 3D...
+      </div>
+    ),
+  }
+);
+```
+
+Penggunaan di dalam halaman (`app/page.tsx`):
+```tsx
+import { ClientJiwoQR } from './components/ClientJiwoQR';
+
+export default function Page() {
+  return (
+    <main className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-8">
+      <div className="w-96 h-96 rounded-2xl overflow-hidden shadow-2xl border border-slate-800">
+        <ClientJiwoQR
+          value="https://nextjs.org"
+          model="globe"
+          mode="3d"
+        />
+      </div>
+    </main>
+  );
+}
+```
+
+---
+
+### 2. Next.js Pages Router
+
+```tsx
+// pages/index.tsx
+import dynamic from 'next/dynamic';
+
+const JiwoQR = dynamic(
+  () => import('@jiwoqr/react').then((mod) => mod.JiwoQR),
+  { ssr: false }
+);
+
+export default function Home() {
+  return (
+    <div style={{ width: 500, height: 500 }}>
+      <JiwoQR value="https://jiwoqr.dev" model="architecture" mode="3d" />
+    </div>
+  );
+}
+```
+
+---
+
+### 3. Vite + React + Tailwind CSS
+
+```tsx
+// src/App.tsx
+import { useState } from 'react';
+import { JiwoQR } from '@jiwoqr/react';
+
+export default function App() {
+  const [mode, setMode] = useState<'3d' | 'scan'>('3d');
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-zinc-950 text-white">
+      <div className="w-[450px] h-[450px] bg-zinc-900 rounded-3xl overflow-hidden border border-zinc-800 shadow-cyan-500/20 shadow-2xl relative">
+        <JiwoQR
+          value="https://vitejs.dev"
+          model="globe"
+          mode={mode}
+        />
+        <button
+          onClick={() => setMode(m => m === '3d' ? 'scan' : '3d')}
+          className="absolute bottom-4 right-4 bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-4 py-2 rounded-xl transition"
+        >
+          {mode === '3d' ? '📷 Pindai' : '🌐 3D'}
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## 🔄 Manajemen Siklus Hidup & Sinkronisasi Props
+
+Implementasi internal `<JiwoQR />` menggunakan ref terisolasi untuk mengontrol instance WebGL secara efisien:
+
+```mermaid
+sequenceDiagram
+    participant React as React Component Lifecycle
+    participant Renderer as JiwoWebGLRenderer Instance
+    participant GPU as Three.js WebGL / GPU
+
+    React->>Renderer: Inisialisasi JiwoWebGLRenderer(container, model, mode)
+    React->>Renderer: setData(value)
+    Renderer->>GPU: Render 3D Scene (60 FPS loop)
+
+    Note over React,Renderer: Saat Prop Berubah (cth: mode: 'scan')
+    React->>Renderer: setMode('scan')
+    Renderer->>GPU: Mulai Animasi Eased Morphing (800ms)
+
+    Note over React,Renderer: Saat Komponen Di-unmount
+    React->>Renderer: dispose()
+    Renderer->>GPU: Hentikan loop, bersihkan geometri & canvas
+```
+
+---
+
+
+
+## 📄 Berkas: `packages/web-component/README.md`
+
+# 🧩 @jiwoqr/web-component
+
+> **Native Custom Element `<jiwo-qr>` Tanpa Framework**  
+> *Gunakan generator QR prosedural 3D JiwoQR langsung di HTML murni, Vue, Svelte, Angular, SolidJS, atau Astro menggunakan standar Web Components W3C.*
+
+[![Package: @jiwoqr/web-component](https://img.shields.io/badge/Package-%40jiwoqr%2Fweb--component-blue.svg)](file:///d:/REPOS/jiwoQR/packages/web-component)
+[![Web Components](https://img.shields.io/badge/Standard-W3C%20Custom%20Elements-orange.svg)](https://developer.mozilla.org/en-US/docs/Web/API/Web_components)
+[![TypeScript Strict](https://img.shields.io/badge/TypeScript-Strict-blue.svg)](file:///d:/REPOS/jiwoQR/packages/web-component/tsconfig.json)
+
+---
+
+## 📖 Daftar Isi
+
+- [Gambaran Umum](#-gambaran-umum)
+- [Instalasi & Registrasi](#-instalasi--registrasi)
+- [Atribut & Properti HTML](#-atribut--properti-html)
+- [Metode JavaScript DOM](#-metode-javascript-dom)
+- [Contoh Penggunaan](#-contoh-penggunaan)
+  - [1. HTML Murni & Vanilla JavaScript](#1-html-murni--vanilla-javascript)
+  - [2. Integrasi Vue 3](#2-integrasi-vue-3)
+  - [3. Integrasi Svelte](#3-integrasi-svelte)
+  - [4. Integrasi Angular](#4-integrasi-angular)
+- [Siklus Hidup Custom Element](#-siklus-hidup-custom-element)
+
+---
+
+## 🌟 Gambaran Umum
+
+Paket `@jiwoqr/web-component` menyediakan elemen kustom native `<jiwo-qr>` yang membungkus `@jiwoqr/renderer-webgl`. 
+Kelebihan Web Component:
+- **Zero-Framework Overhead**: Dapat disematkan pada halaman web mana pun tanpa membutuhkan bundler atau runtime React/Vue.
+- **Deklaratif**: Cukup tulis `<jiwo-qr value="..." model="globe"></jiwo-qr>` di HTML.
+- **Reaktivitas Otomatis**: Setiap perubahan atribut pada DOM (`setAttribute`) langsung memicu pembaruan pada visual 3D.
+
+---
+
+## 📦 Instalasi & Registrasi
+
+```bash
+pnpm add @jiwoqr/web-component @jiwoqr/renderer-webgl three
+```
+
+Cukup impor paket sekali di berkas entri aplikasi Anda untuk mendaftarkan Custom Element:
+
+```typescript
+import '@jiwoqr/web-component';
+```
+
+---
+
+## 🏷️ Atribut & Properti HTML
+
+| Atribut | Tipe | Nilai Default | Pilihan Nilai | Deskripsi |
+| :--- | :--- | :--- | :--- | :--- |
+| `value` | `string` | `"https://jiwoqr.dev"` | Teks string atau URL apa pun | Payload yang akan di-encode ke dalam matriks QR. |
+| `model` | `string` | `"architecture"` | `"architecture"`, `"globe"`, `"circuit"`, `"biomorphic"`, `"city"`, `"origami"` | Arketipe visual 3D yang aktif. |
+| `mode` | `string` | `"3d"` | `"3d"`, `"scan"` | Mode tampilan interaktif 3D atau mode pemindaian 2D datar. |
+
+---
+
+## ⚡ Metode JavaScript DOM
+
+Elemen `<jiwo-qr>` mengekspos metode publik yang dapat dipanggil langsung melalui referensi DOM:
+
+```typescript
+const qr = document.querySelector<JiwoQRElement>('jiwo-qr')!;
+
+// 1. Mengubah mode (3d atau scan) dengan animasi halus
+qr.setMode('scan');
+
+// 2. Mengubah arketipe model visual
+qr.setModel('globe');
+
+// 3. Mengontrol progress morphing secara manual (0.0 s.d. 1.0)
+qr.setMorphProgress(0.75);
+```
+
+---
+
+## 💻 Contoh Penggunaan
+
+### 1. HTML Murni & Vanilla JavaScript
+
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>JiwoQR Web Component Demo</title>
+  <script type="module">
+    import './node_modules/@jiwoqr/web-component/dist/index.js';
+  </script>
+  <style>
+    .qr-card {
+      width: 450px;
+      height: 450px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="qr-card">
+    <jiwo-qr 
+      id="my-qr"
+      value="https://github.com/AlbertAZ1992/every-qrcode" 
+      model="globe" 
+      mode="3d">
+    </jiwo-qr>
+  </div>
+
+  <button onclick="document.getElementById('my-qr').setMode('scan')">
+    Mode Scan
+  </button>
+  <button onclick="document.getElementById('my-qr').setMode('3d')">
+    Mode 3D
+  </button>
+</body>
+</html>
+```
+
+---
+
+### 2. Integrasi Vue 3
+
+Di file konfigurasi Vite / Vue (`vite.config.ts`), izinkan tag kustom:
+```typescript
+// vite.config.ts
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+
+export default defineConfig({
+  plugins: [
+    vue({
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) => tag.startsWith('jiwo-'),
+        },
+      },
+    }),
+  ],
+});
+```
+
+Penggunaan di komponen Vue:
+```vue
+<template>
+  <div class="qr-wrapper">
+    <jiwo-qr 
+      :value="url" 
+      :model="model" 
+      :mode="isScan ? 'scan' : '3d'"
+    ></jiwo-qr>
+    
+    <div class="controls">
+      <button @click="isScan = !isScan">
+        {{ isScan ? 'Mode 3D' : 'Mode Scan' }}
+      </button>
+      <button @click="model = model === 'architecture' ? 'globe' : 'architecture'">
+        Ganti Model ({{ model }})
+      </button>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+import '@jiwoqr/web-component';
+
+const url = ref('https://vuejs.org');
+const model = ref('globe');
+const isScan = ref(false);
+</script>
+
+<style scoped>
+.qr-wrapper {
+  width: 480px;
+  height: 480px;
+}
+</style>
+```
+
+---
+
+### 3. Integrasi Svelte
+
+```svelte
+<script>
+  import { onMount } from 'svelte';
+  import '@jiwoqr/web-component';
+
+  let url = 'https://svelte.dev';
+  let mode = '3d';
+  let model = 'architecture';
+</script>
+
+<div style="width: 450px; height: 450px;">
+  <jiwo-qr 
+    value={url} 
+    {model} 
+    {mode}
+  ></jiwo-qr>
+</div>
+
+<button on:click={() => mode = mode === '3d' ? 'scan' : '3d'}>
+  Toggle Scan Mode
+</button>
+```
+
+---
+
+### 4. Integrasi Angular
+
+Di modul Angular (`app.module.ts`), tambahkan `CUSTOM_ELEMENTS_SCHEMA`:
+```typescript
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import '@jiwoqr/web-component';
+
+@NgModule({
+  declarations: [AppComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
+export class AppModule {}
+```
+
+Template HTML (`app.component.html`):
+```html
+<div style="width: 500px; height: 500px;">
+  <jiwo-qr [attr.value]="qrUrl" [attr.model]="qrModel" [attr.mode]="qrMode"></jiwo-qr>
+</div>
+```
+
+---
+
+## 🔄 Siklus Hidup Custom Element
+
+1. **`connectedCallback()`**: Membaca atribut awal (`value`, `model`, `mode`), membuat instance `JiwoWebGLRenderer`, dan memasang canvas WebGL ke shadow/host element.
+2. **`attributeChangedCallback(name, oldValue, newValue)`**: Mencegat perubahan atribut secara otomatis dan mengarahkan ke metode renderer yang sesuai (`setData`, `setModel`, `setMode`).
+3. **`disconnectedCallback()`**: Memanggil `renderer.dispose()` untuk membebaskan konteks WebGL dan geometri saat elemen dihapus dari dokumen.
+
+---
+
+
+
+## 📄 Berkas: `apps/demo/README.md`
+
+# 🚀 JiwoQR Interactive Studio (`apps/demo`)
+
+> **Playground & Studio Web Interaktif untuk Eksplorasi QR Prosedural 3D**  
+> *Aplikasi web berbasis Vite dan TypeScript murni untuk menguji coba payload URL secara real-time, menginspeksi telemetri DNA deterministik, beralih arketipe visual (Architecture, Globe, Circuit PCB), menguji pemindaian barcode dengan smartphone, serta mengekspor aset 3D & cetak 2D.*
+
+[![App: demo](https://img.shields.io/badge/App-Interactive%20Studio-blue.svg)](file:///d:/REPOS/jiwoQR/apps/demo)
+[![Vite](https://img.shields.io/badge/Vite-6.2-purple.svg?logo=vite)](https://vitejs.dev/)
+
+---
+
+## 📖 Daftar Isi
+
+- [Gambaran Umum](#-gambaran-umum)
+- [Fitur Utama Antarmuka (UI)](#-fitur-utama-antarmuka-ui)
+  - [1. Viewport 3D & Orbit Kamera](#1-viewport-3d--orbit-kamera)
+  - [2. Input URL & Preset Cepat](#2-input-url--preset-cepat)
+  - [3. Selector Tiga Arketipe Model](#3-selector-tiga-arketipe-model)
+  - [4. Kontrol Dual-Mode & Morph Scrub Slider](#4-kontrol-dual-mode--morph-scrub-slider)
+  - [5. Bilah Alat Ekspor 3D & Cetak 2D](#5-bilah-alat-ekspor-3d--cetak-2d)
+  - [6. Sensor Giroskop Holografik (Mobile)](#6-sensor-giroskop-holografik-mobile)
+  - [7. Panel Telemetri DNA Deterministik](#7-panel-telemetri-dna-deterministik)
+- [Cara Menjalankan Lokal](#-cara-menjalankan-lokal)
+- [Struktur Berkas](#-struktur-berkas)
+
+---
+
+## 🌟 Gambaran Umum
+
+Aplikasi `apps/demo` berfungsi sebagai showcase dan environment pengujian terintegrasi untuk seluruh paket dalam monorepo JiwoQR. Di sini, Anda dapat mengamati secara langsung bagaimana teks atau tautan URL diubah menjadi DNA visual dan matriks QR 3D dengan rendering 60 FPS.
+
+---
+
+## 🖥️ Fitur Utama Antarmuka (UI)
+
+### 1. Viewport 3D & Orbit Kamera
+- **Drag Mouse / Touch**: Memutar sudut pandang kamera 3D di sekeliling model secara bebas.
+- **Scroll Mouse**: Zoom in dan zoom out dengan batas jarak aman (*clamped camera frustum*).
+
+### 2. Input URL, Template Pintas & Preset
+- **Template Pembuat Pintas**: Tombol template instan untuk:
+  - **URL**: Web link standar (`https://...`).
+  - **vCard**: Kontak kartu nama digital lengkap (`BEGIN:VCARD...`).
+  - **Wi-Fi**: Konfigurasi koneksi jaringan nirkabel (`WIFI:S:MyNet;T:WPA;P:MyPass;;`).
+- **Preset Chips**: Tombol pintas untuk menguji variasi payload populer secara instan.
+
+### 3. Pemilih Level Koreksi Galat (ECC Selector)
+- Tombol pemilih level pemulihan galat ISO/IEC 18004 secara langsung:
+  - **L (~7%)**: Kerapatan data tertinggi / modul paling ringkas.
+  - **M (~15%)**: Kerapatan standar.
+  - **Q (~25%)**: Sangat direkomendasikan untuk procedural 3D relief.
+  - **H (~30%)**: Pemulihan maksimal untuk stilasi 3D ekstrim.
+
+### 4. Selector Enam Arketipe Model
+- **Architecture**: Menghasilkan kota pencakar langit cyber-brutalist dengan menara finder landmark.
+- **Globe**: Menghasilkan gundukan bola voxel 3D dual-hemisfer dengan gradien warna elevasi.
+- **Circuit**: Menghasilkan motherboard PCB mikroelektronik dengan chip QFP, resistor/kapasitor SMD, dan jalur konduktor tembaga.
+- **Biomorphic**: Menghasilkan pertumbuhan kristal mineral heksagonal, klaster geode bercahaya, dan material kaca refraktif PBR.
+- **City Metropolis**: Menghasilkan tata kota metropolitan realistis ditenagai model 3D STL dinamis dari folder `STL-for-buildingModels/` dengan kalkulasi orientasi hadap jalan (*street-facing*), zonasi blok distrik seluler, dan konsentrasi CBD pencakar langit.
+- **Origami Fold (Model ke-6)**: Menghasilkan lipatan kertas geometris / low-poly polyhedron dengan bayangan faset tajam (*flat shading*), tekstur washi/parchment, mahkota burung bangau (*crane wings*) di 3 sudut finder, dan animasi pembukaan lipatan mekanis (*unfolding*) saat morphing.
+
+### 5. Color Theme Studio
+- **Preset Palet Warna**:
+  - **Auto DNA**: Menghasilkan palet deterministik berbasis benih URL.
+  - **Cyber Neon**: Pendaran sian, magenta, dan kuning neon berlatar gelap pekat.
+  - **Obsidian Gold**: Emas metalik mewah di atas substrat obsidian gelap.
+  - **Emerald Tech**: Nuansa hijau zamrud bioteknologi dan matriks sirkuit.
+  - **Minimalist Mono**: Titanium monokrom elegan dengan aksen biru safir.
+  - **Custom Hex**: Color picker manual interaktif untuk warna primer, sekunder, aksen, dan latar belakang.
+
+### 6. Kontrol Dual-Mode & GPU Morph Slider
+- **Tombol Mode Toggle**: Beralih otomatis antara *3D World* dan *2D Scan Mode* dengan transisi halus 850ms.
+- **GPU Morph Scrub Slider**: Menggeser posisi animasi transisi secara presisi dari $0.00$ (3D penuh) hingga $1.00$ (2D datar siap scan) dengan zero CPU overhead berkat kalkulasi GPU Vertex Shader 120 FPS.
+
+### 7. Instant WebXR & Native Mobile AR View ("View in AR")
+- Tombol **View in AR** (di header dan bilah ekspor) memicu pengalaman AR langsung di smartphone:
+  - **iOS Safari**: Mengekspor scene ke blob USDZ biner dan meluncurkan **Apple AR Quick Look** bawaan secara instan.
+  - **Chrome Android**: Membuka model via **Google Scene Viewer** ARCore intent scheme (`intent://arvr.google.com/scene-viewer/1.0...`).
+  - **Desktop**: Mengunduh model GLB biner dengan notifikasi panduan pemindahan ke mobile.
+
+### 8. Graphics Engine Switcher (WebGL vs Native WebGPU)
+- Tombol **Engine: WebGL / WebGPU** di header atas mendeteksi ketersediaan WebGPU secara otomatis via `isWebGPUSupported()`.
+- Saat aktif pada peramban modern yang mendukung WebGPU, studio beralih ke `JiwoWebGPURenderer` dengan compute/render pass WGSL murni dan storage buffer instancing.
+
+### 9. Bilah Alat Ekspor 3D & Cetak 2D
+- **Export GLB**: Mengunduh file `.glb` 3D scene aktif Three.js.
+- **Export STL**: Mengunduh file `.stl` biner watertight untuk software 3D printing slicer dengan ketinggian balok sesuai model 3D aktif (`architecture`, `globe`, `circuit`, `biomorphic`, `city`, atau `origami`).
+- **Export PNG**: Mengunduh file `.png` 300 DPI ultra-tajam untuk percetakan fisik.
+- **Export SVG**: Mengunduh file vector `.svg` mandiri dengan quiet zone.
+- **View in AR (Mobile)**: Tombol pintas mobile AR di bilah ekspor.
+
+### 10. Sensor Giroskop Holografik (iOS Safari & Android Compatible)
+- Tombol **Gyro** mengaktifkan sensor `DeviceOrientationEvent` dengan dialog izin resmi iOS 13+ Apple Safari untuk efek kedalaman 3D holografik saat memiringkan perangkat.
+
+
+### 7. Panel Telemetri DNA Deterministik
+HUD samping menampilkan informasi rekayasa data real-time:
+- **64-bit Hash**: Nilai heksadesimal hash FNV-1a dari payload.
+- **32-bit Seed**: Benih bilangan bulat yang menggerakkan Mulberry32 PRNG.
+- **QR Specifications**: Versi QR (cth: `v3 (37x37)`), ukuran total modul, dan tingkat koreksi galat (*ECC Level*).
+- **DNA Parameter Readout**:
+  - *Mode Architecture*: Tipe menara (`MONOLITH`, `CITADEL`, `OBELISK`, `PAGODA`), batas tinggi, dan gaya atap.
+  - *Mode Globe*: Jumlah satelit, elevasi benua, kedalaman samudera, dan kecepatan rotasi.
+  - *Mode Circuit*: Paket chip IC (`QFP`, `BGA`), warna solder mask (`green`, `black`, `blue`, `red`), dan gaya trace.
+- **Palette Swatches**: 5 kotak sampel warna (*Primary, Secondary, Accent, Substrate, Finder Glow*) yang dihasilkan secara deterministik.
+
+---
+
+## 🛠️ Cara Menjalankan Lokal
+
+```bash
+# Menjalankan Vite dev server
+pnpm dev
+
+# Atau menjalankan spesifik pada workspace demo
+pnpm --filter demo dev
+```
+
+Buka peramban di: `http://localhost:5173`.
+
+Build produksi:
+```bash
+pnpm --filter demo build
+```
+
+---
+
+## 📁 Struktur Berkas
+
+```
+apps/demo/
+├── index.html             # Layout HTML antarmuka studio, HUD, bilah ekspor & kontrol
+├── src/
+│   ├── main.ts            # Logika interaksi DOM, binding renderer, ekspor & sensor
+│   └── style.css          # Desain tema gelap cyber/futuristik
+├── vite.config.ts         # Konfigurasi Vite & cacheDir isolasi
+└── package.json           # Manifest dependensi demo app
+```
+
+---
+
+
+
+## 📄 Berkas: `update_tracker.md`
 
 # JiwoQR - Update Tracker
 
@@ -961,1507 +2727,94 @@ This file tracks all file creations, modifications, and deletions in the reposit
 - `STL-for-buildingModels/` [MODIFIED]:
   - **Rationale**: Re-optimized all 8 active STL models to ~1,600 triangles each. Total combined size of all 8 files is now only **650 KB** (reduced from 120 MB!). Total triangles across all ~300 city modules is reduced from 2.2 million down to **~500,000 triangles**, rendering at rock-solid **60-120 FPS**.
 
-
-
-
-
-
-
-
-
-
-
-
-
----
-
-## 📄 File: packages/core/README.md (Core Package README (@jiwoqr/core))
-
-# 🧬 @jiwoqr/core
-
-> **Modul Inti Generator QR & DNA Visual Deterministik**  
-> *Enkoder bitstream multi-mode QR murni TypeScript sesuai ISO/IEC 18004, kompresi numerik & alfanumerik, kalkulasi Galois Field Reed-Solomon ECC, serta generator DNA prosedural berbasis FNV-1a 64-bit dan Mulberry32 PRNG tanpa dependensi runtime pihak ketiga.*
-
-[![Package: @jiwoqr/core](https://img.shields.io/badge/Package-%40jiwoqr%2Fcore-blue.svg)](file:///d:/REPOS/jiwoQR/packages/core)
-[![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero-brightgreen.svg)](file:///d:/REPOS/jiwoQR/packages/core/package.json)
-[![TypeScript Strict](https://img.shields.io/badge/TypeScript-Strict-blue.svg)](file:///d:/REPOS/jiwoQR/packages/core/tsconfig.json)
-
----
-
-## 📖 Daftar Isi
-
-- [Gambaran Umum](#-gambaran-umum)
-- [Arsitektur Modul](#-arsitektur-modul)
-  - [1. Hashing & Normalisasi Input (`src/dna/hasher.ts`)](#1-hashing--normalisasi-input-srcdnahasherts)
-  - [2. Mulberry32 PRNG (`src/dna/prng.ts`)](#2-mulberry32-prng-srcdnaprngts)
-  - [3. Generator DNA Deterministik & Arketipe Circuit (`src/dna/generator.ts`)](#3-generator-dna-deterministik--arketipe-circuit-srcdnageneratorts)
-  - [4. Reed-Solomon Error Correction (`src/qr/reed-solomon.ts`)](#4-reed-solomon-error-correction-srcqrreed-solomonts)
-  - [5. ISO/IEC 18004 Multi-Mode Matrix Encoder (`src/qr/encoder.ts`)](#5-isoiec-18004-multi-mode-matrix-encoder-srcqrencoderts)
-- [Struktur Tipe Data & Interface](#-struktur-tipe-data--interface)
-- [Panduan Penggunaan API](#-panduan-penggunaan-api)
-  - [Fungsi Utama: `createJiwoQR`](#fungsi-utama-createjiwoqr)
-  - [Enkoding Matriks QR Multi-Mode: `encodeQR`](#enkoding-matriks-qr-multi-mode-encodeqr)
-  - [Pembangkitan DNA Prosedural: `generateDNA`](#pembangkitan-dna-prosedural-generatedna)
-- [Pengujian Unit](#-pengujian-unit)
-
----
-
-## 🌟 Gambaran Umum
-
-Paket `@jiwoqr/core` adalah fondasi logika dari seluruh ekosistem JiwoQR. Paket ini dirancang dengan prinsip:
-- **Zero Runtime Dependencies**: Ditulis murni dalam TypeScript standar tanpa ketergantungan pada library pihak ketiga.
-- **Kepatuhan Spesifikasi Standar**: Mengikuti spesifikasi resmi **ISO/IEC 18004** untuk encoding multi-mode (Numeric, Alphanumeric, Byte), Reed-Solomon Error Correction Code (ECC), masking bitwise optimal, serta margin wajib 4 modul *Quiet Zone*.
-- **Deterministik Penuh**: Mengonversi setiap input string/URL menjadi benih acak (*seed*) 64-bit yang konsisten, menghasilkan palet warna, siluet arsitektur, parameter globe, dan konfigurasi PCB circuit yang selalu identik untuk input yang sama.
-
----
-
-## 🏗️ Arsitektur Modul
-
-```
-packages/core/src/
-├── dna/
-│   ├── hasher.ts          # Hashing FNV-1a 64-bit & normalisasi URL
-│   ├── prng.ts            # Mulberry32 Pseudo-Random Number Generator
-│   └── generator.ts       # Pembangkitan palet warna, arsitektur, globe & circuit DNA
-├── qr/
-│   ├── tables.ts          # Tabel kapasitas ISO/IEC 18004, alignment, & format bits
-│   ├── reed-solomon.ts    # Aritmatika Galois Field GF(256) & pembagian polinomial
-│   └── encoder.ts         # Multi-mode bitstream encoder, 8 mask evaluation, matrix layout
-├── types.ts               # Interface TypeScript publik
-└── index.ts               # Entry point ekspor publik
-```
-
----
-
-### 1. Hashing & Normalisasi Input (`src/dna/hasher.ts`)
-
-#### Normalisasi URL (`normalizeInput`)
-Untuk mencegah perbedaan visual yang tidak diinginkan akibat variasi penulisan kecil pada URL (seperti huruf kapital pada domain atau port default), fungsi `normalizeInput` melakukan standardisasi:
-- Mengubah skema protokol (`http://`, `https://`) dan hostname menjadi huruf kecil (*lowercase*).
-- Menghapus port standar (`:80`, `:443`).
-- Menghilangkan *trailing slash* yang berlebihan pada root path.
-
-#### Algoritma FNV-1a 64-bit (`fnv1a64`)
-```typescript
-const FNV_OFFSET_BASIS = 0xcbf29ce484222325n;
-const FNV_PRIME = 0x100000001b3n;
-
-export function fnv1a64(input: string): bigint {
-  let hash = FNV_OFFSET_BASIS;
-  for (let i = 0; i < input.length; i++) {
-    hash ^= BigInt(input.charCodeAt(i));
-    hash = (hash * FNV_PRIME) & 0xffffffffffffffffn;
-  }
-  return hash;
-}
-```
-
----
-
-### 2. Mulberry32 PRNG (`src/dna/prng.ts`)
-
-Menggunakan algoritma **Mulberry32** dengan konversi aman dari benih 64-bit `BigInt` ke `uint32` melalui `BigInt.asUintN(32, seed)`.
-
----
-
-### 3. Generator DNA Deterministik & Arketipe Circuit (`src/dna/generator.ts`)
-
-Membangkitkan entitas `DeterministicDNA` yang mengatur seluruh karakteristik visual renderer 3D:
-
-1. **Palet Warna Harmonis**: Pilihan tema (*cyber, neon, brutalist, synthwave, obsidian, solar, emerald*).
-2. **Karakteristik Arsitektur**: `maxHeight`, `heightVariance`, `roofStyle` (`flat`, `stepped`, `sloped`, `spire`), dan `towerArchetype` (`monolith`, `citadel`, `obelisk`, `pagoda`).
-3. **Karakteristik Globe**: `continentElevation`, `oceanDepth`, `satelliteCount`, dan `rotationSpeed`.
-4. **Karakteristik Circuit (`CircuitDNA`)**:
-   - `traceStyle`: Jalur tembaga (`ortho-45` sudut 45 derajat, `manhattan` sudut 90 derajat, `curved`).
-   - `chipPackage`: Tipe kemasan IC mikroprosesor finder (`QFP`, `BGA`, `DIP`, `SOP`).
-   - `solderMaskColor`: Warna lapisan pelindung PCB (`green`, `black`, `blue`, `red`, `purple`).
-   - `componentDensity`: Kepadatan resistor/kapasitor SMD.
-   - `viaDensity`: Kepadatan via pad solder emas.
-   - `traceWidth`: Lebar jalur konduktor.
-5. **Karakteristik Biomorphic (`BiomorphicDNA`)**:
-   - `crystalGrowthStyle`: Gaya pertumbuhan prisma kristal (`hexagonal`, `needle_prism`, `geode_cluster`, `coral_branch`).
-   - `refractionIndex`: Indeks bias optik mineral ($1.33$ hingga $1.72$).
-   - `facetSharpness`: Ketajaman facet prisma kristal.
-   - `clusterDensity`: Kepadatan formasi kristal geodesik.
-   - `glowIntensity`: Intensitas pendaran monolit finder kristal.
-6. **Karakteristik Kota Metropolis (`CityDNA`)**:
-   - `zoningArchetype`: Gaya zoning distrik perkotaan (`commercial`, `residential`, `civic`, `industrial`, `mixed`).
-   - `skylineDensity`: Kepadatan menara pencakar langit di pusat distrik CBD.
-   - `streetOrientationBias`: Kecenderungan rotasi fasad gedung menghadap jalan raya terbuka (*orthogonal 4-way analysis*).
-   - `landmarkStyle`: Bentuk dan elevasi menara sudut monumental (*spire*, *obelisk*, *citadel*).
-   - `buildingScale`: Proporsi skala gedung relatif terhadap modul QR.
-
----
-
-### 4. Reed-Solomon Error Correction (`src/qr/reed-solomon.ts`)
-
-Perhitungan Galois Field $\text{GF}(2^{8})$ berbasis polinomial primitif $P(x) = x^8 + x^4 + x^3 + x^2 + 1$ (285):
-- Tabel eksponensial (`EXP_TABLE`) dan logaritma (`LOG_TABLE`) 256 entri.
-- Fungsi `gfMul(x, y)` untuk perkalian Galois Field.
-- Pembangkit polinomial generator $g(x) = \prod_{i=0}^{n-1} (x - \alpha^i)$.
-- Pembagian polinomial modulo $g(x)$ untuk menghasilkan deretan *codeword* koreksi galat.
-
----
-
-### 5. ISO/IEC 18004 Multi-Mode Matrix Encoder (`src/qr/encoder.ts`)
-
-Mendukung deteksi dan kompresi bitstream otomatis:
-1. **Mode Numeric (Mode Indicator `0001`)**:
-   - Memadatkan 3 digit angka (`0-9`) ke dalam 10 bit, 2 digit ke 7 bit, dan 1 digit ke 4 bit.
-   - Mengurangi ukuran versi QR secara signifikan untuk nomor telepon, ID numerik, atau kode OTP.
-2. **Mode Alphanumeric (Mode Indicator `0010`)**:
-   - Mendukung 45 karakter: `0-9`, `A-Z`, spasi, `$`, `%`, `*`, `+`, `-`, `.`, `/`, `:`.
-   - Memadatkan 2 karakter ke dalam 11 bit dengan formula: $V = c_1 \times 45 + c_2$.
-3. **Mode Byte (Mode Indicator `0100`)**:
-   - 8-bit byte stream untuk URL, string campuran, dan karakter UTF-8.
-4. **Auto-Mode Detection (`detectQRMode`)**:
-   - Memilih mode terpadat secara otomatis jika opsi `mode: 'auto'` digunakan.
-5. **Evaluasi 8 Pola Masking & Format Info BCH**:
-   - Menghitung penalti $N_1, N_2, N_3, N_4$ untuk memilih mask terbaik.
-   - Menambahkan format info 15-bit berpelindung BCH $(15, 5)$.
-6. **Margin 4 Modul Quiet Zone & Tag Semantik Modul**.
-
----
-
-## 📐 Struktur Tipe Data & Interface
-
-```typescript
-export type ECCLevel = 'L' | 'M' | 'Q' | 'H';
-
-export type QRMode = 'numeric' | 'alphanumeric' | 'byte';
-export type QRModeOption = 'auto' | QRMode;
-
-export type ModuleType =
-  | 'FINDER'
-  | 'FINDER_SEPARATOR'
-  | 'ALIGNMENT'
-  | 'TIMING'
-  | 'DARK'
-  | 'FORMAT'
-  | 'VERSION'
-  | 'DATA'
-  | 'QUIET';
-
-export interface QRModule {
-  x: number;
-  y: number;
-  isDark: boolean;
-  type: ModuleType;
-}
-
-export interface QRMatrix {
-  size: number;
-  version: number;
-  ecc: ECCLevel;
-  quietZone: number;
-  totalSize: number;
-  grid: QRModule[][];
-  get(x: number, y: number): QRModule | undefined;
-}
-
-export interface CircuitDNA {
-  traceStyle: 'orthogonal' | 'diagonal' | 'curved';
-  chipPackage: 'qfp' | 'bga' | 'soic';
-  solderMaskColor: 'green' | 'black' | 'blue' | 'purple';
-  componentDensity: number;
-  viaDensity: number;
-  traceWidth: number;
-}
-
-export interface BiomorphicDNA {
-  crystalGrowthStyle: 'hexagonal' | 'coral_branch' | 'geode_cluster' | 'needle_prism';
-  refractionIndex: number;
-  facetSharpness: number;
-  clusterDensity: number;
-  glowIntensity: number;
-}
-
-export interface DeterministicDNA {
-  rawHash: bigint;
-  seed32: number;
-  normalizedUrl: string;
-  palette: ColorPalette;
-  architecture: ArchitectureDNA;
-  globe: GlobeDNA;
-  circuit: CircuitDNA;
-  biomorphic: BiomorphicDNA;
-}
-
-export interface EncodeOptions {
-  ecc?: ECCLevel;
-  minVersion?: number;
-  maxVersion?: number;
-  quietZone?: number;
-  mode?: QRModeOption;
-}
-```
-
----
-
-## 💻 Panduan Penggunaan API
-
-### Fungsi Utama: `createJiwoQR`
-
-```typescript
-import { createJiwoQR } from '@jiwoqr/core';
-
-const entity = createJiwoQR('https://jiwoqr.dev', {
-  ecc: 'Q',        // Level ECC (default: 'Q')
-  quietZone: 4,    // Margin quiet zone (default: 4)
-  mode: 'auto',    // Deteksi mode bitstream otomatis
-});
-
-console.log('QR Version:', entity.matrix.version);
-console.log('Circuit Mask:', entity.dna.circuit.solderMaskColor);
-console.log('Chip Package:', entity.dna.circuit.chipPackage);
-```
-
----
-
-### Enkoding Matriks QR Multi-Mode: `encodeQR`
-
-```typescript
-import { encodeQR } from '@jiwoqr/core';
-
-// 1. Numerik: menghasilkan versi QR lebih kecil
-const numMatrix = encodeQR('0812345678901234', { mode: 'numeric' });
-
-// 2. Alfanumerik
-const alphaMatrix = encodeQR('HTTP://JIWOQR.DEV/CODE123', { mode: 'alphanumeric' });
-```
-
----
-
-## 🧪 Pengujian Unit
-
-```bash
-pnpm test
-```
-Test suite memverifikasi akurasi packing bitstream numeric/alphanumeric, deteksi mode otomatis, perhitungan Reed-Solomon, serta stabilitas deterministik `CircuitDNA`.
-
-
----
-
-## 📄 File: packages/math/README.md (Math Package README (@jiwoqr/math))
-
-# 📐 @jiwoqr/math
-
-> **Fondasi Matematika Grafika, Easing & Proyeksi Spasial 3D**  
-> *Transformasi vektor 3D, kurva interpolasi cubic easing, proyeksi ekstrusi arsitektur brutalist, pemetaan dual-hemisphere voxel mound dome, serta kalkulasi komponen sirkuit PCB untuk transisi mulus 3D ke 2D scan mode.*
-
-[![Package: @jiwoqr/math](https://img.shields.io/badge/Package-%40jiwoqr%2Fmath-blue.svg)](file:///d:/REPOS/jiwoQR/packages/math)
-[![TypeScript Strict](https://img.shields.io/badge/TypeScript-Strict-blue.svg)](file:///d:/REPOS/jiwoQR/packages/math/tsconfig.json)
-
----
-
-## 📖 Daftar Isi
-
-- [Gambaran Umum](#-gambaran-umum)
-- [Arsitektur Modul](#-arsitektur-modul)
-- [Fungsi Interpolasi & Easing (`src/easing.ts`)](#-fungsi-interpolasi--easing-srceasingts)
-- [Proyeksi Ekstrusi Arsitektur (`src/projections/extrusion.ts`)](#-proyeksi-ekstrusi-arsitektur-srcprojectionsextrusionts)
-- [Proyeksi Spherical & Voxel Mound Dome (`src/projections/spherical.ts`)](#-proyeksi-spherical--voxel-mound-dome-srcprojectionssphericalts)
-- [Proyeksi Komponen Sirkuit PCB (`src/projections/circuit.ts`)](#-proyeksi-komponen-sirkuit-pcb-srcprojectionscircuitts)
-- [Proyeksi Mineral & Karang Biomorphic (`src/projections/biomorphic.ts`)](#-proyeksi-mineral--karang-biomorphic-srcprojectionsbiomorphicts)
-- [Struktur Interface & Tipe Data](#-struktur-interface--tipe-data)
-- [Contoh Penggunaan API](#-contoh-penggunaan-api)
-- [Pengujian Unit](#-pengujian-unit)
-
----
-
-## 🌟 Gambaran Umum
-
-Paket `@jiwoqr/math` menyediakan fungsi-fungsi kalkulasi geometris dan transformasi spasial deterministik yang digunakan oleh engine renderer WebGL JiwoQR. Paket ini bertanggung jawab memastikan:
-1. **Determinisme Geometris**: Transformasi setiap modul QR (posisi, rotasi, skala) dihitung murni secara matematis dari koordinat grid dan benih PRNG tanpa bergantung pada state global Three.js.
-2. **Keterbacaan Optik 100%**: Menjamin bahwa saat parameter morfisme $t \to 1.0$, seluruh modul $3\text{D}$ bertransformasi tepat pada posisi kanonikal grid $2\text{D}$ dengan ketinggian mendekati nol ($Z \approx 0.02$).
-
----
-
-## 🏗️ Arsitektur Modul
-
-```
-packages/math/src/
-├── easing.ts                  # lerp, lerpVec3, easeInOutCubic, smoothstep
-├── projections/
-│   ├── extrusion.ts           # Ekstrusi ketinggian & transisi 3D-ke-2D Arsitektur
-│   ├── spherical.ts           # Cube-to-sphere, UV-to-sphere & Voxel Dome Mound
-│   ├── circuit.ts             # Transformasi IC chip, SMD resistor, via pad, & trace
-│   ├── biomorphic.ts          # Transformasi prisma kristal heksagonal, pilar geodesik & karang
-│   └── city.ts                # Kalkulasi orientasi hadap jalan (street-facing), cellular zoning & CBD gradient
-├── types.ts                   # Vec2, Vec3, ExtrusionModuleTransform, SpherifiedModuleTransform, CircuitModuleTransform, BiomorphicModuleTransform, CityModuleTransform
-└── index.ts                   # Ekspor publik
-```
-
----
-
-## 📈 Fungsi Interpolasi & Easing (`src/easing.ts`)
-
-### 1. Linear Interpolation (`lerp` & `lerpVec3`)
-$$\text{lerp}(a, b, t) = a + (b - a) \times t$$
-
-### 2. Cubic Ease-In-Out (`easeInOutCubic`)
-$$f(t) = \begin{cases} 4t^3 & \text{jika } t < 0.5 \\ 1 - \frac{(-2t + 2)^3}{2} & \text{jika } t \ge 0.5 \end{cases}$$
-
----
-
-## 🏙️ Proyeksi Ekstrusi Arsitektur (`src/projections/extrusion.ts`)
-
-Pada model Arsitektur, setiap modul gelap QR code diekstrusi ke sumbu $+Z$:
-1. **Modul Finder**: $H_{\text{finder}} = H_{\text{max}} \times 1.75$ sebagai *landmark towers*.
-2. **Modul Data**: $H_{\text{data}} = H_{\text{min}} + (H_{\text{max}} - H_{\text{min}}) \times \text{noise}(x, y, \text{seed})$.
-3. **Interpolasi 3D-ke-2D (`interpolateExtrusion`)**: Berkurang secara mulus menuju $Z = 0.01$ dan $S_z = 0.02$.
-
----
-
-## 🌍 Proyeksi Spherical & Voxel Mound Dome (`src/projections/spherical.ts`)
-
-Formula medan elevasi kubah bola simetris:
-$$H(x, y) = H_{\text{max}} \times \sqrt{\max\left(0, 1 - \left(\frac{\text{dist}(x, y)}{R_{\text{max}}}\right)^2\right)}$$
-- **Top Mound A**: Menempel di $Z = 0$ diekstrusi ke $+Z$.
-- **Bottom Mound B**: Menempel di $Z = 0$ diekstrusi ke $-Z$.
-- Pertemuan kedua kubah membentuk bola voxel padu tanpa pelat pembelah di mode 3D.
-
----
-
-## 🔌 Proyeksi Komponen Sirkuit PCB (`src/projections/circuit.ts`)
-
-Menentukan jenis dan orientasi komponen elektronik mikro pada modul QR:
-1. **Pola Finder**: Diberi tipe `chip` (paket IC QFP dengan pin logam).
-2. **Modul Data**: Secara deterministik dibagi menjadi:
-   - `smd_resistor`: Balok resistor dengan tutup solder perak.
-   - `smd_capacitor`: Balok kapasitor keramik cokelat muda.
-   - `via_pad`: Silinder solder via pad emas.
-   - `trace`: Jalur konduktor tembaga dengan sudut 45 atau 90 derajat.
-3. **Interpolasi Morphing (`interpolateCircuitMorph`)**:
-   - Memutar orientasi komponen kembali ke sudut $\text{Rot} = (0, 0, 0)$.
-   - Meratakan tinggi modul $S_z \to 0.02$ tepat di atas pelat solder mask.
-
----
-
-## 💎 Proyeksi Mineral & Karang Biomorphic (`src/projections/biomorphic.ts`)
-
-Mengalkulasi pertumbuhan kristal mineral prisma heksagonal dan formasi karang:
-1. **Pola Finder**: Dimodelkan sebagai klaster monolitik kristal geodesik bercahaya tinggi ($H_{\text{finder}} = H_{\text{max}} \times 1.85$).
-2. **Modul Data**: Memiliki gaya pertumbuhan deterministik (`hexagonal`, `needle_prism`, `geode_cluster`, `coral_branch`) dengan variasi sudut facet $\theta_{\text{rot}}$ dan kemiringan organik $\phi_{\text{tilt}}$.
-3. **Interpolasi Morphing (`interpolateBiomorphicMorph`)**:
-   - Merotasikan kristal kembali tegak lurus ($\theta_{\text{rot}} \to 0, \phi_{\text{tilt}} \to 0$).
-   - Menurunkan ketinggian $S_z \to 0.02$ tepat di atas pelat dasar.
-
----
-
-## 🏙️ Proyeksi Tata Kota Metropolis (`src/projections/city.ts`)
-
-Mengalkulasi parameter urban planning deterministik untuk model Kota Realistis (Model 5):
-1. **Orientasi Hadap Jalan (`computeStreetFacingAngle`)**:
-   - Menganalisa 4 tetangga ortogonal sel QR $(x \pm 1, y \pm 1)$.
-   - Jika 1 sisi terbuka (modul terang = jalan raya), bangunan berotasi menghadap jalan tersebut ($0^\circ, 90^\circ, 180^\circ, 270^\circ$).
-   - Jika berada di sudut pertemuan 2 jalan (corner lot), bangunan berotasi diagonal $45^\circ$ atau sejajar koridor utama.
-2. **Cellular Block Zoning & CBD Gradient (`computeCityModuleTransform`)**:
-   - Membagi matriks QR ke dalam blok seluler $3\times3$ atau $4\times4$ agar gedung-gedung bertetangga memiliki keharmonisan arsitektur.
-   - Mengalkulasi jarak radial ke pusat matriks ($c_x, c_y$); sel di dekat pusat (*Central Business District*) memiliki probabilitas tinggi menjadi pencakar langit megah (*High-Rise*), sedangkan tepi matriks menjadi blok residensial/komersial menengah (*Mid-Rise / Urban Block*).
-   - Tiga sudut Finder Pattern dimodelkan sebagai menara *Civic Landmark* monumental dengan elevasi $2.2\times$.
-3. **Interpolasi Morphing (`interpolateCityTransform`)**:
-   - Memutar orientasi yaw kembali ke $0^\circ$.
-   - Mengompresi ketinggian bangunan $S_z \to 0.02$ dan melebarkan dimensi horizontal ke ukuran penuh modul untuk pemindaian instan.
-
----
-
-## 📐 Struktur Interface & Tipe Data
-
-```typescript
-export type BiomorphicCrystalStyle =
-  | 'hexagonal'
-  | 'coral_branch'
-  | 'geode_cluster'
-  | 'needle_prism';
-
-export interface BiomorphicModuleTransform {
-  gridX: number;
-  gridY: number;
-  isDark: boolean;
-  isFinder: boolean;
-  crystalStyle: BiomorphicCrystalStyle;
-  position3D: Vec3;
-  position2D: Vec3;
-  scale3D: Vec3;
-  scale2D: Vec3;
-  rotationZ: number;
-  tiltAngle: number;
-}
-```
-
----
-
-## 💻 Contoh Penggunaan API
-
-```typescript
-import {
-  computeCircuitModuleTransform,
-  interpolateCircuitMorph,
-} from '@jiwoqr/math';
-
-// Menghitung transformasi sirkuit PCB untuk modul
-const transform = computeCircuitModuleTransform(
-  8,     // gridX
-  12,    // gridY
-  29,    // totalGridSize
-  true,  // isDark
-  false, // isFinder
-  98765  // seed32
-);
-
-console.log('Tipe Komponen:', transform.componentType); // 'smd_resistor' | 'via_pad' | etc.
-
-// Interpolasi saat morphing ke scan mode
-const current = interpolateCircuitMorph(transform, 0.8);
-```
-
----
-
-## 🧪 Pengujian Unit
-
-```bash
-pnpm test
-```
-Memverifikasi batas kurva easing, proyeksi ekstrusi arsitektur, radial falloff gundukan bola, serta akurasi penempatan komponen circuit PCB.
-
-
----
-
-## 📄 File: packages/renderer-webgl/README.md (WebGL Renderer Package README (@jiwoqr/renderer-webgl))
-
-# 🎨 @jiwoqr/renderer-webgl
-
-> **Engine Visualisasi 3D WebGL / Three.js Kinerja Tinggi**  
-> *Instanced rendering 60 FPS, arketipe visual Arsitektur, Globe & Circuit PCB, kontrol kamera orbit & sensor giroskop, sistem mitigasi pencahayaan & bayangan, serta graceful fallback ke 2D Canvas.*
-
-[![Package: @jiwoqr/renderer-webgl](https://img.shields.io/badge/Package-%40jiwoqr%2Frenderer--webgl-blue.svg)](file:///d:/REPOS/jiwoQR/packages/renderer-webgl)
-[![Three.js](https://img.shields.io/badge/Three.js-r174-black.svg?logo=three.js)](https://threejs.org/)
-[![TypeScript Strict](https://img.shields.io/badge/TypeScript-Strict-blue.svg)](file:///d:/REPOS/jiwoQR/packages/renderer-webgl/tsconfig.json)
-
----
-
-## 📖 Daftar Isi
-
-- [Gambaran Umum](#-gambaran-umum)
-- [Arsitektur Modul](#-arsitektur-modul)
-- [Kelas Utama: `JiwoWebGLRenderer`](#-kelas-utama-jiwowebglrenderer)
-  - [Konfigurasi & Inisialisasi](#konfigurasi--inisialisasi)
-  - [Metode & Siklus Hidup (Lifecycle)](#metode--siklus-hidup-lifecycle)
-- [Model Visual 3D](#-model-visual-3d)
-  - [1. Model Arsitektur (`src/models/architecture.ts`)](#1-model-arsitektur-srcmodelsarchitecturets)
-  - [2. Model Bola Voxel (`src/models/globe.ts`)](#2-model-bola-voxel-srcmodelsglobets)
-  - [3. Model Sirkuit Elektronik (`src/models/circuit.ts`)](#3-model-sirkuit-elektronik-srcmodelscircuitts)
-  - [4. Model Biomorphic Crystalline (`src/models/biomorphic.ts`)](#4-model-biomorphic-crystalline-srcmodelsbiomorphicts)
-- [GPU Vertex Shader Morphing Pipeline (`src/shaders/gpu-morph.ts`)](#-gpu-vertex-shader-morphing-pipeline-srcshadersgpu-morphts)
-- [Sistem Kamera, Orbit & Giroskop Mobile (iOS Safari Compatible)](#-sistem-kamera-orbit--giroskop-mobile-ios-safari-compatible)
-- [Sistem Mitigasi Pencahayaan & Bayangan untuk Pemindaian Optik](#-sistem-mitigasi-pencahayaan--bayangan-untuk-pemindaian-optik)
-- [Zero-WebGL Graceful Fallback (`src/fallback/`)](#-zero-webgl-graceful-fallback-srcfallback)
-- [Optimasi Performa Rendering](#-optimasi-performa-rendering)
-- [Contoh Kode Integrasi](#-contoh-kode-integrasi)
-
----
-
-## 🌟 Gambaran Umum
-
-Paket `@jiwoqr/renderer-webgl` bertanggung jawab mengubah struktur semantik data QR dari `@jiwoqr/core` dan kalkulasi spasial dari `@jiwoqr/math` menjadi pemandangan 3D interaktif yang menakjubkan menggunakan **Three.js**.
-
-Keunggulan utama:
-- **GPU-Accelerated 120 FPS Vertex Shader Morphing**: Melakukan kalkulasi interpolasi morphing $3\text{D} \to 2\text{D}$ langsung di GPU Vertex Shader melalui uniform `uMorphProgress` dan instanced buffer attributes (`aPosition3D`, `aPosition2D`, `aScale3D`, `aScale2D`, `aRotationZ3D`, `aColor3D`, `aColor2D`), menghilangkan beban loop per-modul di CPU.
-- **Empat Arketipe Visual**: Architecture (kota brutalist), Globe (kubah bola voxel mound), Circuit (papan PCB microchip), dan Biomorphic (pertumbuhan kristal mineral heksagonal).
-- **iOS 13+ Safari Gyroscope Permission**: Utilitas asynchronous terstandar untuk otorisasi sensor gerak pada perangkat Apple dan Android.
-- **Graceful Fallback**: Deteksi otomatis kapabilitas WebGL dengan fallback mulus ke Canvas 2D murni.
-
----
-
-## 🏗️ Arsitektur Modul
-
-```
-packages/renderer-webgl/src/
-├── fallback/
-│   └── fallback.ts            # Deteksi WebGL & canvas 2D fallback renderer
-├── shaders/
-│   └── gpu-morph.ts           # Hook shader Three.js untuk interpolasi posisi, rotasi, & warna di GPU
-├── models/
-│   ├── architecture.ts        # Model 1: Kota skyscraper cyber-brutalist & menara finder
-│   ├── globe.ts               # Model 2: Dual-hemisphere voxel mound dome & gradien elevasi
-│   ├── circuit.ts             # Model 3: PCB board, chip QFP, SMD components, via & traces
-│   ├── biomorphic.ts          # Model 4: Kristal mineral heksagonal, geode bercahaya & refraksi PBR
-│   ├── city.ts                # Model 5: Kota metropolitan realistis (multi-STL instances, street-facing)
-│   └── building-manager.ts    # Asset loader & normalizer model STL 3D dinamis
-├── scene/
-│   └── camera-controller.ts   # Orbit drag 3D, sensor giroskop iOS/Android, & auto-alignment
-├── types.ts                   # Interface opsi renderer & model types
-├── renderer.ts                # Kelas utama JiwoWebGLRenderer & render loop
-└── index.ts                   # Ekspor publik
-```
-
----
-
-## 🚀 Kelas Utama: `JiwoWebGLRenderer`
-
-### Konfigurasi & Inisialisasi
-
-```typescript
-import { JiwoWebGLRenderer, JiwoRendererOptions } from '@jiwoqr/renderer-webgl';
-
-const renderer = new JiwoWebGLRenderer({
-  container: document.getElementById('canvas-container')!,
-  model: 'circuit',     // 'architecture' | 'globe' | 'circuit'
-  mode: '3d',           // '3d' | 'scan'
-  morphDuration: 800,   // Durasi animasi perpindahan mode (ms)
-  antialias: true,
-});
-```
-
-### Metode & Siklus Hidup (Lifecycle)
-
-| Metode | Deskripsi |
-| :--- | :--- |
-| `setData(payload: string)` | Menghitung DNA & matriks QR baru dari string/URL, lalu membangun ulang model 3D secara reaktif. |
-| `setEntity(entity: JiwoQREntity)` | Memuat entitas `JiwoQREntity` yang sudah dihitung sebelumnya. |
-| `setModel(model: RenderModel)` | Mengganti arketipe visual (`'architecture'`, `'globe'`, `'circuit'`). |
-| `getModel(): RenderModel` | Mengambil arketipe model yang sedang aktif. |
-| `setMode(mode: RenderMode)` | Memulai animasi transisi mulus antara `'3d'` dan `'scan'` mode. |
-| `getMode(): RenderMode` | Mengambil mode yang sedang aktif (`'3d'` atau `'scan'`). |
-| `setMorphProgress(progress: number)` | Mengatur progress morphing secara manual ($0.0 = 3\text{D}$, $1.0 = \text{Scan}$). |
-| `getMorphProgress(): number` | Mengambil nilai progress morphing saat ini. |
-| `getScene(): THREE.Scene` | Mengambil referensi THREE.Scene aktif (berguna untuk eksportir GLB). |
-| `getCameraController(): CameraController` | Mengambil instance pengontrol kamera. |
-| `resize(width: number, height: number)` | Menyesuaikan rasio aspek kamera dan ukuran viewport WebGL. |
-| `dispose()` | Menghentikan render loop, memutuskan ResizeObserver, menghapus event listener, dan membersihkan memori GPU. |
-
----
-
-## 🏛️ Model Visual 3D
-
-### 1. Model Arsitektur (`src/models/architecture.ts`)
-- Membentuk kota bertingkat dari blok-blok instanced box (`BoxGeometry(1, 1, 1)`).
-- Menara Finder diekstrusi hingga $1.75\times$ tinggi maksimum dengan warna pendaran emisif khusus (`finderEmissive`).
-- Dilengkapi pelat dasar (*ground substrate plate*) yang menutupi area matriks QR beserta zona tenang 4 modul.
-
-### 2. Model Bola Voxel (`src/models/globe.ts`)
-- Membentuk gundukan voxel 3D dual-hemisfer (Kubah A di $+Z$ dan Kubah B di $-Z$).
-- Gradasi warna kontinental dari terracotta di ekuator ke biru/ungu di tengah dan emas di puncak.
-- Pelat ekuator $Z = 0$ disembunyikan di mode 3D agar bola tampak melayang utuh, dan memudar masuk saat bertransisi ke Mode Scan.
-
-### 3. Model Sirkuit Elektronik (`src/models/circuit.ts`)
-- Menampilkan motherboard PCB lengkap dengan lapisan solder mask (hijau, hitam, biru, ungu).
-- Tiga pola finder dirender sebagai chip mikroprosesor IC QFP dengan pin logam.
-- Modul data dirender sebagai komponen SMD (resistor, kapasitor, gold via pads, dan copper traces).
-- Seluruh komponen melebur rata menjadi modul biner 2D hitam pekat di atas pelat putih saat beralih ke Mode Scan.
-
-### 4. Model Biomorphic Crystalline (`src/models/biomorphic.ts`)
-- **Tema:** *Crystalline Mineral & Coral Growth*.
-- Modul QR dirender sebagai prisma kristal heksagonal (`CylinderGeometry(0.46, 0.54, 1.0, 6)`) dengan orientasi facet dan kemiringan deterministik.
-- Pola Finder dimodelkan sebagai klaster kristal geodesik monolitik besar bercahaya tinggi.
-- Material menggunakan `MeshPhysicalMaterial` dengan sifat translusen/refraktif (`transmission: 0.35`, `ior: 1.55`, `clearcoat: 0.75`).
-- Saat beralih ke Mode Scan ($t \to 1.0$), kristal memadat dan permukaannya merata menjadi modul hitam-putih kanonikal.
-
-### 5. Model Kota Realistis Metropolitan (`src/models/city.ts` & `src/models/building-manager.ts`)
-- **Tema:** *Realistic 3D Metropolis City Grid with Dynamic Custom STL Building Models*.
-- **Dynamic Asset Auto-Discovery (`BuildingModelManager`)**: Memuat semua model `.stl` dari `STL-for-buildingModels/` secara asinkronus, menormalisasi titik pusat $(0,0)$ dan fondasi dasar pada $Z = 0$, serta mengatur ukuran horizontal menjadi $0.92$ unit untuk ruang gang (*alleyways*) yang rapih.
-- **Street-Facing Orientation**: Menganalisa 4 tetangga ortogonal setiap sel untuk memutar orientasi bangunan ($0^\circ, 90^\circ, 180^\circ, 270^\circ$) agar selalu menghadap ke jalan raya terbuka.
-- **Cellular Block Zoning & CBD Gradient**: Pengelompokan lot bangunan dalam distrik harmonis dengan pencakar langit terkonsentrasi di pusat kota (*Central Business District*) dan menara monumental di 3 sudut Finder.
-- **Multi-Geometry Instanced Rendering**: Menggunakan `THREE.InstancedMesh` per model STL unik dengan `DynamicDrawUsage` untuk rendering GPU 60+ FPS.
-
----
-
-## ⚡ GPU Vertex Shader Morphing Pipeline (`src/shaders/gpu-morph.ts`)
-
-Pada Fase 3, seluruh interpolasi spasial dan warna modul dipindahkan dari CPU ke **GPU Vertex Shader**:
-1. **Instanced Buffer Attributes**: Posisi target 3D ($x_1, y_1, z_1$) dan 2D ($x_0, y_0, z_0$), skala 3D/2D, sudut rotasi Z, dan warna 3D disimpan langsung dalam VBO GPU:
-   - `aPosition3D`, `aPosition2D`
-   - `aScale3D`, `aScale2D`
-   - `aRotationZ3D`
-   - `aColor3D`, `aColor2D`
-2. **Zero-Looping CPU Execution**: Pada setiap frame (`requestAnimationFrame`), CPU hanya memperbarui nilai uniform:
-   ```typescript
-   morphUniforms.uMorphProgress.value = morphProgress;
-   ```
-3. **Hasil Efisiensi**: Penggunaan CPU per frame turun dari $\sim 3\text{ ms}$ menjadi $< 0.01\text{ ms}$, mempertahankan framerate stabil **120 FPS / 144 FPS** pada layar ProMotion dan perangkat mobile.
-
----
-
-## 🎥 Sistem Kamera, Orbit & Giroskop Mobile (iOS Safari Compatible)
-
-- **Orbit Mouse/Touch**: Rotasi bebas dengan redaman inersia $0.05$.
-- **iOS 13+ Safari Permission Handling**:
-  ```typescript
-  import { requestDeviceOrientationPermission } from '@jiwoqr/renderer-webgl';
-
-  btnGyro.addEventListener('click', async () => {
-    const granted = await requestDeviceOrientationPermission();
-    if (granted) {
-      window.addEventListener('deviceorientation', (e) => {
-        if (e.gamma !== null && e.beta !== null) {
-          renderer.getCameraController().applyGyroTilt(e.gamma, e.beta);
-        }
-      });
-    }
-  });
-  ```
-- **Auto-Alignment Scan Mode**: Kamera otomatis berpindah tegak lurus ke posisi $(0, 0, Z)$ tepat menghadap QR.
-
----
-
-## 💡 Sistem Mitigasi Pencahayaan & Bayangan untuk Pemindaian Optik
-
-Saat bertransisi ke Mode Scan ($t > 0.85$):
-- Bayangan directional dinonaktifkan (`castShadow = false`).
-- Ambient light dinaikkan menjadi $1.0\times$.
-- Material dialihkan dari PBR glossy menjadi matte diffuse murni.
-
----
-
-## 🛡️ Zero-WebGL Graceful Fallback (`src/fallback/`)
-
-Menyediakan fungsi utility untuk browser tanpa WebGL:
-
-```typescript
-import { isWebGLSupported, render2DFallbackCanvas } from '@jiwoqr/renderer-webgl';
-
-if (!isWebGLSupported()) {
-  const canvas = document.createElement('canvas');
-  render2DFallbackCanvas(canvas, matrix, {
-    size: 400,
-    darkColor: '#000000',
-    lightColor: '#ffffff',
-  });
-  container.appendChild(canvas);
-}
-```
-
----
-
-## 💻 Contoh Kode Integrasi
-
-```typescript
-import { JiwoWebGLRenderer } from '@jiwoqr/renderer-webgl';
-
-const renderer = new JiwoWebGLRenderer({
-  container: document.getElementById('app')!,
-  model: 'circuit',
-  mode: '3d',
-});
-
-renderer.setData('https://jiwoqr.dev');
-```
-
-
----
-
-## 📄 File: packages/exporter/README.md (Exporter Package README (@jiwoqr/exporter))
-
-# 🖨️ @jiwoqr/exporter
-
-> **Mesin Ekspor Mesh 3D Cetak & Raster/Vektor Cetak Resolusi Tinggi**  
-> *Generator berkas biner STL watertight/manifold untuk 3D printing dengan elevasi prosedural sesuai model 3D aktif, konverter Three.js ke GLB biner, serta eksportir SVG vektor & PNG 300 DPI ultra-tajam.*
-
-[![Package: @jiwoqr/exporter](https://img.shields.io/badge/Package-%40jiwoqr%2Fexporter-blue.svg)](file:///d:/REPOS/jiwoQR/packages/exporter)
-[![3D Print Ready](https://img.shields.io/badge/3D%20Print-Binary%20STL%20Watertight-brightgreen.svg)](file:///d:/REPOS/jiwoQR/packages/exporter)
-[![TypeScript Strict](https://img.shields.io/badge/TypeScript-Strict-blue.svg)](file:///d:/REPOS/jiwoQR/packages/exporter/tsconfig.json)
-
----
-
-## 📖 Daftar Isi
-
-- [Gambaran Umum](#-gambaran-umum)
-- [Fitur Utama](#-fitur-utama)
-- [Arsitektur Modul](#-arsitektur-modul)
-- [Panduan Ekspor Berkas](#-panduan-ekspor-berkas)
-  - [1. Ekspor 3D Print Watertight STL (`exportSTL`)](#1-ekspor-3d-print-watertight-stl-exportstl)
-  - [2. Ekspor 3D Scene Binary GLB (`exportGLB`)](#2-ekspor-3d-scene-binary-glb-exportglb)
-  - [3. Ekspor Vektor SVG Mandiri (`exportSVG`)](#3-ekspor-vektor-svg-mandiri-exportsvg)
-  - [4. Ekspor Raster 300 DPI PNG (`exportPNG`)](#4-ekspor-raster-300-dpi-png-exportpng)
-  - [5. Helper Download Otomatis (`downloadFile`)](#5-helper-download-otomatis-downloadfile)
-- [Struktur Tipe Data & Interface](#-struktur-tipe-data--interface)
-- [Pengujian Unit](#-pengujian-unit)
-
----
-
-## 🌟 Gambaran Umum
-
-Paket `@jiwoqr/exporter` menjembatani dunia virtual 3D JiwoQR dengan manufaktur fisik (3D printing, laser cutting, sablon kartu nama) dan integrasi aset digital 3D game/animasi.
-
-Setiap berkas mesh `.stl` yang dihasilkan dihitung secara presisi dengan topologi tertutup (*closed manifold geometry*) dengan normal segitiga menghadap ke luar (*Counter-Clockwise/CCW winding order*), sehingga siap dimasukkan langsung ke software *slicer* (Cura, PrusaSlicer, Bambu Studio, OrcaSlicer) tanpa error *non-manifold edge*.
-
----
-
-## ✨ Fitur Utama
-
-- **Watertight Solid Binary STL**: Menghasilkan pelat substrate dasar padu ($W \times H \times T_{\text{base}}$) dan balok modul data timbul. Elevasi balok dapat mengikuti arketipe 3D aktif (`architecture` pencakar langit bertingkat, `globe` kubah bola, `circuit` chip SMD, `biomorphic` pilar kristal, `city` blok kota metropolitan bertingkat, atau `flat` standar).
-- **Three.js Binary GLB**: Mengonversi `THREE.Scene` aktif ke file `.glb` biner dengan mempertahankan material PBR, instance mesh, dan warna vertex.
-- **300 DPI Print-Ready PNG**: Merender QR code kanonikal beresolusi ultra-tinggi ($2048\times2048+$) dengan anti-aliasing dinonaktifkan untuk mencegah pendaran piksel buram pada kemasan fisik.
-- **Vektor SVG Skalabel**: Format SVG mandiri dengan batas 4 modul quiet zone dan opsi radius sudut (*rounded corners*).
-- **Cross-Browser Downloader**: Fungsi `downloadFile()` untuk memicu unduhan file instan di peramban.
-
----
-
-## 🏗️ Arsitektur Modul
-
-```
-packages/exporter/src/
-├── stl.ts                     # Binary watertight STL generator (12 triangles per box)
-├── glb.ts                     # Three.js GLTFExporter wrapper untuk GLB binary
-├── svg.ts                     # Standalone SVG vector generator
-├── png.ts                     # 300 DPI high-res canvas-to-blob raster generator
-├── utils.ts                   # downloadFile() blob URL browser helper
-├── types.ts                   # Interface opsi ekspor (STLExportOptions, dsb.)
-└── index.ts                   # Ekspor publik
-```
-
----
-
-## 💻 Panduan Ekspor Berkas
-
-### 1. Ekspor 3D Print Watertight STL (`exportSTL`)
-
-```typescript
-import { createJiwoQR } from '@jiwoqr/core';
-import { exportSTL, downloadFile } from '@jiwoqr/exporter';
-
-const entity = createJiwoQR('https://jiwoqr.dev');
-
-// Menghasilkan buffer STL dengan elevasi gedung kota arsitektur
-const stlBuffer = exportSTL(entity.matrix, {
-  dna: entity.dna,
-  model: 'architecture', // 'architecture' | 'globe' | 'circuit' | 'flat'
-  moduleSize: 2.0,       // 2mm per modul
-  baseThickness: 2.0,    // 2mm pelat dasar
-  moduleHeight: 2.5,     // Ketinggian maksimum balok
-});
-
-downloadFile(stlBuffer, 'jiwo-qr-3dprint.stl', 'application/sla');
-```
-
----
-
-### 2. Ekspor 3D Scene Binary GLB (`exportGLB`)
-
-```typescript
-import { JiwoWebGLRenderer } from '@jiwoqr/renderer-webgl';
-import { exportGLB, downloadFile } from '@jiwoqr/exporter';
-
-const renderer = new JiwoWebGLRenderer({ container, model: 'globe' });
-renderer.setData('https://jiwoqr.dev');
-
-// Ekspor scene 3D aktif
-const glbBuffer = await exportGLB(renderer.getScene(), { binary: true });
-downloadFile(glbBuffer, 'jiwo-globe-scene.glb', 'model/gltf-binary');
-```
-
----
-
-### 3. Ekspor Vektor SVG Mandiri (`exportSVG`)
-
-```typescript
-import { encodeQR } from '@jiwoqr/core';
-import { exportSVG, downloadFile } from '@jiwoqr/exporter';
-
-const matrix = encodeQR('https://jiwoqr.dev');
-const svgString = exportSVG(matrix, {
-  size: 512,
-  darkColor: '#000000',
-  lightColor: '#ffffff',
-  borderRadius: 0.1, // modul agak membulat
-});
-
-downloadFile(svgString, 'jiwo-qr.svg', 'image/svg+xml');
-```
-
----
-
-### 4. Ekspor Raster 300 DPI PNG (`exportPNG`)
-
-```typescript
-import { encodeQR } from '@jiwoqr/core';
-import { exportPNG, downloadFile } from '@jiwoqr/exporter';
-
-const matrix = encodeQR('https://jiwoqr.dev');
-const pngBlob = await exportPNG(matrix, {
-  size: 2048,          // Resolusi 2048x2048 piksel
-  darkColor: '#000000',
-  lightColor: '#ffffff',
-});
-
-downloadFile(pngBlob, 'jiwo-qr-300dpi.png', 'image/png');
-```
-
----
-
-## 📐 Struktur Tipe Data & Interface
-
-```typescript
-export type STLArchetypeModel = 'architecture' | 'globe' | 'circuit' | 'biomorphic' | 'flat';
-
-export interface STLExportOptions {
-  dna?: DeterministicDNA;
-  model?: STLArchetypeModel;
-
-  moduleSize?: number;     // Ukuran fisik modul (mm) - default: 2.0
-  baseThickness?: number;  // Ketebalan pelat dasar (mm) - default: 2.0
-  moduleHeight?: number;   // Ketinggian timbul modul (mm) - default: 2.0
-  maxHeight?: number;      // Multiplier ketinggian gedung/mound 3D
-}
-
-export interface GLBExportOptions {
-  binary?: boolean;
-  embedImages?: boolean;
-}
-
-export interface SVGExportOptions {
-  size?: number;
-  darkColor?: string;
-  lightColor?: string;
-  borderRadius?: number;
-}
-
-export interface PNGExportOptions {
-  size?: number;
-  darkColor?: string;
-  lightColor?: string;
-}
-```
-
----
-
-## 🧪 Pengujian Unit
-
-```bash
-pnpm --filter @jiwoqr/exporter test
-```
-Verifikasi unit test memeriksa kebenaran header 80-byte STL biner, perhitungan jumlah segitiga ($\text{Triangles} = 12 + 12 \times \text{darkModules}$), panjang buffer tepat, validitas markup SVG, dan struktur header GLB.
-
-
----
-
-## 📄 File: packages/react/README.md (React Package README (@jiwoqr/react))
-
-# ⚛️ @jiwoqr/react
-
-> **Komponen React Siap Pakai untuk Generator QR Prosedural 3D JiwoQR**  
-> *Integrasi mulus ke ekosistem React 18, React 19, Next.js (App Router & Pages Router), serta Vite dengan sinkronisasi props reaktif dan pembersihan memori otomatis.*
-
-[![Package: @jiwoqr/react](https://img.shields.io/badge/Package-%40jiwoqr%2Freact-blue.svg)](file:///d:/REPOS/jiwoQR/packages/react)
-[![React](https://img.shields.io/badge/React-18%20%2F%2019-61dafb.svg?logo=react)](https://react.dev/)
-[![TypeScript Strict](https://img.shields.io/badge/TypeScript-Strict-blue.svg)](file:///d:/REPOS/jiwoQR/packages/react/tsconfig.json)
-
----
-
-## 📖 Daftar Isi
-
-- [Gambaran Umum](#-gambaran-umum)
-- [Instalasi](#-instalasi)
-- [Referensi Props & Tipe Data](#-referensi-props--tipe-data)
-- [Contoh Penggunaan Dasar](#-contoh-penggunaan-dasar)
-- [Integrasi Framework](#-integrasi-framework)
-  - [1. Next.js App Router (SSR-Safe Dynamic Import)](#1-nextjs-app-router-ssr-safe-dynamic-import)
-  - [2. Next.js Pages Router](#2-nextjs-pages-router)
-  - [3. Vite + React + Tailwind CSS](#3-vite--react--tailwind-css)
-- [Manajemen Siklus Hidup & Sinkronisasi Props](#-manajemen-siklus-hidup--sinkronisasi-props)
-
----
-
-## 🌟 Gambaran Umum
-
-Paket `@jiwoqr/react` menyediakan komponen `<JiwoQR />` yang membungkus engine `@jiwoqr/renderer-webgl` ke dalam paradigma deklaratif React. 
-
-Fitur utama:
-- **Sinkronisasi Props Reaktif**: Setiap perubahan prop `value`, `model`, atau `mode` secara otomatis memicu pembaruan canvas tanpa perlu me-reload keseluruhan instance Three.js.
-- **Pencegahan Memory Leak**: Instance renderer dan WebGL context dibersihkan secara otomatis (`renderer.dispose()`) saat komponen di-unmount.
-- **Dukungan SSR Aman**: Kompatibel dengan arsitektur SSR Next.js melalui dynamic import.
-
----
-
-## 📦 Instalasi
-
-Tambahkan paket ke proyek React Anda:
-
-```bash
-pnpm add @jiwoqr/react @jiwoqr/renderer-webgl three
-# atau
-npm install @jiwoqr/react @jiwoqr/renderer-webgl three
-# atau
-yarn add @jiwoqr/react @jiwoqr/renderer-webgl three
-```
-
----
-
-## 📐 Referensi Props & Tipe Data
-
-```typescript
-import { RenderModel, RenderMode } from '@jiwoqr/renderer-webgl';
-
-export interface JiwoQRProps {
-  /** Target URL atau teks string yang akan di-encode ke matriks QR */
-  value: string;
-
-  /** Arketipe visual 3D ('architecture' | 'globe' | 'circuit' | 'biomorphic' | 'city') - Default: 'architecture' */
-  model?: RenderModel;
-
-
-  /** Mode tampilan ('3d' dunia interaktif | 'scan' 2D datar) - Default: '3d' */
-  mode?: RenderMode;
-
-  /** Durasi animasi transisi morphing dalam milidetik - Default: 800 */
-  morphDuration?: number;
-
-  /** Kelas CSS tambahan pada elemen pembungkus */
-  className?: string;
-
-  /** Gaya inline CSS tambahan pada elemen pembungkus */
-  style?: React.CSSProperties;
-}
-```
-
----
-
-## 💻 Contoh Penggunaan Dasar
-
-```tsx
-import React, { useState } from 'react';
-import { JiwoQR } from '@jiwoqr/react';
-
-export function App() {
-  const [url, setUrl] = useState('https://jiwoqr.dev');
-  const [model, setModel] = useState<'architecture' | 'globe'>('architecture');
-  const [mode, setMode] = useState<'3d' | 'scan'>('3d');
-
-  return (
-    <div style={{ maxWidth: 600, margin: '0 auto', fontFamily: 'sans-serif' }}>
-      <h1>JiwoQR React Demo</h1>
-
-      {/* Input URL */}
-      <input
-        type="text"
-        value={url}
-        onChange={(e) => setUrl(e.target.value)}
-        style={{ width: '100%', padding: '8px 12px', marginBottom: 12 }}
-      />
-
-      {/* Viewport 3D QR Code */}
-      <div style={{ width: '100%', height: 450, borderRadius: 12, overflow: 'hidden' }}>
-        <JiwoQR
-          value={url}
-          model={model}
-          mode={mode}
-          morphDuration={800}
-        />
-      </div>
-
-      {/* Kontrol Interaktif */}
-      <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
-        <button onClick={() => setModel(m => m === 'architecture' ? 'globe' : 'architecture')}>
-          Model: {model.toUpperCase()}
-        </button>
-        <button onClick={() => setMode(m => m === '3d' ? 'scan' : '3d')}>
-          Mode: {mode.toUpperCase()}
-        </button>
-      </div>
-    </div>
-  );
-}
-```
-
----
-
-## 🛠️ Integrasi Framework
-
-### 1. Next.js App Router (SSR-Safe Dynamic Import)
-
-Karena Three.js dan WebGL membutuhkan objek global `window` dan DOM `HTMLCanvasElement`, gunakan dynamic import dengan `ssr: false`:
-
-```tsx
-// app/components/ClientJiwoQR.tsx
-'use client';
-
-import dynamic from 'next/dynamic';
-
-export const ClientJiwoQR = dynamic(
-  () => import('@jiwoqr/react').then((mod) => mod.JiwoQR),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="w-full h-full flex items-center justify-center bg-slate-900 text-cyan-400">
-        Memuat Engine 3D...
-      </div>
-    ),
-  }
-);
-```
-
-Penggunaan di dalam halaman (`app/page.tsx`):
-```tsx
-import { ClientJiwoQR } from './components/ClientJiwoQR';
-
-export default function Page() {
-  return (
-    <main className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-8">
-      <div className="w-96 h-96 rounded-2xl overflow-hidden shadow-2xl border border-slate-800">
-        <ClientJiwoQR
-          value="https://nextjs.org"
-          model="globe"
-          mode="3d"
-        />
-      </div>
-    </main>
-  );
-}
-```
-
----
-
-### 2. Next.js Pages Router
-
-```tsx
-// pages/index.tsx
-import dynamic from 'next/dynamic';
-
-const JiwoQR = dynamic(
-  () => import('@jiwoqr/react').then((mod) => mod.JiwoQR),
-  { ssr: false }
-);
-
-export default function Home() {
-  return (
-    <div style={{ width: 500, height: 500 }}>
-      <JiwoQR value="https://jiwoqr.dev" model="architecture" mode="3d" />
-    </div>
-  );
-}
-```
-
----
-
-### 3. Vite + React + Tailwind CSS
-
-```tsx
-// src/App.tsx
-import { useState } from 'react';
-import { JiwoQR } from '@jiwoqr/react';
-
-export default function App() {
-  const [mode, setMode] = useState<'3d' | 'scan'>('3d');
-
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-zinc-950 text-white">
-      <div className="w-[450px] h-[450px] bg-zinc-900 rounded-3xl overflow-hidden border border-zinc-800 shadow-cyan-500/20 shadow-2xl relative">
-        <JiwoQR
-          value="https://vitejs.dev"
-          model="globe"
-          mode={mode}
-        />
-        <button
-          onClick={() => setMode(m => m === '3d' ? 'scan' : '3d')}
-          className="absolute bottom-4 right-4 bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-4 py-2 rounded-xl transition"
-        >
-          {mode === '3d' ? '📷 Pindai' : '🌐 3D'}
-        </button>
-      </div>
-    </div>
-  );
-}
-```
-
----
-
-## 🔄 Manajemen Siklus Hidup & Sinkronisasi Props
-
-Implementasi internal `<JiwoQR />` menggunakan ref terisolasi untuk mengontrol instance WebGL secara efisien:
-
-```mermaid
-sequenceDiagram
-    participant React as React Component Lifecycle
-    participant Renderer as JiwoWebGLRenderer Instance
-    participant GPU as Three.js WebGL / GPU
-
-    React->>Renderer: Inisialisasi JiwoWebGLRenderer(container, model, mode)
-    React->>Renderer: setData(value)
-    Renderer->>GPU: Render 3D Scene (60 FPS loop)
-
-    Note over React,Renderer: Saat Prop Berubah (cth: mode: 'scan')
-    React->>Renderer: setMode('scan')
-    Renderer->>GPU: Mulai Animasi Eased Morphing (800ms)
-
-    Note over React,Renderer: Saat Komponen Di-unmount
-    React->>Renderer: dispose()
-    Renderer->>GPU: Hentikan loop, bersihkan geometri & canvas
-```
-
-
----
-
-## 📄 File: packages/web-component/README.md (Web Component Package README (@jiwoqr/web-component))
-
-# 🧩 @jiwoqr/web-component
-
-> **Native Custom Element `<jiwo-qr>` Tanpa Framework**  
-> *Gunakan generator QR prosedural 3D JiwoQR langsung di HTML murni, Vue, Svelte, Angular, SolidJS, atau Astro menggunakan standar Web Components W3C.*
-
-[![Package: @jiwoqr/web-component](https://img.shields.io/badge/Package-%40jiwoqr%2Fweb--component-blue.svg)](file:///d:/REPOS/jiwoQR/packages/web-component)
-[![Web Components](https://img.shields.io/badge/Standard-W3C%20Custom%20Elements-orange.svg)](https://developer.mozilla.org/en-US/docs/Web/API/Web_components)
-[![TypeScript Strict](https://img.shields.io/badge/TypeScript-Strict-blue.svg)](file:///d:/REPOS/jiwoQR/packages/web-component/tsconfig.json)
-
----
-
-## 📖 Daftar Isi
-
-- [Gambaran Umum](#-gambaran-umum)
-- [Instalasi & Registrasi](#-instalasi--registrasi)
-- [Atribut & Properti HTML](#-atribut--properti-html)
-- [Metode JavaScript DOM](#-metode-javascript-dom)
-- [Contoh Penggunaan](#-contoh-penggunaan)
-  - [1. HTML Murni & Vanilla JavaScript](#1-html-murni--vanilla-javascript)
-  - [2. Integrasi Vue 3](#2-integrasi-vue-3)
-  - [3. Integrasi Svelte](#3-integrasi-svelte)
-  - [4. Integrasi Angular](#4-integrasi-angular)
-- [Siklus Hidup Custom Element](#-siklus-hidup-custom-element)
-
----
-
-## 🌟 Gambaran Umum
-
-Paket `@jiwoqr/web-component` menyediakan elemen kustom native `<jiwo-qr>` yang membungkus `@jiwoqr/renderer-webgl`. 
-Kelebihan Web Component:
-- **Zero-Framework Overhead**: Dapat disematkan pada halaman web mana pun tanpa membutuhkan bundler atau runtime React/Vue.
-- **Deklaratif**: Cukup tulis `<jiwo-qr value="..." model="globe"></jiwo-qr>` di HTML.
-- **Reaktivitas Otomatis**: Setiap perubahan atribut pada DOM (`setAttribute`) langsung memicu pembaruan pada visual 3D.
-
----
-
-## 📦 Instalasi & Registrasi
-
-```bash
-pnpm add @jiwoqr/web-component @jiwoqr/renderer-webgl three
-```
-
-Cukup impor paket sekali di berkas entri aplikasi Anda untuk mendaftarkan Custom Element:
-
-```typescript
-import '@jiwoqr/web-component';
-```
-
----
-
-## 🏷️ Atribut & Properti HTML
-
-| Atribut | Tipe | Nilai Default | Pilihan Nilai | Deskripsi |
-| :--- | :--- | :--- | :--- | :--- |
-| `value` | `string` | `"https://jiwoqr.dev"` | Teks string atau URL apa pun | Payload yang akan di-encode ke dalam matriks QR. |
-| `model` | `string` | `"architecture"` | `"architecture"`, `"globe"`, `"circuit"`, `"biomorphic"`, `"city"` | Arketipe visual 3D yang aktif. |
-| `mode` | `string` | `"3d"` | `"3d"`, `"scan"` | Mode tampilan interaktif 3D atau mode pemindaian 2D datar. |
-
----
-
-## ⚡ Metode JavaScript DOM
-
-Elemen `<jiwo-qr>` mengekspos metode publik yang dapat dipanggil langsung melalui referensi DOM:
-
-```typescript
-const qr = document.querySelector<JiwoQRElement>('jiwo-qr')!;
-
-// 1. Mengubah mode (3d atau scan) dengan animasi halus
-qr.setMode('scan');
-
-// 2. Mengubah arketipe model visual
-qr.setModel('globe');
-
-// 3. Mengontrol progress morphing secara manual (0.0 s.d. 1.0)
-qr.setMorphProgress(0.75);
-```
-
----
-
-## 💻 Contoh Penggunaan
-
-### 1. HTML Murni & Vanilla JavaScript
-
-```html
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <title>JiwoQR Web Component Demo</title>
-  <script type="module">
-    import './node_modules/@jiwoqr/web-component/dist/index.js';
-  </script>
-  <style>
-    .qr-card {
-      width: 450px;
-      height: 450px;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-    }
-  </style>
-</head>
-<body>
-  <div class="qr-card">
-    <jiwo-qr 
-      id="my-qr"
-      value="https://github.com/AlbertAZ1992/every-qrcode" 
-      model="globe" 
-      mode="3d">
-    </jiwo-qr>
-  </div>
-
-  <button onclick="document.getElementById('my-qr').setMode('scan')">
-    Mode Scan
-  </button>
-  <button onclick="document.getElementById('my-qr').setMode('3d')">
-    Mode 3D
-  </button>
-</body>
-</html>
-```
-
----
-
-### 2. Integrasi Vue 3
-
-Di file konfigurasi Vite / Vue (`vite.config.ts`), izinkan tag kustom:
-```typescript
-// vite.config.ts
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-
-export default defineConfig({
-  plugins: [
-    vue({
-      template: {
-        compilerOptions: {
-          isCustomElement: (tag) => tag.startsWith('jiwo-'),
-        },
-      },
-    }),
-  ],
-});
-```
-
-Penggunaan di komponen Vue:
-```vue
-<template>
-  <div class="qr-wrapper">
-    <jiwo-qr 
-      :value="url" 
-      :model="model" 
-      :mode="isScan ? 'scan' : '3d'"
-    ></jiwo-qr>
-    
-    <div class="controls">
-      <button @click="isScan = !isScan">
-        {{ isScan ? 'Mode 3D' : 'Mode Scan' }}
-      </button>
-      <button @click="model = model === 'architecture' ? 'globe' : 'architecture'">
-        Ganti Model ({{ model }})
-      </button>
-    </div>
-  </div>
-</template>
-
-<script setup>
-import { ref } from 'vue';
-import '@jiwoqr/web-component';
-
-const url = ref('https://vuejs.org');
-const model = ref('globe');
-const isScan = ref(false);
-</script>
-
-<style scoped>
-.qr-wrapper {
-  width: 480px;
-  height: 480px;
-}
-</style>
-```
-
----
-
-### 3. Integrasi Svelte
-
-```svelte
-<script>
-  import { onMount } from 'svelte';
-  import '@jiwoqr/web-component';
-
-  let url = 'https://svelte.dev';
-  let mode = '3d';
-  let model = 'architecture';
-</script>
-
-<div style="width: 450px; height: 450px;">
-  <jiwo-qr 
-    value={url} 
-    {model} 
-    {mode}
-  ></jiwo-qr>
-</div>
-
-<button on:click={() => mode = mode === '3d' ? 'scan' : '3d'}>
-  Toggle Scan Mode
-</button>
-```
-
----
-
-### 4. Integrasi Angular
-
-Di modul Angular (`app.module.ts`), tambahkan `CUSTOM_ELEMENTS_SCHEMA`:
-```typescript
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import '@jiwoqr/web-component';
-
-@NgModule({
-  declarations: [AppComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
-})
-export class AppModule {}
-```
-
-Template HTML (`app.component.html`):
-```html
-<div style="width: 500px; height: 500px;">
-  <jiwo-qr [attr.value]="qrUrl" [attr.model]="qrModel" [attr.mode]="qrMode"></jiwo-qr>
-</div>
-```
-
----
-
-## 🔄 Siklus Hidup Custom Element
-
-1. **`connectedCallback()`**: Membaca atribut awal (`value`, `model`, `mode`), membuat instance `JiwoWebGLRenderer`, dan memasang canvas WebGL ke shadow/host element.
-2. **`attributeChangedCallback(name, oldValue, newValue)`**: Mencegat perubahan atribut secara otomatis dan mengarahkan ke metode renderer yang sesuai (`setData`, `setModel`, `setMode`).
-3. **`disconnectedCallback()`**: Memanggil `renderer.dispose()` untuk membebaskan konteks WebGL dan geometri saat elemen dihapus dari dokumen.
-
-
----
-
-## 📄 File: apps/demo/README.md (Demo Studio App README (apps/demo))
-
-# 🚀 JiwoQR Interactive Studio (`apps/demo`)
-
-> **Playground & Studio Web Interaktif untuk Eksplorasi QR Prosedural 3D**  
-> *Aplikasi web berbasis Vite dan TypeScript murni untuk menguji coba payload URL secara real-time, menginspeksi telemetri DNA deterministik, beralih arketipe visual (Architecture, Globe, Circuit PCB), menguji pemindaian barcode dengan smartphone, serta mengekspor aset 3D & cetak 2D.*
-
-[![App: demo](https://img.shields.io/badge/App-Interactive%20Studio-blue.svg)](file:///d:/REPOS/jiwoQR/apps/demo)
-[![Vite](https://img.shields.io/badge/Vite-6.2-purple.svg?logo=vite)](https://vitejs.dev/)
-
----
-
-## 📖 Daftar Isi
-
-- [Gambaran Umum](#-gambaran-umum)
-- [Fitur Utama Antarmuka (UI)](#-fitur-utama-antarmuka-ui)
-  - [1. Viewport 3D & Orbit Kamera](#1-viewport-3d--orbit-kamera)
-  - [2. Input URL & Preset Cepat](#2-input-url--preset-cepat)
-  - [3. Selector Tiga Arketipe Model](#3-selector-tiga-arketipe-model)
-  - [4. Kontrol Dual-Mode & Morph Scrub Slider](#4-kontrol-dual-mode--morph-scrub-slider)
-  - [5. Bilah Alat Ekspor 3D & Cetak 2D](#5-bilah-alat-ekspor-3d--cetak-2d)
-  - [6. Sensor Giroskop Holografik (Mobile)](#6-sensor-giroskop-holografik-mobile)
-  - [7. Panel Telemetri DNA Deterministik](#7-panel-telemetri-dna-deterministik)
-- [Cara Menjalankan Lokal](#-cara-menjalankan-lokal)
-- [Struktur Berkas](#-struktur-berkas)
-
----
-
-## 🌟 Gambaran Umum
-
-Aplikasi `apps/demo` berfungsi sebagai showcase dan environment pengujian terintegrasi untuk seluruh paket dalam monorepo JiwoQR. Di sini, Anda dapat mengamati secara langsung bagaimana teks atau tautan URL diubah menjadi DNA visual dan matriks QR 3D dengan rendering 60 FPS.
-
----
-
-## 🖥️ Fitur Utama Antarmuka (UI)
-
-### 1. Viewport 3D & Orbit Kamera
-- **Drag Mouse / Touch**: Memutar sudut pandang kamera 3D di sekeliling model secara bebas.
-- **Scroll Mouse**: Zoom in dan zoom out dengan batas jarak aman (*clamped camera frustum*).
-
-### 2. Input URL, Template Pintas & Preset
-- **Template Pembuat Pintas**: Tombol template instan untuk:
-  - **URL**: Web link standar (`https://...`).
-  - **vCard**: Kontak kartu nama digital lengkap (`BEGIN:VCARD...`).
-  - **Wi-Fi**: Konfigurasi koneksi jaringan nirkabel (`WIFI:S:MyNet;T:WPA;P:MyPass;;`).
-- **Preset Chips**: Tombol pintas untuk menguji variasi payload populer secara instan.
-
-### 3. Pemilih Level Koreksi Galat (ECC Selector)
-- Tombol pemilih level pemulihan galat ISO/IEC 18004 secara langsung:
-  - **L (~7%)**: Kerapatan data tertinggi / modul paling ringkas.
-  - **M (~15%)**: Kerapatan standar.
-  - **Q (~25%)**: Sangat direkomendasikan untuk procedural 3D relief.
-  - **H (~30%)**: Pemulihan maksimal untuk stilasi 3D ekstrim.
-
-### 4. Selector Lima Arketipe Model
-- **Architecture**: Menghasilkan kota pencakar langit cyber-brutalist dengan menara finder landmark.
-- **Globe**: Menghasilkan gundukan bola voxel 3D dual-hemisfer dengan gradien warna elevasi.
-- **Circuit**: Menghasilkan motherboard PCB mikroelektronik dengan chip QFP, resistor/kapasitor SMD, dan jalur konduktor tembaga.
-- **Biomorphic**: Menghasilkan pertumbuhan kristal mineral heksagonal, klaster geode bercahaya, dan material kaca refraktif PBR.
-- **City Metropolis**: Menghasilkan tata kota metropolitan realistis ditenagai model 3D STL dinamis dari folder `STL-for-buildingModels/` dengan kalkulasi orientasi hadap jalan (*street-facing*), zonasi blok distrik seluler, dan konsentrasi CBD pencakar langit.
-
-### 5. Color Theme Studio
-- **Preset Palet Warna**:
-  - **Auto DNA**: Menghasilkan palet deterministik berbasis benih URL.
-  - **Cyber Neon**: Pendaran sian, magenta, dan kuning neon berlatar gelap pekat.
-  - **Obsidian Gold**: Emas metalik mewah di atas substrat obsidian gelap.
-  - **Emerald Tech**: Nuansa hijau zamrud bioteknologi dan matriks sirkuit.
-  - **Minimalist Mono**: Titanium monokrom elegan dengan aksen biru safir.
-  - **Custom Hex**: Color picker manual interaktif untuk warna primer, sekunder, aksen, dan latar belakang.
-
-### 6. Kontrol Dual-Mode & GPU Morph Slider
-- **Tombol Mode Toggle**: Beralih otomatis antara *3D World* dan *2D Scan Mode* dengan transisi halus 850ms.
-- **GPU Morph Scrub Slider**: Menggeser posisi animasi transisi secara presisi dari $0.00$ (3D penuh) hingga $1.00$ (2D datar siap scan) dengan zero CPU overhead berkat kalkulasi GPU Vertex Shader 120 FPS.
-
-### 7. Bilah Alat Ekspor 3D & Cetak 2D
-- **Export GLB**: Mengunduh file `.glb` 3D scene aktif Three.js.
-- **Export STL**: Mengunduh file `.stl` biner watertight untuk software 3D printing slicer dengan ketinggian balok sesuai model 3D aktif (`architecture`, `globe`, `circuit`, atau `biomorphic`).
-- **Export PNG**: Mengunduh file `.png` 300 DPI ultra-tajam untuk percetakan fisik.
-- **Export SVG**: Mengunduh file vector `.svg` mandiri dengan quiet zone.
-
-### 8. Sensor Giroskop Holografik (iOS Safari & Android Compatible)
-- Tombol **Gyro** mengaktifkan sensor `DeviceOrientationEvent` dengan dialog izin resmi iOS 13+ Apple Safari untuk efek kedalaman 3D holografik saat memiringkan perangkat.
-
-
-### 7. Panel Telemetri DNA Deterministik
-HUD samping menampilkan informasi rekayasa data real-time:
-- **64-bit Hash**: Nilai heksadesimal hash FNV-1a dari payload.
-- **32-bit Seed**: Benih bilangan bulat yang menggerakkan Mulberry32 PRNG.
-- **QR Specifications**: Versi QR (cth: `v3 (37x37)`), ukuran total modul, dan tingkat koreksi galat (*ECC Level*).
-- **DNA Parameter Readout**:
-  - *Mode Architecture*: Tipe menara (`MONOLITH`, `CITADEL`, `OBELISK`, `PAGODA`), batas tinggi, dan gaya atap.
-  - *Mode Globe*: Jumlah satelit, elevasi benua, kedalaman samudera, dan kecepatan rotasi.
-  - *Mode Circuit*: Paket chip IC (`QFP`, `BGA`), warna solder mask (`green`, `black`, `blue`, `red`), dan gaya trace.
-- **Palette Swatches**: 5 kotak sampel warna (*Primary, Secondary, Accent, Substrate, Finder Glow*) yang dihasilkan secara deterministik.
-
 ---
-
-## 🛠️ Cara Menjalankan Lokal
 
-```bash
-# Menjalankan Vite dev server
-pnpm dev
+## [2026-09-02] Fase 5: Instant WebXR/AR Mobile View, Model ke-6 Origami Fold, dan Aktivasi Pipeline Native WebGPU
+
+### 1. Monorepo Build & TypeScript Configuration
+- `tsconfig.base.json` [MODIFIED]:
+  - **Rationale**: Removed top-level `"baseUrl": "."` and `"paths"` to prevent `TS6059` compilation errors in subpackages during `tsc --noEmit`. Subpackages resolve dependencies via npm/workspace symlinks.
+- `packages/renderer-webgpu/package.json` [MODIFIED]:
+  - **Rationale**: Added `@webgpu/types: ^0.1.72` to devDependencies.
+- `packages/renderer-webgpu/tsconfig.json` [MODIFIED]:
+  - **Rationale**: Added `"types": ["@webgpu/types"]` to compilerOptions for native WebGPU type definitions.
+
+### 2. `@jiwoqr/core` (Origami DNA)
+- `packages/core/src/types.ts` [MODIFIED]:
+  - **Rationale**: Added `OrigamiDNA` interface (`foldStyle`, `creaseSharpness`, `paperWeight`, `unfoldPattern`, `facetAngle`) and registered `origami: OrigamiDNA` in `DeterministicDNA`.
+- `packages/core/src/dna/generator.ts` [MODIFIED]:
+  - **Rationale**: Implemented deterministic generation of `OrigamiDNA` using Mulberry32 PRNG.
+- `packages/core/tests/core.test.ts` [MODIFIED]:
+  - **Rationale**: Added unit test assertions verifying `dna.origami` deterministic generation and value bounds.
+
+### 3. `@jiwoqr/math` (Origami Projections & Mechanical Unfolding)
+- `packages/math/src/types.ts` [MODIFIED]:
+  - **Rationale**: Added `OrigamiFoldStyle` union ('mountain' | 'valley' | 'diagonal_pyramid' | 'crane_wing') and `OrigamiModuleTransform` interface.
+- `packages/math/src/projections/origami.ts` [NEW]:
+  - **Rationale**: Implemented `computeOrigamiModuleTransform` (calculating fold styles, crease angles, facet elevations, and crane crowns for finder patterns) and `calculateOrigamiUnfold` for 3D-to-2D mechanical planar unfolding.
+- `packages/math/src/index.ts` [MODIFIED]:
+  - **Rationale**: Exported origami projection math.
+- `packages/math/tests/math.test.ts` [MODIFIED]:
+  - **Rationale**: Added 3 unit tests verifying origami transforms, crane wing heights, and 3D-to-2D unfolding.
+
+### 4. `@jiwoqr/renderer-webgl` (Model 6 Origami & IndexedDB Geometry Cache)
+- `packages/renderer-webgl/src/types.ts` [MODIFIED]:
+  - **Rationale**: Added `'origami'` to `RenderModel` union type.
+- `packages/renderer-webgl/src/models/building-manager.ts` [MODIFIED]:
+  - **Rationale**: Implemented IndexedDB persistent geometry asset cache (`jiwoqr-asset-cache`) with `openGeometryCacheDB()`, `getCachedGeometryFromDB()`, `saveGeometryToDB()`, `clearIndexedDBCache()`, and exported `clearBuildingGeometryIndexedDBCache()`. Enables instant model loading (< 50ms) without repeated network fetch or decimation.
+- `packages/renderer-webgl/src/models/origami.ts` [NEW]:
+  - **Rationale**: Implemented **Model Archetype 6 (`createOrigamiModel`)** with faceted paper prism geometry, origami crane crowns for Finder patterns, washi material with flat shading, and GPU morphing vertex shader integration (120 FPS).
+- `packages/renderer-webgl/src/renderer.ts` [MODIFIED]:
+  - **Rationale**: Registered `'origami'` in `buildModel()` and updated `ActiveModelInstance`.
+- `packages/renderer-webgl/src/index.ts` [MODIFIED]:
+  - **Rationale**: Exported `models/origami.js` and `clearBuildingGeometryIndexedDBCache`.
+
+### 5. `@jiwoqr/exporter` (USDZ Export, Mobile AR Quick Look, Scene Viewer & Watertight STL)
+- `packages/exporter/src/types.ts` [MODIFIED]:
+  - **Rationale**: Added `'origami'` to `STLArchetypeModel`. Added `USDZExportOptions`, `ARCapabilities`, and `ARLaunchOptions`.
+- `packages/exporter/src/usdz.ts` [NEW]:
+  - **Rationale**: Implemented native mobile AR preview helpers: `exportUSDZ`, `generateUSDZBlob`, `getAndroidSceneViewerUrl`, `detectARCapabilities`, `launchARQuickLook`, and `launchARView`.
+- `packages/exporter/src/stl.ts` [MODIFIED]:
+  - **Rationale**: Implemented `addOrigamiPrismTriangles` helper constructing 5-sided closed manifold solid polyhedra for watertight 3D-printable binary STL export of origami models.
+- `packages/exporter/src/index.ts` [MODIFIED]:
+  - **Rationale**: Exported USDZ and AR helpers.
+- `packages/exporter/tests/exporter.test.ts` [MODIFIED]:
+  - **Rationale**: Added unit test assertions for watertight Origami STL export, Google Scene Viewer intent formatting, and mobile AR detection.
+
+### 6. `@jiwoqr/renderer-webgpu` (First-Class Native WebGPU Render & Compute Pipeline)
+- `packages/renderer-webgpu/src/math/mat4.ts` [NEW]:
+  - **Rationale**: Lightweight column-major 4x4 matrix math helper (`createMat4`, `mat4Identity`, `mat4Perspective`, `mat4LookAt`, `mat4Multiply`) for native WebGPU rendering without external 3D engine dependencies.
+- `packages/renderer-webgpu/src/shaders/architecture.wgsl.ts` [NEW]:
+  - **Rationale**: WGSL vertex and fragment shader implementing storage buffer instancing, cubic polynomial easing (`jiwoEase`), and real-time 3D-to-2D morphing in the vertex pipeline.
+- `packages/renderer-webgpu/src/pipeline.ts` [NEW]:
+  - **Rationale**: First-class native WebGPU render pipeline with unit cube geometry, uniform buffer, storage buffer instanced rendering, and depth pass.
+- `packages/renderer-webgpu/src/renderer.ts` [NEW]:
+  - **Rationale**: Implemented `JiwoWebGPURenderer` matching the WebGL renderer public contract, featuring mouse/touch orbit controls, scan mode alignment, and smooth morphing.
+- `packages/renderer-webgpu/src/types.ts` [MODIFIED]:
+  - **Rationale**: Updated `WebGPURendererOptions` and `WebGPURenderModel`.
+- `packages/renderer-webgpu/src/index.ts` [MODIFIED]:
+  - **Rationale**: Exported `JiwoWebGPURenderer`, `JiwoWebGPUPipeline`, `ARCHITECTURE_WGSL`, `mat4`, and `isWebGPUSupported`.
+
+### 7. `apps/demo` (Studio Application)
+- `apps/demo/package.json` [MODIFIED]:
+  - **Rationale**: Added `@jiwoqr/renderer-webgpu: workspace:*` dependency.
+- `apps/demo/vite.config.ts` [MODIFIED]:
+  - **Rationale**: Added `@jiwoqr/renderer-webgpu` path alias for Vite local development and HMR.
+- `apps/demo/index.html` [MODIFIED]:
+  - **Rationale**: Added "Engine: WebGL / WebGPU" switcher button, "View in AR" button in header and export panel, Model 6 Origami Fold selector button, and bumped version to `v0.1.0-Fase5`.
+- `apps/demo/src/main.ts` [MODIFIED]:
+  - **Rationale**: Added AR launch handler via `launchARView()`, engine switcher toggling between `JiwoWebGLRenderer` and `JiwoWebGPURenderer`, Origami model click handler, and Origami DNA telemetry readout.
+- `apps/demo/src/style.css` [MODIFIED]:
+  - **Rationale**: Added styling for `.highlight-ar` buttons in header and export grid.
+
+### 8. Multi-Tiered Documentation
+- `packages/exporter/README.md` [MODIFIED]: Added USDZ and mobile AR documentation.
+- `packages/renderer-webgpu/README.md` [MODIFIED]: Added complete active pipeline documentation.
+- `packages/renderer-webgl/README.md` [MODIFIED]: Added Model 6 Origami and IndexedDB cache documentation.
+- `packages/math/README.md` [MODIFIED]: Added Origami projection math documentation.
+- `packages/core/README.md` [MODIFIED]: Added OrigamiDNA documentation.
+- `apps/demo/README.md` [MODIFIED]: Added View in AR, Engine switch, and Origami documentation.
+- `README.md` [MODIFIED]: Updated root documentation for Phase 5.
 
-# Atau menjalankan spesifik pada workspace demo
-pnpm --filter demo dev
-```
-
-Buka peramban di: `http://localhost:5173`.
-
-Build produksi:
-```bash
-pnpm --filter demo build
-```
-
 ---
-
-## 📁 Struktur Berkas
 
-```
-apps/demo/
-├── index.html             # Layout HTML antarmuka studio, HUD, bilah ekspor & kontrol
-├── src/
-│   ├── main.ts            # Logika interaksi DOM, binding renderer, ekspor & sensor
-│   └── style.css          # Desain tema gelap cyber/futuristik
-├── vite.config.ts         # Konfigurasi Vite & cacheDir isolasi
-└── package.json           # Manifest dependensi demo app
-```

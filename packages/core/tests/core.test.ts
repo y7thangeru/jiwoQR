@@ -59,6 +59,20 @@ describe('@jiwoqr/core', () => {
       expect(dna1.circuit).toEqual(dna2.circuit);
       expect(dna1.biomorphic).toEqual(dna2.biomorphic);
       expect(dna1.city).toEqual(dna2.city);
+      expect(dna1.origami).toEqual(dna2.origami);
+
+      // Verify origami properties (Model 6)
+      expect(dna1.origami.creaseSharpness).toBeGreaterThan(0);
+      expect(['mountain', 'valley', 'diagonal_pyramid', 'crane_wing']).toContain(
+        dna1.origami.foldStyle
+      );
+      expect(['washi', 'heavy_cardstock', 'metallic_foil']).toContain(
+        dna1.origami.paperWeight
+      );
+      expect(['radial_spiral', 'mechanical_flatten', 'diagonal_split']).toContain(
+        dna1.origami.unfoldPattern
+      );
+      expect(dna1.origami.facetAngle).toBeGreaterThan(0);
 
       // Verify city properties (Model 5)
       expect(dna1.city.skylineDensity).toBeGreaterThan(0);

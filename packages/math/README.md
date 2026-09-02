@@ -41,8 +41,9 @@ packages/math/src/
 │   ├── spherical.ts           # Cube-to-sphere, UV-to-sphere & Voxel Dome Mound
 │   ├── circuit.ts             # Transformasi IC chip, SMD resistor, via pad, & trace
 │   ├── biomorphic.ts          # Transformasi prisma kristal heksagonal, pilar geodesik & karang
-│   └── city.ts                # Kalkulasi orientasi hadap jalan (street-facing), cellular zoning & CBD gradient
-├── types.ts                   # Vec2, Vec3, ExtrusionModuleTransform, SpherifiedModuleTransform, CircuitModuleTransform, BiomorphicModuleTransform, CityModuleTransform
+│   ├── city.ts                # Kalkulasi orientasi hadap jalan (street-facing), cellular zoning & CBD gradient
+│   └── origami.ts             # Transformasi lipatan kertas origami, mountain/valley creases, & pembukaan mekanis
+├── types.ts                   # Vec2, Vec3, transforms untuk semua 6 arketipe
 └── index.ts                   # Ekspor publik
 ```
 
@@ -117,6 +118,22 @@ Mengalkulasi parameter urban planning deterministik untuk model Kota Realistis (
 3. **Interpolasi Morphing (`interpolateCityTransform`)**:
    - Memutar orientasi yaw kembali ke $0^\circ$.
    - Mengompresi ketinggian bangunan $S_z \to 0.02$ dan melebarkan dimensi horizontal ke ukuran penuh modul untuk pemindaian instan.
+
+---
+
+## 📄 Proyeksi Origami Paper Folds & Pembukaan Mekanis (`src/projections/origami.ts`)
+
+Mengalkulasi parameter lipatan kertas geometris dan mekanisme pembukaan lipatan (*unfolding*) untuk Model 6 (Origami):
+1. **Gaya Lipatan Kertas (`OrigamiFoldStyle`)**:
+   - `mountain`: Puncak lipatan cembung tajam dengan sudut kemiringan $28^\circ \dots 52^\circ$.
+   - `valley`: Lembah lipatan cekung simetris.
+   - `diagonal_pyramid`: Lipatan piramida bersudut empat dengan 8 faset segitiga.
+   - `crane_wing`: Mahkota derek origami bersusun untuk 3 Finder Patterns ($H_{\text{finder}} = H_{\text{max}} \times 2.0$, ketajaman faset $0.95$).
+2. **Orientasi Crease Ortogonal & Diagonal**:
+   - Sudut rotasi $Z$ dihitung deterministik: $[0, \frac{\pi}{4}, \frac{\pi}{2}, \frac{3\pi}{4}]$.
+3. **Mekanisme Unfolding (`calculateOrigamiUnfold`)**:
+   - Saat $t \to 1.0$, sudut lipatan $\theta_{\text{fold}} \to 0$ dan rotasi $Z \to 0$.
+   - Ketinggian $Z$ mengompresi ke bidang datar kanonikal $S_z = 0.01$ dan modul melebar ke $1.0\times1.0$ untuk pemindaian instan.
 
 ---
 

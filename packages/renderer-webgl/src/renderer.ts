@@ -6,6 +6,7 @@ import { createGlobeModel, GlobeModelInstance } from './models/globe.js';
 import { createCircuitModel, CircuitModelInstance } from './models/circuit.js';
 import { createBiomorphicModel, BiomorphicModelInstance } from './models/biomorphic.js';
 import { createCityModel, CityModelInstance } from './models/city.js';
+import { createOrigamiModel, OrigamiModelInstance } from './models/origami.js';
 import { BuildingModelManager } from './models/building-manager.js';
 import { CameraController } from './scene/camera-controller.js';
 
@@ -14,7 +15,9 @@ type ActiveModelInstance =
   | GlobeModelInstance
   | CircuitModelInstance
   | BiomorphicModelInstance
-  | CityModelInstance;
+  | CityModelInstance
+  | OrigamiModelInstance;
+
 
 
 
@@ -176,6 +179,11 @@ export class JiwoWebGLRenderer {
       );
     } else if (this.modelType === 'city') {
       this.currentModelInstance = createCityModel(
+        this.currentEntity.matrix,
+        this.currentEntity.dna
+      );
+    } else if (this.modelType === 'origami') {
+      this.currentModelInstance = createOrigamiModel(
         this.currentEntity.matrix,
         this.currentEntity.dna
       );

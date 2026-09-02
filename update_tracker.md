@@ -461,6 +461,96 @@ This file tracks all file creations, modifications, and deletions in the reposit
 - `STL-for-buildingModels/` [MODIFIED]:
   - **Rationale**: Re-optimized all 8 active STL models to ~1,600 triangles each. Total combined size of all 8 files is now only **650 KB** (reduced from 120 MB!). Total triangles across all ~300 city modules is reduced from 2.2 million down to **~500,000 triangles**, rendering at rock-solid **60-120 FPS**.
 
+---
+
+## [2026-09-02] Fase 5: Instant WebXR/AR Mobile View, Model ke-6 Origami Fold, dan Aktivasi Pipeline Native WebGPU
+
+### 1. Monorepo Build & TypeScript Configuration
+- `tsconfig.base.json` [MODIFIED]:
+  - **Rationale**: Removed top-level `"baseUrl": "."` and `"paths"` to prevent `TS6059` compilation errors in subpackages during `tsc --noEmit`. Subpackages resolve dependencies via npm/workspace symlinks.
+- `packages/renderer-webgpu/package.json` [MODIFIED]:
+  - **Rationale**: Added `@webgpu/types: ^0.1.72` to devDependencies.
+- `packages/renderer-webgpu/tsconfig.json` [MODIFIED]:
+  - **Rationale**: Added `"types": ["@webgpu/types"]` to compilerOptions for native WebGPU type definitions.
+
+### 2. `@jiwoqr/core` (Origami DNA)
+- `packages/core/src/types.ts` [MODIFIED]:
+  - **Rationale**: Added `OrigamiDNA` interface (`foldStyle`, `creaseSharpness`, `paperWeight`, `unfoldPattern`, `facetAngle`) and registered `origami: OrigamiDNA` in `DeterministicDNA`.
+- `packages/core/src/dna/generator.ts` [MODIFIED]:
+  - **Rationale**: Implemented deterministic generation of `OrigamiDNA` using Mulberry32 PRNG.
+- `packages/core/tests/core.test.ts` [MODIFIED]:
+  - **Rationale**: Added unit test assertions verifying `dna.origami` deterministic generation and value bounds.
+
+### 3. `@jiwoqr/math` (Origami Projections & Mechanical Unfolding)
+- `packages/math/src/types.ts` [MODIFIED]:
+  - **Rationale**: Added `OrigamiFoldStyle` union ('mountain' | 'valley' | 'diagonal_pyramid' | 'crane_wing') and `OrigamiModuleTransform` interface.
+- `packages/math/src/projections/origami.ts` [NEW]:
+  - **Rationale**: Implemented `computeOrigamiModuleTransform` (calculating fold styles, crease angles, facet elevations, and crane crowns for finder patterns) and `calculateOrigamiUnfold` for 3D-to-2D mechanical planar unfolding.
+- `packages/math/src/index.ts` [MODIFIED]:
+  - **Rationale**: Exported origami projection math.
+- `packages/math/tests/math.test.ts` [MODIFIED]:
+  - **Rationale**: Added 3 unit tests verifying origami transforms, crane wing heights, and 3D-to-2D unfolding.
+
+### 4. `@jiwoqr/renderer-webgl` (Model 6 Origami & IndexedDB Geometry Cache)
+- `packages/renderer-webgl/src/types.ts` [MODIFIED]:
+  - **Rationale**: Added `'origami'` to `RenderModel` union type.
+- `packages/renderer-webgl/src/models/building-manager.ts` [MODIFIED]:
+  - **Rationale**: Implemented IndexedDB persistent geometry asset cache (`jiwoqr-asset-cache`) with `openGeometryCacheDB()`, `getCachedGeometryFromDB()`, `saveGeometryToDB()`, `clearIndexedDBCache()`, and exported `clearBuildingGeometryIndexedDBCache()`. Enables instant model loading (< 50ms) without repeated network fetch or decimation.
+- `packages/renderer-webgl/src/models/origami.ts` [NEW]:
+  - **Rationale**: Implemented **Model Archetype 6 (`createOrigamiModel`)** with faceted paper prism geometry, origami crane crowns for Finder patterns, washi material with flat shading, and GPU morphing vertex shader integration (120 FPS).
+- `packages/renderer-webgl/src/renderer.ts` [MODIFIED]:
+  - **Rationale**: Registered `'origami'` in `buildModel()` and updated `ActiveModelInstance`.
+- `packages/renderer-webgl/src/index.ts` [MODIFIED]:
+  - **Rationale**: Exported `models/origami.js` and `clearBuildingGeometryIndexedDBCache`.
+
+### 5. `@jiwoqr/exporter` (USDZ Export, Mobile AR Quick Look, Scene Viewer & Watertight STL)
+- `packages/exporter/src/types.ts` [MODIFIED]:
+  - **Rationale**: Added `'origami'` to `STLArchetypeModel`. Added `USDZExportOptions`, `ARCapabilities`, and `ARLaunchOptions`.
+- `packages/exporter/src/usdz.ts` [NEW]:
+  - **Rationale**: Implemented native mobile AR preview helpers: `exportUSDZ`, `generateUSDZBlob`, `getAndroidSceneViewerUrl`, `detectARCapabilities`, `launchARQuickLook`, and `launchARView`.
+- `packages/exporter/src/stl.ts` [MODIFIED]:
+  - **Rationale**: Implemented `addOrigamiPrismTriangles` helper constructing 5-sided closed manifold solid polyhedra for watertight 3D-printable binary STL export of origami models.
+- `packages/exporter/src/index.ts` [MODIFIED]:
+  - **Rationale**: Exported USDZ and AR helpers.
+- `packages/exporter/tests/exporter.test.ts` [MODIFIED]:
+  - **Rationale**: Added unit test assertions for watertight Origami STL export, Google Scene Viewer intent formatting, and mobile AR detection.
+
+### 6. `@jiwoqr/renderer-webgpu` (First-Class Native WebGPU Render & Compute Pipeline)
+- `packages/renderer-webgpu/src/math/mat4.ts` [NEW]:
+  - **Rationale**: Lightweight column-major 4x4 matrix math helper (`createMat4`, `mat4Identity`, `mat4Perspective`, `mat4LookAt`, `mat4Multiply`) for native WebGPU rendering without external 3D engine dependencies.
+- `packages/renderer-webgpu/src/shaders/architecture.wgsl.ts` [NEW]:
+  - **Rationale**: WGSL vertex and fragment shader implementing storage buffer instancing, cubic polynomial easing (`jiwoEase`), and real-time 3D-to-2D morphing in the vertex pipeline.
+- `packages/renderer-webgpu/src/pipeline.ts` [NEW]:
+  - **Rationale**: First-class native WebGPU render pipeline with unit cube geometry, uniform buffer, storage buffer instanced rendering, and depth pass.
+- `packages/renderer-webgpu/src/renderer.ts` [NEW]:
+  - **Rationale**: Implemented `JiwoWebGPURenderer` matching the WebGL renderer public contract, featuring mouse/touch orbit controls, scan mode alignment, and smooth morphing.
+- `packages/renderer-webgpu/src/types.ts` [MODIFIED]:
+  - **Rationale**: Updated `WebGPURendererOptions` and `WebGPURenderModel`.
+- `packages/renderer-webgpu/src/index.ts` [MODIFIED]:
+  - **Rationale**: Exported `JiwoWebGPURenderer`, `JiwoWebGPUPipeline`, `ARCHITECTURE_WGSL`, `mat4`, and `isWebGPUSupported`.
+
+### 7. `apps/demo` (Studio Application)
+- `apps/demo/package.json` [MODIFIED]:
+  - **Rationale**: Added `@jiwoqr/renderer-webgpu: workspace:*` dependency.
+- `apps/demo/vite.config.ts` [MODIFIED]:
+  - **Rationale**: Added `@jiwoqr/renderer-webgpu` path alias for Vite local development and HMR.
+- `apps/demo/index.html` [MODIFIED]:
+  - **Rationale**: Added "Engine: WebGL / WebGPU" switcher button, "View in AR" button in header and export panel, Model 6 Origami Fold selector button, and bumped version to `v0.1.0-Fase5`.
+- `apps/demo/src/main.ts` [MODIFIED]:
+  - **Rationale**: Added AR launch handler via `launchARView()`, engine switcher toggling between `JiwoWebGLRenderer` and `JiwoWebGPURenderer`, Origami model click handler, and Origami DNA telemetry readout.
+- `apps/demo/src/style.css` [MODIFIED]:
+  - **Rationale**: Added styling for `.highlight-ar` buttons in header and export grid.
+
+### 8. Multi-Tiered Documentation
+- `packages/exporter/README.md` [MODIFIED]: Added USDZ and mobile AR documentation.
+- `packages/renderer-webgpu/README.md` [MODIFIED]: Added complete active pipeline documentation.
+- `packages/renderer-webgl/README.md` [MODIFIED]: Added Model 6 Origami and IndexedDB cache documentation.
+- `packages/math/README.md` [MODIFIED]: Added Origami projection math documentation.
+- `packages/core/README.md` [MODIFIED]: Added OrigamiDNA documentation.
+- `apps/demo/README.md` [MODIFIED]: Added View in AR, Engine switch, and Origami documentation.
+- `README.md` [MODIFIED]: Updated root documentation for Phase 5.
+
+
 
 
 

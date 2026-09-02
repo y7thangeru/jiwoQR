@@ -1,4 +1,13 @@
-export type STLArchetypeModel = 'architecture' | 'globe' | 'circuit' | 'biomorphic' | 'city' | 'flat';
+import type * as THREE from 'three';
+
+export type STLArchetypeModel =
+  | 'architecture'
+  | 'globe'
+  | 'circuit'
+  | 'biomorphic'
+  | 'city'
+  | 'origami'
+  | 'flat';
 
 
 export interface STLExportOptions {
@@ -24,6 +33,26 @@ export interface GLBExportOptions {
   animations?: THREE.AnimationClip[];
   /** Only export visible objects (default true) */
   onlyVisible?: boolean;
+}
+
+export interface USDZExportOptions {
+  /** Include custom animations if present */
+  animations?: THREE.AnimationClip[];
+  /** Maximum texture size */
+  maxTextureSize?: number;
+}
+
+export interface ARCapabilities {
+  isIOS: boolean;
+  isAndroid: boolean;
+  isARAvailable: boolean;
+}
+
+export interface ARLaunchOptions {
+  scene: THREE.Object3D | THREE.Scene;
+  glbUrl?: string;
+  modelName?: string;
+  title?: string;
 }
 
 export interface SVGExportOptions {

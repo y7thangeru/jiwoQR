@@ -60,6 +60,7 @@ export default defineConfig({
       '@jiwoqr/core': path.resolve(__dirname, '../../packages/core/src'),
       '@jiwoqr/math': path.resolve(__dirname, '../../packages/math/src'),
       '@jiwoqr/renderer-webgl': path.resolve(__dirname, '../../packages/renderer-webgl/src'),
+      '@jiwoqr/renderer-webgpu': path.resolve(__dirname, '../../packages/renderer-webgpu/src'),
       '@jiwoqr/exporter': path.resolve(__dirname, '../../packages/exporter/src'),
       '@jiwoqr/react': path.resolve(__dirname, '../../packages/react/src'),
     },

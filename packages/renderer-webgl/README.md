@@ -129,9 +129,17 @@ const renderer = new JiwoWebGLRenderer({
 ### 5. Model Kota Realistis Metropolitan (`src/models/city.ts` & `src/models/building-manager.ts`)
 - **Tema:** *Realistic 3D Metropolis City Grid with Dynamic Custom STL Building Models*.
 - **Dynamic Asset Auto-Discovery (`BuildingModelManager`)**: Memuat semua model `.stl` dari `STL-for-buildingModels/` secara asinkronus, menormalisasi titik pusat $(0,0)$ dan fondasi dasar pada $Z = 0$, serta mengatur ukuran horizontal menjadi $0.92$ unit untuk ruang gang (*alleyways*) yang rapih.
+- **IndexedDB Asset Cache**: Menyimpan geometri STL yang telah dinormalisasi dan didesimasi ke dalam browser `IndexedDB`. Jika model gedung pernah diunduh sebelumnya, muat instan langsung dari IndexedDB ($< 50\text{ ms}$).
 - **Street-Facing Orientation**: Menganalisa 4 tetangga ortogonal setiap sel untuk memutar orientasi bangunan ($0^\circ, 90^\circ, 180^\circ, 270^\circ$) agar selalu menghadap ke jalan raya terbuka.
 - **Cellular Block Zoning & CBD Gradient**: Pengelompokan lot bangunan dalam distrik harmonis dengan pencakar langit terkonsentrasi di pusat kota (*Central Business District*) dan menara monumental di 3 sudut Finder.
 - **Multi-Geometry Instanced Rendering**: Menggunakan `THREE.InstancedMesh` per model STL unik dengan `DynamicDrawUsage` untuk rendering GPU 60+ FPS.
+
+### 6. Model Origami Fold (`src/models/origami.ts`)
+
+- **Tema:** *Geometric Folded Paper / Low-Poly Origami Polyhedron*.
+- **Visual:** Modul data gelap dirender sebagai prisma polihedral lipatan kertas miring dengan pencahayaan faset tajam (*flat shading*) dan tekstur serat kertas (*washi/parchment*).
+- **Struktur Finder Patterns:** Tiga Finder Patterns dirender sebagai struktur mahkota derek geometris (*origami crane crowns*) bertingkat dengan sayap terlipat bersudut.
+- **Mekanisme Morphing:** Saat $t \to 1.0$, lipatan kertas membuka (*unfolds*) secara mekanis di GPU shader dan faset-faset segitiga merata menjadi bidang 2D hitam solid.
 
 ---
 

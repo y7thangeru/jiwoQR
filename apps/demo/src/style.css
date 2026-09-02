@@ -545,6 +545,32 @@ body, html {
   box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
 }
 
+.secondary-nav-btn.highlight-ar {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(255, 0, 85, 0.2));
+  border-color: rgba(0, 240, 255, 0.5);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
+}
+
+.secondary-nav-btn.highlight-ar:hover {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.35), rgba(255, 0, 85, 0.35));
+  border-color: #00f0ff;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.export-btn.highlight-ar {
+  border-color: rgba(0, 240, 255, 0.4);
+  background: rgba(0, 240, 255, 0.08);
+  color: #00f0ff;
+  grid-column: span 2;
+}
+
+.export-btn.highlight-ar:hover {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: #00f0ff;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.35);
+}
+
 .export-icon {
   font-size: 14px;
 }

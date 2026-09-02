@@ -4,6 +4,10 @@ import {
   RenderModel,
   requestDeviceOrientationPermission,
 } from '@jiwoqr/renderer-webgl';
+import {
+  JiwoWebGPURenderer,
+  isWebGPUSupported,
+} from '@jiwoqr/renderer-webgpu';
 import { JiwoQREntity, ECCLevel, createJiwoQR, ColorPalette } from '@jiwoqr/core';
 import {
   exportGLB,
@@ -11,6 +15,7 @@ import {
   exportPNG,
   exportSVG,
   downloadFile,
+  launchARView,
 } from '@jiwoqr/exporter';
 
 // DOM Elements
@@ -20,6 +25,10 @@ const btnApply = document.getElementById('btn-apply') as HTMLButtonElement;
 const btnModeToggle = document.getElementById('btn-mode-toggle') as HTMLButtonElement;
 const btnGyroToggle = document.getElementById('btn-gyro-toggle') as HTMLButtonElement;
 const gyroText = document.getElementById('gyro-text') as HTMLSpanElement;
+const btnViewAR = document.getElementById('btn-view-ar') as HTMLButtonElement;
+const btnViewARPanel = document.getElementById('btn-view-ar-panel') as HTMLButtonElement;
+const btnEngineToggle = document.getElementById('btn-engine-toggle') as HTMLButtonElement;
+const engineText = document.getElementById('engine-text') as HTMLSpanElement;
 const morphSlider = document.getElementById('morph-slider') as HTMLInputElement;
 const morphValueLabel = document.getElementById('morph-value') as HTMLSpanElement;
 const presetChips = document.querySelectorAll('.preset-chip');
@@ -182,6 +191,13 @@ function updateTelemetry(entity?: JiwoQREntity) {
     dnaTowerEl.textContent = `ZONE: ${zone}`;
     dnaHeightEl.textContent = `DENSITY: ${dens} (Scale: ${dna.city?.buildingScale ?? 1.0})`;
     dnaRoofEl.textContent = `LANDMARK: ${land}`;
+  } else if (currentModel === 'origami') {
+    const fold = dna.origami?.foldStyle?.toUpperCase() ?? 'MOUNTAIN';
+    const paper = dna.origami?.paperWeight?.toUpperCase() ?? 'WASHI';
+    const angle = dna.origami?.facetAngle ?? 45.0;
+    dnaTowerEl.textContent = `FOLD: ${fold}`;
+    dnaHeightEl.textContent = `PAPER: ${paper} (${angle}°)`;
+    dnaRoofEl.textContent = `UNFOLD: ${dna.origami?.unfoldPattern?.toUpperCase() ?? 'SPIRAL'}`;
   } else {
     dnaTowerEl.textContent = dna.architecture.towerArchetype.toUpperCase();
     dnaHeightEl.textContent = `${dna.architecture.maxHeight}x (var: ${dna.architecture.heightVariance})`;
@@ -452,3 +468,102 @@ function syncUI() {
   requestAnimationFrame(syncUI);
 }
 requestAnimationFrame(syncUI);
+
+// 12. Instant WebXR & Native AR Quick Look / Google Scene Viewer
+async function handleLaunchAR() {
+  try {
+    const currentModel = renderer.getModel();
+    if (btnViewAR) {
+      btnViewAR.disabled = true;
+      btnViewAR.textContent = 'Launching AR...';
+    }
+    if (btnViewARPanel) {
+      btnViewARPanel.disabled = true;
+      btnViewARPanel.textContent = 'Launching AR...';
+    }
+
+    await launchARView({
+      scene: renderer.getScene(),
+      modelName: currentModel,
+      title: `JiwoQR 3D — ${currentModel.toUpperCase()}`,
+    });
+  } catch (err) {
+    console.error('AR Launch Error', err);
+    alert('Failed to launch AR: ' + String(err));
+  } finally {
+    if (btnViewAR) {
+      btnViewAR.disabled = false;
+      btnViewAR.innerHTML = '<span class="nav-icon">🥽</span><span>View in AR</span>';
+    }
+    if (btnViewARPanel) {
+      btnViewARPanel.disabled = false;
+      btnViewARPanel.innerHTML = '<span class="export-icon">🥽</span><span class="export-label">View in AR (Mobile)</span>';
+    }
+  }
+}
+
+btnViewAR?.addEventListener('click', handleLaunchAR);
+btnViewARPanel?.addEventListener('click', handleLaunchAR);
+
+// 13. Graphics Engine Switcher (WebGL 2.0 vs First-Class Native WebGPU WGSL)
+let activeEngine: 'webgl' | 'webgpu' = 'webgl';
+let gpuRenderer: JiwoWebGPURenderer | null = null;
+
+if (!isWebGPUSupported()) {
+  if (btnEngineToggle) {
+    btnEngineToggle.title = 'WebGPU is not supported by your current browser (Falling back to WebGL)';
+    btnEngineToggle.style.opacity = '0.6';
+  }
+  if (engineText) {
+    engineText.textContent = 'Engine: WebGL (GPU N/A)';
+  }
+}
+
+btnEngineToggle?.addEventListener('click', async () => {
+  if (!isWebGPUSupported()) {
+    alert('WebGPU is not supported by your current browser environment. Running with WebGL 2.0 shader engine.');
+    return;
+  }
+
+  if (activeEngine === 'webgl') {
+    try {
+      btnEngineToggle.disabled = true;
+      engineText.textContent = 'Initializing WebGPU...';
+
+      // Hide WebGL canvas
+      const webglCanvas = container.querySelector('canvas');
+      if (webglCanvas) webglCanvas.style.display = 'none';
+
+      if (!gpuRenderer) {
+        gpuRenderer = new JiwoWebGPURenderer({
+          container,
+          powerPreference: 'high-performance',
+        });
+      }
+      const entity = renderer.getEntity();
+      if (entity) gpuRenderer.setEntity(entity);
+
+      activeEngine = 'webgpu';
+      btnEngineToggle.classList.add('active');
+      engineText.textContent = 'Engine: WebGPU (WGSL)';
+    } catch (err) {
+      console.error('Failed to initialize WebGPU:', err);
+      alert('Could not initialize WebGPU engine: ' + String(err));
+      engineText.textContent = 'Engine: WebGL';
+    } finally {
+      btnEngineToggle.disabled = false;
+    }
+  } else {
+    activeEngine = 'webgl';
+    btnEngineToggle.classList.remove('active');
+    engineText.textContent = 'Engine: WebGL';
+
+    if (gpuRenderer) {
+      gpuRenderer.dispose();
+      gpuRenderer = null;
+    }
+    const webglCanvas = container.querySelector('canvas');
+    if (webglCanvas) webglCanvas.style.display = 'block';
+  }
+});
+

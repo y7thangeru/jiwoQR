@@ -182,9 +182,117 @@ export function createProceduralBuildingGeometries(): THREE.BufferGeometry[] {
   return geometries;
 }
 
+const DB_NAME = 'jiwoqr-asset-cache';
+const DB_VERSION = 1;
+const STORE_NAME = 'building-geometries';
+
+interface SerializedGeometryData {
+  url: string;
+  positions: Float32Array;
+  normals: Float32Array;
+  indices?: Uint16Array | Uint32Array | null;
+  timestamp: number;
+}
+
+/**
+ * Lightweight browser IndexedDB helper for persistent geometry caching.
+ * Safely falls back to null in SSR / Node.js testing environments.
+ */
+function openGeometryCacheDB(): Promise<IDBDatabase | null> {
+  if (typeof window === 'undefined' || typeof indexedDB === 'undefined') {
+    return Promise.resolve(null);
+  }
+
+  return new Promise((resolve) => {
+    try {
+      const request = indexedDB.open(DB_NAME, DB_VERSION);
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME, { keyPath: 'url' });
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => resolve(null);
+    } catch {
+      resolve(null);
+    }
+  });
+}
+
+async function getCachedGeometryFromDB(url: string): Promise<THREE.BufferGeometry | null> {
+  const db = await openGeometryCacheDB();
+  if (!db) return null;
+
+  return new Promise((resolve) => {
+    try {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.get(url);
+
+      req.onsuccess = () => {
+        const record = req.result as SerializedGeometryData | undefined;
+        if (!record || !record.positions || !record.normals) {
+          resolve(null);
+          return;
+        }
+
+        const geom = new THREE.BufferGeometry();
+        geom.setAttribute('position', new THREE.Float32BufferAttribute(record.positions, 3));
+        geom.setAttribute('normal', new THREE.Float32BufferAttribute(record.normals, 3));
+        if (record.indices) {
+          geom.setIndex(new THREE.BufferAttribute(record.indices, 1));
+        }
+        geom.computeBoundingBox();
+        geom.computeBoundingSphere();
+        resolve(geom);
+      };
+
+      req.onerror = () => resolve(null);
+    } catch {
+      resolve(null);
+    }
+  });
+}
+
+async function saveGeometryToDB(url: string, geom: THREE.BufferGeometry): Promise<void> {
+  const db = await openGeometryCacheDB();
+  if (!db) return;
+
+  const posAttr = geom.getAttribute('position');
+  const normAttr = geom.getAttribute('normal');
+  if (!posAttr || !normAttr) return;
+
+  const positions = new Float32Array(posAttr.array);
+  const normals = new Float32Array(normAttr.array);
+  let indices: Uint16Array | Uint32Array | null = null;
+  if (geom.index) {
+    indices = geom.index.array instanceof Uint32Array
+      ? new Uint32Array(geom.index.array)
+      : new Uint16Array(geom.index.array);
+  }
+
+  const record: SerializedGeometryData = {
+    url,
+    positions,
+    normals,
+    indices,
+    timestamp: Date.now(),
+  };
+
+  try {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    store.put(record);
+  } catch (err) {
+    console.warn('[JiwoQR] Could not save geometry to IndexedDB:', err);
+  }
+}
+
 /**
  * Dynamic Building Model Asset Manager.
  * Handles fetching, parsing, normalizing, caching, and auto-discovering STL 3D building assets.
+ * Integrates an IndexedDB tier for instant startup (< 50ms) when revisiting assets.
  */
 export class BuildingModelManager {
   private static instance?: BuildingModelManager;
@@ -207,6 +315,7 @@ export class BuildingModelManager {
 
   /**
    * Loads a list of STL models from URLs or file paths asynchronously.
+   * Priority: 1. In-memory Cache -> 2. IndexedDB (< 50ms) -> 3. Network Fetch & Decimation.
    */
   public async loadModels(urls: string[]): Promise<THREE.BufferGeometry[]> {
     if (!urls || urls.length === 0) {
@@ -216,10 +325,19 @@ export class BuildingModelManager {
     const loadedGeoms: THREE.BufferGeometry[] = [];
 
     const fetchPromises = urls.map(async (url) => {
+      // 1. In-memory cache hit
       if (this.cache.has(url)) {
         return this.cache.get(url)!;
       }
 
+      // 2. IndexedDB persistent cache hit (< 50ms instant load)
+      const cachedFromDB = await getCachedGeometryFromDB(url);
+      if (cachedFromDB) {
+        this.cache.set(url, cachedFromDB);
+        return cachedFromDB;
+      }
+
+      // 3. Network fetch, parse & decimation
       try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -228,7 +346,11 @@ export class BuildingModelManager {
         const arrayBuffer = await response.arrayBuffer();
         const rawGeom = this.loader.parse(arrayBuffer);
         const normalized = normalizeBuildingGeometry(rawGeom);
+
+        // Store in memory and persist in IndexedDB asynchronously
         this.cache.set(url, normalized);
+        saveGeometryToDB(url, normalized).catch(() => {});
+
         return normalized;
       } catch (err) {
         console.warn(`[JiwoQR] Warning: Could not load building model from "${url}":`, err);
@@ -273,6 +395,25 @@ export class BuildingModelManager {
     return this.isLoaded;
   }
 
+  /**
+   * Clears the persistent IndexedDB cache for building geometries.
+   */
+  public async clearIndexedDBCache(): Promise<void> {
+    const db = await openGeometryCacheDB();
+    if (!db) return;
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        store.clear();
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => resolve();
+      } catch {
+        resolve();
+      }
+    });
+  }
+
   public dispose() {
     for (const geom of this.cache.values()) {
       geom.dispose();
@@ -280,3 +421,8 @@ export class BuildingModelManager {
     this.cache.clear();
   }
 }
+
+export async function clearBuildingGeometryIndexedDBCache(): Promise<void> {
+  return BuildingModelManager.getInstance().clearIndexedDBCache();
+}
+

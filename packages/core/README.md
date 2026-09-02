@@ -111,6 +111,12 @@ Membangkitkan entitas `DeterministicDNA` yang mengatur seluruh karakteristik vis
    - `streetOrientationBias`: Kecenderungan rotasi fasad gedung menghadap jalan raya terbuka (*orthogonal 4-way analysis*).
    - `landmarkStyle`: Bentuk dan elevasi menara sudut monumental (*spire*, *obelisk*, *citadel*).
    - `buildingScale`: Proporsi skala gedung relatif terhadap modul QR.
+7. **Karakteristik Origami Fold (`OrigamiDNA`)**:
+   - `foldStyle`: Gaya lipatan kertas geometris (`mountain`, `valley`, `diagonal_pyramid`, `crane_wing`).
+   - `creaseSharpness`: Ketajaman lipatan faset segitiga ($0.50$ hingga $0.95$).
+   - `paperWeight`: Tekstur bobot kertas (`washi`, `heavy_cardstock`, `metallic_foil`).
+   - `unfoldPattern`: Pola pembukaan mekanis saat morphing (`radial_spiral`, `mechanical_flatten`, `diagonal_split`).
+   - `facetAngle`: Sudut faset lipatan kertas ($25.0^\circ$ hingga $55.0^\circ$).
 
 ---
 

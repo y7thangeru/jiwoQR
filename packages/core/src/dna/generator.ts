@@ -6,6 +6,7 @@ import {
   CircuitDNA,
   BiomorphicDNA,
   CityDNA,
+  OrigamiDNA,
 } from '../types.js';
 import { fnv1a64, normalizeInput } from './hasher.js';
 import { Mulberry32 } from './prng.js';
@@ -150,6 +151,31 @@ export function generateDNA(input: string): DeterministicDNA {
     buildingScale: Number(rng.range(0.85, 1.15).toFixed(2)),
   };
 
+  const foldStyles: OrigamiDNA['foldStyle'][] = [
+    'mountain',
+    'valley',
+    'diagonal_pyramid',
+    'crane_wing',
+  ];
+  const paperWeights: OrigamiDNA['paperWeight'][] = [
+    'washi',
+    'heavy_cardstock',
+    'metallic_foil',
+  ];
+  const unfoldPatterns: OrigamiDNA['unfoldPattern'][] = [
+    'radial_spiral',
+    'mechanical_flatten',
+    'diagonal_split',
+  ];
+
+  const origami: OrigamiDNA = {
+    foldStyle: rng.choice(foldStyles),
+    creaseSharpness: Number(rng.range(0.5, 0.95).toFixed(2)),
+    paperWeight: rng.choice(paperWeights),
+    unfoldPattern: rng.choice(unfoldPatterns),
+    facetAngle: Number(rng.range(25.0, 55.0).toFixed(1)),
+  };
+
   return {
     rawHash,
     seed32,
@@ -160,6 +186,8 @@ export function generateDNA(input: string): DeterministicDNA {
     circuit,
     biomorphic,
     city,
+    origami,
   };
 }
+
 

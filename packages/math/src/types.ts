@@ -118,3 +118,32 @@ export interface CityModuleTransform {
   /** Cellular block zoning ID */
   zoneId: number;
 }
+
+export type OrigamiFoldStyle =
+  | 'mountain'
+  | 'valley'
+  | 'diagonal_pyramid'
+  | 'crane_wing';
+
+export interface OrigamiModuleTransform {
+  gridX: number;
+  gridY: number;
+  isDark: boolean;
+  isFinder: boolean;
+  foldStyle: OrigamiFoldStyle;
+  /** 3D folded paper peak world position */
+  position3D: Vec3;
+  /** 2D canonical flat scan position */
+  position2D: Vec3;
+  /** Scale in 3D folded mode (width, depth, height) */
+  scale3D: Vec3;
+  /** Scale in 2D canonical flat mode */
+  scale2D: Vec3;
+  /** Crease rotation angle around Z (rad) */
+  rotationZ: number;
+  /** Crease steepness / fold inclination angle in radians */
+  foldAngle: number;
+  /** Crease sharpness factor (0.0 to 1.0) */
+  creaseSharpness: number;
+}
+

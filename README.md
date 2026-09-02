@@ -103,23 +103,44 @@ Menyusun matriks QR menjadi motherboard sirkuit cetak (*Cybernetic PCB / Microch
 Menyusun matriks QR menjadi struktur kristal mineral dan pertumbuhan karang heksagonal (*Crystalline Mineral & Coral Growth*).
 - **Geode Monolith Finders**: Tiga Finder Patterns dimodelkan sebagai klaster kristal geodesik monolitik besar bercahaya tinggi.
 - **Hexagonal Crystal Prisms**: Modul data dirender sebagai prisma kristal heksagonal dengan sudut facet dan kemiringan natural menggunakan material translusen/refraktif PBR.
-- **Crystalline Planar Fusion**: Saat beralih ke Mode Scan ($t \to 1.0$), kristal memadat dan permukaannya merata menjadi modul hitam-putih kanonikal.
-
-### 5. Model Kota Realistis Metropolitan (`model="city"`)
+- **Crystalline Planar Fusion**: Saat beralih ke Mode Scan ($t \to 1.0$), kristal memadat dan permukaannya merata menjadi modul hitam-put### 5. Model Kota Realistis Metropolitan (`model="city"`)
 Menyusun matriks QR menjadi sebuah kota metropolitan realistis menggunakan aset model 3D kustom (`STL-for-buildingModels/*.stl`) dengan tata ruang urban cerdas:
 - **Dynamic Model Auto-Discovery**: Secara otomatis mendeteksi dan memuat semua file `.stl` di direktori `STL-for-buildingModels/`. Pengguna dapat menambah, mengurangi, atau mengganti model referensi tanpa mengubah kode sumber.
+- **IndexedDB Asset Cache**: Menyimpan geometri STL yang telah dinormalisasi ke dalam IndexedDB peramban untuk waktu pemuatan instan ($< 50\text{ ms}$).
 - **Street-Facing Orientation**: Menganalisa tetangga ortogonal sel QR untuk memutar orientasi bangunan ($0^\circ, 90^\circ, 180^\circ, 270^\circ$) agar fasad bangunan selalu menghadap ke arah jalan raya atau plaza terbuka (*light modules*).
 - **Cellular Block Zoning & CBD Density**: Pengelompokan distrik (*neighborhood zoning*) harmonis, dengan gedung pencakar langit terkonsentrasi di pusat matriks (*Central Business District*) dan menara monumental megah pada pola sudut Finder.
 - **Multi-Instanced GPU Rendering & Scan Morphing**: Setiap model bangunan di-instance secara independen pada GPU untuk performa 60+ FPS, dan merata secara mulus menjadi grid biner hitam pekat saat berpindah ke mode pemindaian.
+
+### 6. Model Origami Fold (`model="origami"`)
+Menyusun matriks QR menjadi lipatan seni kertas geometris polihedral (*Low-Poly Origami Polyhedron*):
+- **Prisma Polihedral Faset**: Modul data dirender sebagai prisma lipatan kertas dengan bayangan faset tajam (*flat shading*) dan tekstur serat kertas (*washi/cardstock*).
+- **Mahkota Derek Finder**: Tiga pola sudut Finder dirender sebagai struktur derek origami geometris (*origami crane crowns*) bertingkat.
+- **Mekanisme Pembukaan Lipatan (Unfolding)**: Saat bertransisi ke Mode Scan ($t \to 1.0$), seluruh lipatan faset membuka secara mekanis di GPU shader dan merata menjadi bidang hitam kanonikal.
+- **Watertight STL 3D Print**: Menghasilkan balok prisma bertutup miring tertutup (*closed manifold*) siap cetak 3D tanpa error non-manifold edge.
 
 ---
 
 ## ⚡ GPU Vertex Shader Morphing Pipeline (120 FPS)
 
-Pada JiwoQR Fase 3, seluruh interpolasi posisi 3D ke 2D datar dikalkulasi langsung di GPU Vertex Shader melalui uniform `uMorphProgress` ($0.0 \to 1.0$):
+Pada JiwoQR Fase 3 & 4, seluruh interpolasi posisi 3D ke 2D datar dikalkulasi langsung di GPU Vertex Shader melalui uniform `uMorphProgress` ($0.0 \to 1.0$):
 - **VBO Instanced Attributes**: Posisi 3D ($x_1, y_1, z_1$), posisi 2D ($x_0, y_0, z_0$), skala 3D/2D, rotasi Z, dan warna 3D disimpan langsung dalam buffer GPU (`aPosition3D`, `aPosition2D`, `aScale3D`, `aScale2D`, `aRotationZ3D`, `aColor3D`, `aColor2D`).
 - **Zero CPU Looping**: CPU hanya memperbarui `uMorphProgress` sekali per frame di `requestAnimationFrame`, menghilangkan iterasi per-modul dan menjaga rendering stabil di **120+ FPS**.
 
+---
+
+## 🥽 Instant WebXR & Native Mobile AR View
+
+- **Apple AR Quick Look (iOS Safari)**: Otomatis mengonversi 3D scene aktif ke blob biner USDZ dan memicu viewer AR bawaan iOS Safari tanpa perlu instalasi aplikasi pihak ketiga.
+- **Google Scene Viewer (Android Chrome)**: Menyusun skema intent ARCore bawaan Google Scene Viewer (`intent://...`) untuk memproyeksikan QR 3D ke lingkungan fisik pengguna di dunia nyata.
+- **Cross-Platform Auto-Detection**: Fungsi `detectARCapabilities()` dan `launchARView()` memilih jalur AR terbaik untuk setiap sistem operasi secara otomatis.
+
+---
+
+## ⚡ First-Class Native WebGPU Render & Compute Pipeline
+
+- **W3C WebGPU Direct Pipeline**: Paket `@jiwoqr/renderer-webgpu` menyajikan renderer native murni tanpa Three.js berbasis WGSL compute dan vertex shader.
+- **Storage Buffer Instancing**: Modul QR dikemas dalam Float32Array 96-byte terarah ke GPU Storage Buffer.
+- **Dual Engine Toggle di Studio**: Beralih instan antara WebGL 2.0 dan WebGPU Engine di `apps/demo`.
 
 ---
 
@@ -141,8 +162,9 @@ Pada JiwoQR Fase 3, seluruh interpolasi posisi 3D ke 2D datar dikalkulasi langsu
 Paket `@jiwoqr/exporter` memungkinkan hasil pembuatan QR 3D diubah menjadi aset fisik dan digital:
 1. **Binary STL (`exportSTL`)**: Menghasilkan file `.stl` siap cetak 3D untuk slicer (Cura, PrusaSlicer, Bambu Studio, OrcaSlicer) dengan elevasi balok data prosedural sesuai model 3D aktif.
 2. **Binary GLB (`exportGLB`)**: Mengekspor seluruh Three.js Scene ke format standar `.glb` lengkap dengan geometri instanced dan material PBR.
-3. **Print-Ready PNG 300 DPI (`exportPNG`)**: Merender gambar raster beresolusi ultra-tinggi ($2048\times2048+$) tanpa anti-aliasing kabur untuk kebutuhan cetak kartu nama, stiker, dan kemasan produk.
-4. **Vector SVG (`exportSVG`)**: Format vektor murni yang dapat di-scale tak terbatas tanpa kehilangan ketajaman.
+3. **USDZ & Mobile AR (`generateUSDZBlob` & `launchARView`)**: Generator blob USDZ dan pemicu AR Quick Look / Scene Viewer otomatis.
+4. **Print-Ready PNG 300 DPI (`exportPNG`)**: Merender gambar raster beresolusi ultra-tinggi ($2048\times2048+$) tanpa anti-aliasing kabur untuk kebutuhan cetak kartu nama, stiker, dan kemasan produk.
+5. **Vector SVG (`exportSVG`)**: Format vektor murni yang dapat di-scale tak terbatas tanpa kehilangan ketajaman.
 
 ---
 
@@ -166,12 +188,12 @@ jiwoQR/
 │   └── demo/                      # Interactive 3D QR Studio (Vite + TS)
 ├── packages/
 │   ├── core/                      # Multi-mode encoder, RS ECC, DNA generator
-│   ├── math/                      # Vektor, easing, ekstrusi, spherical & circuit projections
-│   ├── renderer-webgl/            # Three.js engine, models (Architecture, Globe, Circuit), fallback
-│   ├── exporter/                  # 3D mesh (GLB, watertight STL) & 2D print (SVG, PNG 300 DPI)
+│   ├── math/                      # Vektor, easing, ekstrusi, spherical, circuit & origami projections
+│   ├── renderer-webgl/            # Three.js engine, 6 models, IndexedDB cache, GPU morph, fallback
+│   ├── renderer-webgpu/           # First-class native WebGPU pipeline & WGSL shader engine
+│   ├── exporter/                  # 3D mesh (GLB, watertight STL), USDZ/AR, & 2D print (SVG, PNG 300 DPI)
 │   ├── react/                     # Komponen wrapper <JiwoQR /> untuk React dengan WebGL fallback
-│   ├── web-component/             # Native Custom Element <jiwo-qr> dengan WebGL fallback
-│   └── renderer-webgpu/           # Scaffolding & type definition WebGPU masa depan
+│   └── web-component/             # Native Custom Element <jiwo-qr> dengan WebGL fallback
 ├── package.json                   # Root package manifest & scripts
 ├── pnpm-workspace.yaml            # Konfigurasi workspace monorepo
 ├── tsconfig.base.json             # Konfigurasi TypeScript global

@@ -5,6 +5,7 @@ import {
   computeCircuitModuleTransform,
   computeBiomorphicModuleTransform,
   computeCityModuleTransform,
+  computeOrigamiModuleTransform,
 } from '@jiwoqr/math';
 import { STLExportOptions } from './types.js';
 
@@ -63,6 +64,59 @@ function addBoxTriangles(
   triangles.push({ normal: { x: 1, y: 0, z: 0 }, v1: v1, v2: v2, v3: v6 });
   triangles.push({ normal: { x: 1, y: 0, z: 0 }, v1: v1, v2: v6, v3: v5 });
 }
+
+function addOrigamiPrismTriangles(
+  triangles: Triangle[],
+  x1: number,
+  y1: number,
+  z1: number,
+  x2: number,
+  y2: number,
+  z2: number,
+  zPeak: number
+) {
+  const v0: Point3D = { x: x1, y: y1, z: z1 };
+  const v1: Point3D = { x: x2, y: y1, z: z1 };
+  const v2: Point3D = { x: x2, y: y2, z: z1 };
+  const v3: Point3D = { x: x1, y: y2, z: z1 };
+
+  const v4: Point3D = { x: x1, y: y1, z: z2 };
+  const v5: Point3D = { x: x2, y: y1, z: z2 };
+  const v6: Point3D = { x: x2, y: y2, z: z2 };
+  const v7: Point3D = { x: x1, y: y2, z: z2 };
+
+  const midX = (x1 + x2) * 0.5;
+  const midY = (y1 + y2) * 0.5;
+  const apex: Point3D = { x: midX, y: midY, z: zPeak };
+
+  // Bottom (-Z)
+  triangles.push({ normal: { x: 0, y: 0, z: -1 }, v1: v0, v2: v2, v3: v1 });
+  triangles.push({ normal: { x: 0, y: 0, z: -1 }, v1: v0, v2: v3, v3: v2 });
+
+  // 4 Vertical sides
+  // Front (-Y)
+  triangles.push({ normal: { x: 0, y: -1, z: 0 }, v1: v0, v2: v1, v3: v5 });
+  triangles.push({ normal: { x: 0, y: -1, z: 0 }, v1: v0, v2: v5, v3: v4 });
+
+  // Back (+Y)
+  triangles.push({ normal: { x: 0, y: 1, z: 0 }, v1: v3, v2: v6, v3: v2 });
+  triangles.push({ normal: { x: 0, y: 1, z: 0 }, v1: v3, v2: v7, v3: v6 });
+
+  // Left (-X)
+  triangles.push({ normal: { x: -1, y: 0, z: 0 }, v1: v0, v2: v4, v3: v7 });
+  triangles.push({ normal: { x: -1, y: 0, z: 0 }, v1: v0, v2: v7, v3: v3 });
+
+  // Right (+X)
+  triangles.push({ normal: { x: 1, y: 0, z: 0 }, v1: v1, v2: v2, v3: v6 });
+  triangles.push({ normal: { x: 1, y: 0, z: 0 }, v1: v1, v2: v6, v3: v5 });
+
+  // 4 Faceted Origami paper roof triangles
+  triangles.push({ normal: { x: 0, y: -0.7, z: 0.7 }, v1: v4, v2: v5, v3: apex });
+  triangles.push({ normal: { x: 0.7, y: 0, z: 0.7 }, v1: v5, v2: v6, v3: apex });
+  triangles.push({ normal: { x: 0, y: 0.7, z: 0.7 }, v1: v6, v2: v7, v3: apex });
+  triangles.push({ normal: { x: -0.7, y: 0, z: 0.7 }, v1: v7, v2: v4, v3: apex });
+}
+
 
 /**
  * Generates a 3D-printing ready, manifold / watertight binary STL file from a QR matrix and visual DNA.
@@ -201,6 +255,28 @@ export function exportSTL(
           }
         );
         moduleHeight = Math.max(1.0, transform.scale3D.z);
+      } else if (model === 'origami') {
+        const origamiMaxHeight = options.maxHeight ?? 6.0;
+        const transform = computeOrigamiModuleTransform(
+          mod.x,
+          mod.y,
+          totalModules,
+          true,
+          isFinder,
+          seed32,
+          {
+            moduleSize,
+            gap: 0,
+            maxHeight: origamiMaxHeight,
+            finderMultiplier: 2.0,
+          }
+        );
+        moduleHeight = Math.max(1.2, transform.scale3D.z);
+        const z1 = baseThickness;
+        const z2 = baseThickness + moduleHeight * 0.65;
+        const zPeak = baseThickness + moduleHeight;
+        addOrigamiPrismTriangles(triangles, x1, y1, z1, x2, y2, z2, zPeak);
+        continue;
       }
 
       const z1 = baseThickness;

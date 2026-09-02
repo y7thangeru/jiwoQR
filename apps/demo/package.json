@@ -12,6 +12,7 @@
     "@jiwoqr/core": "workspace:*",
     "@jiwoqr/math": "workspace:*",
     "@jiwoqr/renderer-webgl": "workspace:*",
+    "@jiwoqr/renderer-webgpu": "workspace:*",
     "@jiwoqr/exporter": "workspace:*",
     "three": "^0.174.0"
   },

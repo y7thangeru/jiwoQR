@@ -22,9 +22,17 @@
         <div class="brand">
           <span class="logo-badge">3D</span>
           <h1>JIWO<span>QR</span></h1>
-          <span class="version-tag">v0.1.0-Fase3</span>
+          <span class="version-tag">v0.1.0-Fase5</span>
         </div>
         <div class="header-actions">
+          <button id="btn-engine-toggle" class="secondary-nav-btn" title="Toggle Graphics Engine (WebGL vs native WebGPU)">
+            <span class="nav-icon">⚡</span>
+            <span id="engine-text">Engine: WebGL</span>
+          </button>
+          <button id="btn-view-ar" class="secondary-nav-btn highlight-ar" title="View 3D QR in Augmented Reality (iOS Quick Look / Android Scene Viewer)">
+            <span class="nav-icon">🥽</span>
+            <span>View in AR</span>
+          </button>
           <button id="btn-gyro-toggle" class="secondary-nav-btn" title="Toggle Device Orientation Tilt for mobile holographic orbit">
             <span class="nav-icon">📱</span>
             <span id="gyro-text">Gyro: OFF</span>
@@ -137,6 +145,10 @@
               <span class="model-name">City Metropolis</span>
               <span class="model-desc">Realistic 3D STL Buildings & Urban Grid</span>
             </button>
+            <button class="model-btn" data-model="origami">
+              <span class="model-name">Origami Fold</span>
+              <span class="model-desc">Folded Polyhedron Paper & Crane Crowns</span>
+            </button>
           </div>
         </div>
 
@@ -195,6 +207,10 @@
             <button id="btn-export-svg" class="export-btn" title="Export canonical vector SVG">
               <span class="export-icon">📐</span>
               <span class="export-label">Export SVG</span>
+            </button>
+            <button id="btn-view-ar-panel" class="export-btn highlight-ar" title="View in Augmented Reality (iOS Quick Look / Android Scene Viewer)">
+              <span class="export-icon">🥽</span>
+              <span class="export-label">View in AR (Mobile)</span>
             </button>
           </div>
         </div>

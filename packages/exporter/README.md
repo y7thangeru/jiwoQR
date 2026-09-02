@@ -35,7 +35,8 @@ Setiap berkas mesh `.stl` yang dihasilkan dihitung secara presisi dengan topolog
 
 ## ✨ Fitur Utama
 
-- **Watertight Solid Binary STL**: Menghasilkan pelat substrate dasar padu ($W \times H \times T_{\text{base}}$) dan balok modul data timbul. Elevasi balok dapat mengikuti arketipe 3D aktif (`architecture` pencakar langit bertingkat, `globe` kubah bola, `circuit` chip SMD, `biomorphic` pilar kristal, `city` blok kota metropolitan bertingkat, atau `flat` standar).
+- **Watertight Solid Binary STL**: Menghasilkan pelat substrate dasar padu ($W \times H \times T_{\text{base}}$) dan balok modul data timbul. Elevasi balok dapat mengikuti arketipe 3D aktif (`architecture` pencakar langit bertingkat, `globe` kubah bola, `circuit` chip SMD, `biomorphic` pilar kristal, `city` blok kota metropolitan bertingkat, `origami` prisma polihedral lipatan kertas miring, atau `flat` standar).
+- **Native AR Quick Look (iOS) & Scene Viewer (Android)**: Mengekspor scene Three.js aktif ke blob USDZ biner untuk memicu AR Quick Look asli pada iOS Safari, atau menyusun intent URL Google Scene Viewer untuk preview AR instan pada Chrome Android.
 - **Three.js Binary GLB**: Mengonversi `THREE.Scene` aktif ke file `.glb` biner dengan mempertahankan material PBR, instance mesh, dan warna vertex.
 - **300 DPI Print-Ready PNG**: Merender QR code kanonikal beresolusi ultra-tinggi ($2048\times2048+$) dengan anti-aliasing dinonaktifkan untuk mencegah pendaran piksel buram pada kemasan fisik.
 - **Vektor SVG Skalabel**: Format SVG mandiri dengan batas 4 modul quiet zone dan opsi radius sudut (*rounded corners*).
@@ -47,12 +48,13 @@ Setiap berkas mesh `.stl` yang dihasilkan dihitung secara presisi dengan topolog
 
 ```
 packages/exporter/src/
-├── stl.ts                     # Binary watertight STL generator (12 triangles per box)
+├── stl.ts                     # Binary watertight STL generator (Architecture, City, Origami, Flat)
 ├── glb.ts                     # Three.js GLTFExporter wrapper untuk GLB binary
+├── usdz.ts                    # USDZ exporter, iOS AR Quick Look & Android Scene Viewer intent
 ├── svg.ts                     # Standalone SVG vector generator
 ├── png.ts                     # 300 DPI high-res canvas-to-blob raster generator
 ├── utils.ts                   # downloadFile() blob URL browser helper
-├── types.ts                   # Interface opsi ekspor (STLExportOptions, dsb.)
+├── types.ts                   # Interface opsi ekspor (STLExportOptions, ARLaunchOptions, dsb.)
 └── index.ts                   # Ekspor publik
 ```
 
@@ -68,16 +70,15 @@ import { exportSTL, downloadFile } from '@jiwoqr/exporter';
 
 const entity = createJiwoQR('https://jiwoqr.dev');
 
-// Menghasilkan buffer STL dengan elevasi gedung kota arsitektur
-const stlBuffer = exportSTL(entity.matrix, {
-  dna: entity.dna,
-  model: 'architecture', // 'architecture' | 'globe' | 'circuit' | 'flat'
-  moduleSize: 2.0,       // 2mm per modul
-  baseThickness: 2.0,    // 2mm pelat dasar
-  moduleHeight: 2.5,     // Ketinggian maksimum balok
+// Menghasilkan buffer STL dengan elevasi kertas origami bersudut
+const stlBuffer = exportSTL(entity.matrix, entity.dna, {
+  model: 'origami',     // 'architecture' | 'globe' | 'circuit' | 'biomorphic' | 'city' | 'origami' | 'flat'
+  moduleSize: 2.0,      // 2mm per modul
+  baseThickness: 2.0,   // 2mm pelat dasar
+  maxHeight: 6.0,       // Ketinggian puncak mahkota lipatan
 });
 
-downloadFile(stlBuffer, 'jiwo-qr-3dprint.stl', 'application/sla');
+downloadFile(stlBuffer, 'jiwo-qr-origami-3dprint.stl', 'application/sla');
 ```
 
 ---
@@ -98,7 +99,25 @@ downloadFile(glbBuffer, 'jiwo-globe-scene.glb', 'model/gltf-binary');
 
 ---
 
-### 3. Ekspor Vektor SVG Mandiri (`exportSVG`)
+### 3. Instant Mobile AR Preview (`launchARView` & `generateUSDZBlob`)
+
+```typescript
+import { launchARView, generateUSDZBlob, detectARCapabilities } from '@jiwoqr/exporter';
+
+// Deteksi kemampuan AR perangkat
+const { isIOS, isAndroid, isARAvailable } = detectARCapabilities();
+
+// Memicu AR Quick Look di iOS Safari atau Google Scene Viewer di Android
+await launchARView({
+  scene: renderer.getScene(),
+  modelName: renderer.getModel(),
+  title: 'JiwoQR 3D Holographic Model',
+});
+```
+
+---
+
+### 4. Ekspor Vektor SVG Mandiri (`exportSVG`)
 
 ```typescript
 import { encodeQR } from '@jiwoqr/core';
@@ -117,7 +136,7 @@ downloadFile(svgString, 'jiwo-qr.svg', 'image/svg+xml');
 
 ---
 
-### 4. Ekspor Raster 300 DPI PNG (`exportPNG`)
+### 5. Ekspor Raster 300 DPI PNG (`exportPNG`)
 
 ```typescript
 import { encodeQR } from '@jiwoqr/core';
@@ -138,34 +157,46 @@ downloadFile(pngBlob, 'jiwo-qr-300dpi.png', 'image/png');
 ## 📐 Struktur Tipe Data & Interface
 
 ```typescript
-export type STLArchetypeModel = 'architecture' | 'globe' | 'circuit' | 'biomorphic' | 'flat';
+export type STLArchetypeModel =
+  | 'architecture'
+  | 'globe'
+  | 'circuit'
+  | 'biomorphic'
+  | 'city'
+  | 'origami'
+  | 'flat';
 
 export interface STLExportOptions {
-  dna?: DeterministicDNA;
   model?: STLArchetypeModel;
-
   moduleSize?: number;     // Ukuran fisik modul (mm) - default: 2.0
   baseThickness?: number;  // Ketebalan pelat dasar (mm) - default: 2.0
   moduleHeight?: number;   // Ketinggian timbul modul (mm) - default: 2.0
-  maxHeight?: number;      // Multiplier ketinggian gedung/mound 3D
+  maxHeight?: number;      // Ketinggian fitur tertinggi 3D (mm)
+  padding?: number;
+}
+
+export interface USDZExportOptions {
+  animations?: THREE.AnimationClip[];
+  maxTextureSize?: number;
+}
+
+export interface ARCapabilities {
+  isIOS: boolean;
+  isAndroid: boolean;
+  isARAvailable: boolean;
+}
+
+export interface ARLaunchOptions {
+  scene: THREE.Object3D | THREE.Scene;
+  glbUrl?: string;
+  modelName?: string;
+  title?: string;
 }
 
 export interface GLBExportOptions {
   binary?: boolean;
-  embedImages?: boolean;
-}
-
-export interface SVGExportOptions {
-  size?: number;
-  darkColor?: string;
-  lightColor?: string;
-  borderRadius?: number;
-}
-
-export interface PNGExportOptions {
-  size?: number;
-  darkColor?: string;
-  lightColor?: string;
+  animations?: THREE.AnimationClip[];
+  onlyVisible?: boolean;
 }
 ```
 
@@ -174,6 +205,6 @@ export interface PNGExportOptions {
 ## 🧪 Pengujian Unit
 
 ```bash
-pnpm --filter @jiwoqr/exporter test
+pnpm test
 ```
-Verifikasi unit test memeriksa kebenaran header 80-byte STL biner, perhitungan jumlah segitiga ($\text{Triangles} = 12 + 12 \times \text{darkModules}$), panjang buffer tepat, validitas markup SVG, dan struktur header GLB.
+Verifikasi unit test memeriksa kebenaran header 80-byte STL biner, perhitungan jumlah segitiga, manifold watertightness model Origami, format intent Google Scene Viewer, dan deteksi kapabilitas mobile AR.

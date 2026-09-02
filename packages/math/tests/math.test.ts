@@ -17,7 +17,10 @@ import {
   computeStreetFacingAngle,
   computeCityModuleTransform,
   interpolateCityTransform,
+  computeOrigamiModuleTransform,
+  calculateOrigamiUnfold,
 } from '../src/index.js';
+
 
 
 describe('@jiwoqr/math', () => {
@@ -244,7 +247,48 @@ describe('@jiwoqr/math', () => {
       expect(at1.rotationZ).toBeCloseTo(0, 2);
     });
   });
+
+  describe('Origami Fold Projections (Model 6)', () => {
+    it('computes low-poly folded paper polyhedron transforms with mountain and valley creases', () => {
+      const module = computeOrigamiModuleTransform(12, 12, 29, true, false, 999);
+      expect(module.isDark).toBe(true);
+      expect(module.isFinder).toBe(false);
+      expect(['mountain', 'diagonal_pyramid', 'valley']).toContain(module.foldStyle);
+      expect(module.scale3D.z).toBeGreaterThan(0.5);
+      expect(module.foldAngle).toBeGreaterThan(0);
+      expect(module.creaseSharpness).toBeGreaterThanOrEqual(0.65);
+    });
+
+    it('assigns elevated crane crown structures to finder patterns', () => {
+      const finder = computeOrigamiModuleTransform(3, 3, 29, true, true, 999);
+      expect(finder.isFinder).toBe(true);
+      expect(finder.foldStyle).toBe('crane_wing');
+      expect(finder.scale3D.z).toBeGreaterThan(5.0);
+      expect(finder.creaseSharpness).toBeCloseTo(0.95, 2);
+    });
+
+    it('mechanically unfolds 3D paper facets into solid canonical 2D modules', () => {
+      const module = computeOrigamiModuleTransform(10, 10, 29, true, false, 999);
+      const at0 = calculateOrigamiUnfold(module, 0.0);
+      const atHalf = calculateOrigamiUnfold(module, 0.5);
+      const at1 = calculateOrigamiUnfold(module, 1.0);
+
+      // At t = 0: full 3D fold
+      expect(at0.scale.z).toBeCloseTo(module.scale3D.z, 2);
+      expect(at0.foldAngle).toBeCloseTo(module.foldAngle, 2);
+
+      // Intermediate t = 0.5: unfolding in progress
+      expect(atHalf.scale.z).toBeLessThan(at0.scale.z);
+      expect(atHalf.scale.z).toBeGreaterThan(at1.scale.z);
+
+      // At t = 1.0: flattened canonical 2D scan mode
+      expect(at1.scale.z).toBeCloseTo(0.01, 2);
+      expect(at1.foldAngle).toBeCloseTo(0, 2);
+      expect(at1.rotationZ).toBeCloseTo(0, 2);
+    });
+  });
 });
+
 
 
 

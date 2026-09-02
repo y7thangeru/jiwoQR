@@ -123,6 +123,20 @@ describe('@jiwoqr/exporter', () => {
       const headerStr = new TextDecoder().decode(headerBytes);
       expect(headerStr).toContain('CITY');
     });
+
+    it('generates 3D-printable STL for Origami model (Model 6)', () => {
+      const entity = createJiwoQR('https://jiwoqr.dev/origami-paper');
+      const buffer = exportSTL(entity.matrix, entity.dna, {
+        model: 'origami',
+        maxHeight: 7.0,
+      });
+
+      expect(buffer).toBeInstanceOf(ArrayBuffer);
+      const headerBytes = new Uint8Array(buffer, 0, 80);
+      const headerStr = new TextDecoder().decode(headerBytes);
+      expect(headerStr).toContain('ORIGAMI');
+      expect(buffer.byteLength).toBeGreaterThan(1000);
+    });
   });
 
 
@@ -160,6 +174,27 @@ describe('@jiwoqr/exporter', () => {
       const view = new DataView(glb);
       const magic = view.getUint32(0, false);
       expect(magic).toBe(0x676c5446); // 'glTF' in big-endian
+    });
+  });
+
+  describe('USDZ & AR Mobile Web Helpers', () => {
+    it('formats Android Google Scene Viewer intent URLs correctly', async () => {
+      const { getAndroidSceneViewerUrl } = await import('../src/index.js');
+      const glbUrl = 'https://jiwoqr.dev/models/sample.glb';
+      const intentUrl = getAndroidSceneViewerUrl(glbUrl, 'Test Model');
+
+      expect(intentUrl).toContain('intent://arvr.google.com/scene-viewer/1.0?file=');
+      expect(intentUrl).toContain(encodeURIComponent(glbUrl));
+      expect(intentUrl).toContain('package=com.google.ar.core');
+      expect(intentUrl).toContain('action=android.intent.action.VIEW');
+    });
+
+    it('detects AR capabilities in browser environment', async () => {
+      const { detectARCapabilities } = await import('../src/index.js');
+      const caps = detectARCapabilities();
+      expect(typeof caps.isIOS).toBe('boolean');
+      expect(typeof caps.isAndroid).toBe('boolean');
+      expect(typeof caps.isARAvailable).toBe('boolean');
     });
   });
 });

@@ -97,6 +97,14 @@ export interface CityDNA {
   buildingScale: number;
 }
 
+export interface OrigamiDNA {
+  foldStyle: 'mountain' | 'valley' | 'diagonal_pyramid' | 'crane_wing';
+  creaseSharpness: number;
+  paperWeight: 'washi' | 'heavy_cardstock' | 'metallic_foil';
+  unfoldPattern: 'radial_spiral' | 'mechanical_flatten' | 'diagonal_split';
+  facetAngle: number;
+}
+
 export interface DeterministicDNA {
   rawHash: bigint;
   seed32: number;
@@ -107,6 +115,7 @@ export interface DeterministicDNA {
   circuit: CircuitDNA;
   biomorphic: BiomorphicDNA;
   city: CityDNA;
+  origami: OrigamiDNA;
 }
 
 /**
