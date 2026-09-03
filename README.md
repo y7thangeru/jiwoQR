@@ -3,10 +3,13 @@
 > **Next-Generation Procedural 3D QR Code Ecosystem**  
 > *Transforming functional 2D barcodes into deterministic 3D architectural worlds, voxel globes & microchip PCB circuits without sacrificing scannability.*
 
+[![CI/CD Pipeline](https://github.com/y7thangeru/jiwoQR/actions/workflows/ci.yml/badge.svg)](https://github.com/y7thangeru/jiwoQR/actions/workflows/ci.yml)
+[![Version](https://img.shields.io/badge/version-v1.0.0-blue.svg)](https://github.com/y7thangeru/jiwoQR)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg?logo=typescript)](https://www.typescriptlang.org/)
 [![Three.js](https://img.shields.io/badge/Three.js-r174-black.svg?logo=three.js)](https://threejs.org/)
 [![pnpm workspace](https://img.shields.io/badge/pnpm-workspace-orange.svg?logo=pnpm)](https://pnpm.io/)
-[![Vitest](https://img.shields.io/badge/Vitest-3.0-green.svg?logo=vitest)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Vitest-3.2-green.svg?logo=vitest)](https://vitest.dev/)
 [![ISO/IEC 18004](https://img.shields.io/badge/Standard-ISO%2FIEC%2018004-purple.svg)](https://www.iso.org/standard/62021.html)
 
 ---

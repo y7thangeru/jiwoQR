@@ -1,21 +1,48 @@
 {
   "name": "@jiwoqr/core",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Deterministic procedural DNA and semantic QR matrix engine for JiwoQR",
   "type": "module",
   "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit"
   },
-  "keywords": ["qr", "qrcode", "procedural", "deterministic", "3d", "dna"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/y7thangeru/jiwoQR.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/y7thangeru/jiwoQR#readme",
+  "bugs": {
+    "url": "https://github.com/y7thangeru/jiwoQR/issues"
+  },
+  "keywords": [
+    "qr",
+    "qrcode",
+    "procedural",
+    "deterministic",
+    "3d",
+    "dna",
+    "generator",
+    "iso-18004"
+  ],
   "author": "JiwoQR",
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }

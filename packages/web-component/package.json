@@ -1,16 +1,22 @@
 {
   "name": "@jiwoqr/web-component",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Native Web Component <jiwo-qr> for procedural 3D JiwoQR codes",
   "type": "module",
   "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit"
@@ -22,7 +28,26 @@
   "devDependencies": {
     "typescript": "^5.7.3"
   },
-  "keywords": ["web-component", "custom-element", "qrcode", "3d", "procedural"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/y7thangeru/jiwoQR.git",
+    "directory": "packages/web-component"
+  },
+  "homepage": "https://github.com/y7thangeru/jiwoQR#readme",
+  "bugs": {
+    "url": "https://github.com/y7thangeru/jiwoQR/issues"
+  },
+  "keywords": [
+    "web-component",
+    "custom-element",
+    "qrcode",
+    "3d",
+    "procedural",
+    "vanilla-js"
+  ],
   "author": "JiwoQR",
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }

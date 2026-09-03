@@ -1,16 +1,22 @@
 {
   "name": "@jiwoqr/renderer-webgpu",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Modern WGSL compute/vertex pipeline renderer for JiwoQR",
   "type": "module",
   "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit"
@@ -23,7 +29,27 @@
     "@webgpu/types": "^0.1.72",
     "typescript": "^5.7.3"
   },
-  "keywords": ["webgpu", "wgsl", "qrcode", "procedural", "3d"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/y7thangeru/jiwoQR.git",
+    "directory": "packages/renderer-webgpu"
+  },
+  "homepage": "https://github.com/y7thangeru/jiwoQR#readme",
+  "bugs": {
+    "url": "https://github.com/y7thangeru/jiwoQR/issues"
+  },
+  "keywords": [
+    "webgpu",
+    "wgsl",
+    "qrcode",
+    "procedural",
+    "3d",
+    "compute",
+    "storage-buffers"
+  ],
   "author": "JiwoQR",
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }

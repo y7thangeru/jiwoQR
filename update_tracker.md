@@ -550,14 +550,42 @@ This file tracks all file creations, modifications, and deletions in the reposit
 - `apps/demo/README.md` [MODIFIED]: Added View in AR, Engine switch, and Origami documentation.
 - `README.md` [MODIFIED]: Updated root documentation for Phase 5.
 
+---
 
+## [2026-09-03] Final Milestone: Production Polish, NPM Release Preparation, Static STL Asset Pipeline & Automated CI/CD Setup
 
+### 1. Root Workspace & Licensing
+- `package.json` [MODIFIED]:
+  - **Rationale**: Synchronized root version to `1.0.0`, added official Git repository URL (`https://github.com/y7thangeru/jiwoQR.git`), issue tracker (`bugs`), homepage, and MIT license declaration.
+- `LICENSE` [NEW]:
+  - **Rationale**: Added formal root MIT License file specifying copyright (c) 2026 JiwoQR Contributors.
 
+### 2. NPM Distribution Manifests Across Subpackages
+- `packages/core/package.json` [MODIFIED]:
+  - **Rationale**: Upgraded to `v1.0.0`, configured dual module resolution (`main`, `module`, `types`, explicit `exports` map with `types`, `import`, `default`), scoped files array (`files: ["dist", "README.md"]`), repository locator with package subdirectory, issue tracker, keywords, and `publishConfig: { "access": "public" }`.
+- `packages/math/package.json` [MODIFIED]:
+  - **Rationale**: Upgraded to `v1.0.0`, configured standardized npm distribution metadata, `files` whitelist, repository path, and keywords.
+- `packages/renderer-webgl/package.json` [MODIFIED]:
+  - **Rationale**: Upgraded to `v1.0.0`, configured standardized npm distribution metadata, `files` whitelist, and repository directory.
+- `packages/renderer-webgpu/package.json` [MODIFIED]:
+  - **Rationale**: Upgraded to `v1.0.0`, configured standardized npm distribution metadata, `files` whitelist, and repository directory.
+- `packages/exporter/package.json` [MODIFIED]:
+  - **Rationale**: Upgraded to `v1.0.0`, configured standardized npm distribution metadata, expanded keywords with AR/WebXR/USDZ, `files` whitelist, and repository directory.
+- `packages/react/package.json` [MODIFIED]:
+  - **Rationale**: Upgraded to `v1.0.0`, configured standardized npm distribution metadata, peer dependency constraints, `files` whitelist, and repository directory.
+- `packages/web-component/package.json` [MODIFIED]:
+  - **Rationale**: Upgraded to `v1.0.0`, configured standardized npm distribution metadata, `files` whitelist, and repository directory.
 
+### 3. Static STL Asset Bundling & Hosting Resilience (`apps/demo`)
+- `apps/demo/package.json` [MODIFIED]:
+  - **Rationale**: Synchronized version to `v1.0.0`.
+- `apps/demo/vite.config.ts` [MODIFIED]:
+  - **Rationale**: Enhanced `buildingModelsPlugin` with `generateBundle` (Rollup `this.emitFile`) and `closeBundle` (file copy fallback) to ensure all 8 STL building model files from `STL-for-buildingModels/` are bundled into `dist/models/stl/` and static JSON manifests are generated at `dist/api/building-models.json` and `dist/api/building-models`. Guarantees Model 5 (Metropolis City) never encounters 404 Not Found errors on static hosts (Vercel, Netlify, GitHub Pages).
+- `apps/demo/src/main.ts` [MODIFIED]:
+  - **Rationale**: Enhanced `initBuildingModels()` with URL normalization supporting subdirectories (`BASE_URL`), dual-fetch fallback (`/api/building-models` -> `/api/building-models.json`), and offline static array fallback of all 8 models for maximum resilience.
+- `apps/demo/index.html` [MODIFIED]:
+  - **Rationale**: Updated floating header badge tag from `v0.1.0-Fase5` to `v1.0.0`.
 
-
-
-
-
-
-
+### 4. GitHub Actions CI/CD Automation
+- `.github/workflows/ci.yml` [NEW]:
+  - **Rationale**: Established automated continuous integration pipeline triggered on every push and pull request to `main`. Executes environment checkout (`actions/checkout@v4`), Node.js v20 runtime (`actions/setup-node@v4`), pnpm setup (`pnpm/action-setup@v4`), deterministic dependency installation (`pnpm install --frozen-lockfile`), Vitest test suite execution (`pnpm test`), TypeScript strict type checking (`pnpm typecheck`), monorepo packages build (`pnpm build`), and demo static application build (`pnpm --filter demo build`).

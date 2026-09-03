@@ -30,7 +30,7 @@ function buildingModelsPlugin(): Plugin {
         }
       });
 
-      // 2. Serve STL static files from STL-for-buildingModels directory
+      // 2. Serve STL static files from STL-for-buildingModels directory in dev
       server.middlewares.use('/models/stl/', (req, res, next) => {
         try {
           const rawFileName = req.url ? decodeURIComponent(req.url.replace(/^\//, '')) : '';
@@ -48,6 +48,74 @@ function buildingModelsPlugin(): Plugin {
           next(err);
         }
       });
+    },
+
+    generateBundle() {
+      // Emit STL assets and static manifests directly into Rollup bundle
+      if (fs.existsSync(stlDirectory)) {
+        const files = fs.readdirSync(stlDirectory)
+          .filter((f) => f.toLowerCase().endsWith('.stl') && !f.startsWith('_'));
+
+        for (const file of files) {
+          const filePath = path.join(stlDirectory, file);
+          const source = fs.readFileSync(filePath);
+          this.emitFile({
+            type: 'asset',
+            fileName: `models/stl/${file}`,
+            source,
+          });
+        }
+
+        const modelUrls = files.map((f) => `/models/stl/${encodeURIComponent(f)}`);
+        const manifestData = JSON.stringify({ models: modelUrls, count: modelUrls.length }, null, 2);
+
+        this.emitFile({
+          type: 'asset',
+          fileName: 'api/building-models.json',
+          source: manifestData,
+        });
+
+        this.emitFile({
+          type: 'asset',
+          fileName: 'api/building-models',
+          source: manifestData,
+        });
+
+        console.log(`[buildingModelsPlugin] Emitted ${files.length} STL assets and static manifests into bundle.`);
+      }
+    },
+
+    closeBundle() {
+      // Direct file copy fallback to guarantee presence in dist/
+      const distDir = path.resolve(__dirname, 'dist');
+      const targetStlDir = path.resolve(distDir, 'models/stl');
+      const targetApiDir = path.resolve(distDir, 'api');
+
+      if (!fs.existsSync(targetStlDir)) {
+        fs.mkdirSync(targetStlDir, { recursive: true });
+      }
+      if (!fs.existsSync(targetApiDir)) {
+        fs.mkdirSync(targetApiDir, { recursive: true });
+      }
+
+      if (fs.existsSync(stlDirectory)) {
+        const files = fs.readdirSync(stlDirectory)
+          .filter((f) => f.toLowerCase().endsWith('.stl') && !f.startsWith('_'));
+
+        for (const file of files) {
+          const srcFile = path.join(stlDirectory, file);
+          const destFile = path.join(targetStlDir, file);
+          fs.copyFileSync(srcFile, destFile);
+        }
+
+        const modelUrls = files.map((f) => `/models/stl/${encodeURIComponent(f)}`);
+        const manifestData = JSON.stringify({ models: modelUrls, count: modelUrls.length }, null, 2);
+
+        fs.writeFileSync(path.join(targetApiDir, 'building-models.json'), manifestData, 'utf8');
+        fs.writeFileSync(path.join(targetApiDir, 'building-models'), manifestData, 'utf8');
+
+        console.log(`[buildingModelsPlugin] Verified ${files.length} STL models copied to ${targetStlDir}`);
+      }
     },
   };
 }
@@ -76,4 +144,3 @@ export default defineConfig({
     },
   },
 });
-

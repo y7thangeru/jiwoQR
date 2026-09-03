@@ -1,6 +1,6 @@
 {
   "name": "jiwoqr-monorepo",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Next-generation procedural 3D QR code generator ecosystem",
   "packageManager": "pnpm@12.2.1",
@@ -11,6 +11,15 @@
     "typecheck": "pnpm -r run typecheck",
     "dev": "pnpm --filter demo dev"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/y7thangeru/jiwoQR.git"
+  },
+  "homepage": "https://github.com/y7thangeru/jiwoQR#readme",
+  "bugs": {
+    "url": "https://github.com/y7thangeru/jiwoQR/issues"
+  },
+  "license": "MIT",
   "devDependencies": {
     "typescript": "^5.7.3",
     "vitest": "^3.0.7"

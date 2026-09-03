@@ -1,16 +1,22 @@
 {
   "name": "@jiwoqr/renderer-webgl",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "High-performance WebGL / Three.js procedural 3D QR code renderer for JiwoQR",
   "type": "module",
   "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit"
@@ -24,7 +30,28 @@
     "@types/three": "^0.174.0",
     "typescript": "^5.7.3"
   },
-  "keywords": ["threejs", "webgl", "qrcode", "procedural", "3d", "instancedmesh"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/y7thangeru/jiwoQR.git",
+    "directory": "packages/renderer-webgl"
+  },
+  "homepage": "https://github.com/y7thangeru/jiwoQR#readme",
+  "bugs": {
+    "url": "https://github.com/y7thangeru/jiwoQR/issues"
+  },
+  "keywords": [
+    "threejs",
+    "webgl",
+    "qrcode",
+    "procedural",
+    "3d",
+    "instancedmesh",
+    "interactive",
+    "gpu-morphing"
+  ],
   "author": "JiwoQR",
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }

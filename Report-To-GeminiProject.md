@@ -1,9 +1,11 @@
-# 🌐 JiwoQR: Executive & Technical Project Report (Phase 5 Milestone)
+# 🌐 JiwoQR: Executive & Technical Project Report (v1.0.0 Production Release)
 
 > **Proyek**: JiwoQR — Next-Generation Procedural 3D QR Code Ecosystem  
-> **Status**: Fase 5 Selesai: Instant WebXR/AR Mobile View, Model ke-6 Origami Fold, dan Aktivasi Pipeline Native WebGPU  
-> **Versi**: v0.1.0-Fase5  
-> **Tanggal Rilis**: 2026-09-02  
+> **Status**: Fase Terakhir Selesai: Production Polish, NPM Release Preparation (v1.0.0), Static STL Asset Bundling Pipeline, & Automated GitHub Actions CI/CD  
+> **Versi**: v1.0.0  
+> **Tanggal Rilis**: 2026-09-03  
+> **Repositori**: https://github.com/y7thangeru/jiwoQR  
+> **Lisensi**: MIT  
 
 ---
 
@@ -12,7 +14,7 @@
 ## 1. Executive Summary & Problem Solved
 JiwoQR memecahkan tantangan mendasar dalam dunia desain identitas digital dan interaksi fisik-ke-digital: **menghadirkan barcode fungsional yang tidak lagi membosankan berbentuk matriks datar 2D hitam-putih, melainkan dunia 3D prosedural holografis yang estetis, interaktif, dapat diekspor untuk 3D printing fisik, dapat dilihat langsung di dunia nyata melalui Augmented Reality (AR), namun 100% tetap dapat dipindai oleh kamera ponsel mana pun tanpa kompromi (*guaranteed scannability*)**.
 
-Sejak Fase 1 hingga Fase 5, arsitektur JiwoQR telah berkembang menjadi ekosistem grafika mutakhir:
+Ekosistem JiwoQR kini telah mencapai tahap rilis produksi matang (**v1.0.0**), siap didistribusikan ke NPM Registry dengan jaminan kehandalan:
 1. **100% Kepatuhan ISO/IEC 18004**: Bitstream encoder multi-mode (numeric, alphanumeric, byte) dengan deteksi otomatis, masking bitwise optimal, serta kalkulasi Galois Field GF(256) Reed-Solomon Error Correction Code (level L, M, Q, H).
 2. **Deterministic Visual DNA**: Mengonversi URL menjadi benih konsisten via FNV-1a 64-bit hashing dan PRNG Mulberry32, memastikan tampilan 3D selalu identik dan dapat direproduksi untuk URL yang sama.
 3. **Enam Arketipe Visual 3D Prosedural Mandiri**:
@@ -33,8 +35,13 @@ Sejak Fase 1 hingga Fase 5, arsitektur JiwoQR telah berkembang menjadi ekosistem
    - Shader WGSL (`architecture.wgsl.ts`) dengan Storage Buffer instanced rendering dan fungsi easing polinomial kubik (`jiwoEase`) murni di GPU.
    - Modul helper matriks 4x4 mandiri (`mat4.ts`) untuk orbit kamera.
    - Tombol pengalih grafis (**Engine: WebGL vs WebGPU**) di `apps/demo`.
-7. **Optimasi GPU Morphing 120 FPS**:
-   - Seluruh interpolasi transisi $3\text{D} \to 2\text{D}$ dihitung di GPU Vertex Shader, membebaskan beban CPU (overhead $< 0.001\text{ ms}$).
+7. **Static STL Asset Bundling & Hosting Resilience**:
+   - Integrasi Vite build plugin (`buildingModelsPlugin`) yang mengekspor seluruh aset model STL (`dist/models/stl/`) dan static API manifests (`dist/api/building-models.json` dan `dist/api/building-models`).
+   - Resilient dual-fetch and static array fallback pada client-side `main.ts`, menjamin Model 5 (City) 100% bebas dari galat 404 saat dideploy ke static hosting (Vercel, Netlify, GitHub Pages).
+8. **NPM Distribution Architecture (v1.0.0)**:
+   - 7 subpaket modular tertata rapi dengan skema `exports` dual resolution, definisi tipe TypeScript (`.d.ts`), whitelist distribusi (`files: ["dist", "README.md"]`), dan lisensi MIT.
+9. **Automated CI/CD Pipeline**:
+   - File alur kerja GitHub Actions (`.github/workflows/ci.yml`) menguji setiap commit dan PR: instalasi pnpm dengan frozen lockfile, Vitest suite, verifikasi ketat tipe TypeScript, dan kompilasi bundle produksi.
 
 ---
 
@@ -51,39 +58,47 @@ Sejak Fase 1 hingga Fase 5, arsitektur JiwoQR telah berkembang menjadi ekosistem
 
 ---
 
-## 3. Arsitektur Monorepo & Struktur Direktori
+## 3. Arsitektur Monorepo & Ekosistem Paket v1.0.0
 
 ```
 d:/REPOS/jiwoQR/
+├── .github/
+│   └── workflows/
+│       └── ci.yml             # GitHub Actions CI/CD Pipeline (Test, Typecheck, Build)
 ├── STL-for-buildingModels/    # Repositori model 3D STL bangunan arsitektur (auto-discovered, 650 KB total)
 │   └── _raw_originals/        # Salinan cadangan file STL mentah (CAD un-decimated 120 MB)
 ├── packages/
-│   ├── core/                  # ISO/IEC 18004 encoder, Reed-Solomon, FNV-1a hasher, Mulberry32, & Origami DNA
-│   ├── math/                  # Easing, ekstrusi arsitektur, spherical mound, PCB traces, city & origami math
-│   ├── renderer-webgl/        # Three.js engine, 6 model archetypes, IndexedDB asset cache, GPU morph shader
-│   ├── renderer-webgpu/       # First-class native WebGPU pipeline, WGSL shaders, storage buffers & mat4 math
-│   ├── exporter/              # 3D print watertight STL, binary GLB, USDZ/AR Quick Look/Scene Viewer, 300 DPI PNG, & SVG
-│   ├── react/                 # Komponen first-class <JiwoQR /> dengan auto WebGL fallback
-│   └── web-component/         # Custom Element native <jiwo-qr> zero-framework
-└── apps/
-    └── demo/                  # Interactive Studio dengan 6 visual archetypes, Engine Toggle, Mobile AR, Theme Studio & Export
+│   ├── core/                  # [v1.0.0] ISO/IEC 18004 encoder, Reed-Solomon, FNV-1a hasher, Mulberry32, & Origami DNA
+│   ├── math/                  # [v1.0.0] Easing, ekstrusi arsitektur, spherical mound, PCB traces, city & origami math
+│   ├── renderer-webgl/        # [v1.0.0] Three.js engine, 6 model archetypes, IndexedDB asset cache, GPU morph shader
+│   ├── renderer-webgpu/       # [v1.0.0] First-class native WebGPU pipeline, WGSL shaders, storage buffers & mat4 math
+│   ├── exporter/              # [v1.0.0] 3D print watertight STL, binary GLB, USDZ/AR Quick Look/Scene Viewer, 300 DPI PNG, & SVG
+│   ├── react/                 # [v1.0.0] Komponen first-class <JiwoQR /> dengan auto WebGL fallback
+│   └── web-component/         # [v1.0.0] Custom Element native <jiwo-qr> zero-framework
+├── apps/
+│   └── demo/                  # [v1.0.0] Interactive Studio dengan 6 visual archetypes, Engine Toggle, Mobile AR, Theme Studio & Export
+├── LICENSE                    # Root MIT License
+├── README.md                  # Comprehensive Root Documentation
+├── update_tracker.md          # Complete Engineering Audit Trail
+└── Report-To-GeminiProject.md # Consolidated Multi-Tier Project Report
 ```
 
 ---
 
-## 4. Quality Assurance & Hasil Pengujian
+## 4. Quality Assurance & Hasil Pengujian Produksi
 
 - **Unit Test Monorepo (Vitest v3.2.7)**:
   - Total Pengujian: **40 passed (100% Lulus)**
-  - Durasi: **1.22s**
+  - Durasi: **1.20s**
   - Komponen Teruji:
     - `@jiwoqr/core`: ISO/IEC 18004 matrix layout, bitstream compression, Reed-Solomon ECC, deterministic DNA (termasuk OrigamiDNA).
     - `@jiwoqr/math`: Easing curves, extrusion, spherical projection, circuit transforms, city street-facing, dan origami unfolding math.
     - `@jiwoqr/exporter`: Watertight binary STL export (Architecture, City, Origami polyhedra), format intent Google Scene Viewer, dan deteksi mobile AR.
 - **TypeScript Strict Verification (`pnpm typecheck`)**:
-  - 8 dari 8 paket/aplikasi workspace bebas galat (`0 errors`).
-- **Production Bundle Compilation (`pnpm build`)**:
-  - Seluruh paket dan aplikasi `apps/demo` berhasil dikompilasi ke format ES Module dan declaration types (`.d.ts`).
+  - Seluruh paket dan aplikasi monorepo lulus verifikasi ketat tipe (`0 errors`).
+- **Production Clean Compilation (`pnpm build` & `pnpm --filter demo build`)**:
+  - Seluruh subpaket terkompilasi bersih menghasilkan `.js`, `.mjs`, dan `.d.ts` declarations.
+  - Output `apps/demo/dist/` mencakup seluruh aset STL (`dist/models/stl/`) dan API manifest (`dist/api/building-models.json`) siap saji untuk deployment statis Vercel/GitHub Pages.
 
 ---
 
@@ -103,10 +118,13 @@ Bagian ini menyatukan seluruh berkas dokumentasi markdown (`.md`) dari setiap pa
 > **Next-Generation Procedural 3D QR Code Ecosystem**  
 > *Transforming functional 2D barcodes into deterministic 3D architectural worlds, voxel globes & microchip PCB circuits without sacrificing scannability.*
 
+[![CI/CD Pipeline](https://github.com/y7thangeru/jiwoQR/actions/workflows/ci.yml/badge.svg)](https://github.com/y7thangeru/jiwoQR/actions/workflows/ci.yml)
+[![Version](https://img.shields.io/badge/version-v1.0.0-blue.svg)](https://github.com/y7thangeru/jiwoQR)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg?logo=typescript)](https://www.typescriptlang.org/)
 [![Three.js](https://img.shields.io/badge/Three.js-r174-black.svg?logo=three.js)](https://threejs.org/)
 [![pnpm workspace](https://img.shields.io/badge/pnpm-workspace-orange.svg?logo=pnpm)](https://pnpm.io/)
-[![Vitest](https://img.shields.io/badge/Vitest-3.0-green.svg?logo=vitest)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Vitest-3.2-green.svg?logo=vitest)](https://vitest.dev/)
 [![ISO/IEC 18004](https://img.shields.io/badge/Standard-ISO%2FIEC%2018004-purple.svg)](https://www.iso.org/standard/62021.html)
 
 ---
@@ -2815,6 +2833,46 @@ This file tracks all file creations, modifications, and deletions in the reposit
 - `packages/core/README.md` [MODIFIED]: Added OrigamiDNA documentation.
 - `apps/demo/README.md` [MODIFIED]: Added View in AR, Engine switch, and Origami documentation.
 - `README.md` [MODIFIED]: Updated root documentation for Phase 5.
+
+---
+
+## [2026-09-03] Final Milestone: Production Polish, NPM Release Preparation, Static STL Asset Pipeline & Automated CI/CD Setup
+
+### 1. Root Workspace & Licensing
+- `package.json` [MODIFIED]:
+  - **Rationale**: Synchronized root version to `1.0.0`, added official Git repository URL (`https://github.com/y7thangeru/jiwoQR.git`), issue tracker (`bugs`), homepage, and MIT license declaration.
+- `LICENSE` [NEW]:
+  - **Rationale**: Added formal root MIT License file specifying copyright (c) 2026 JiwoQR Contributors.
+
+### 2. NPM Distribution Manifests Across Subpackages
+- `packages/core/package.json` [MODIFIED]:
+  - **Rationale**: Upgraded to `v1.0.0`, configured dual module resolution (`main`, `module`, `types`, explicit `exports` map with `types`, `import`, `default`), scoped files array (`files: ["dist", "README.md"]`), repository locator with package subdirectory, issue tracker, keywords, and `publishConfig: { "access": "public" }`.
+- `packages/math/package.json` [MODIFIED]:
+  - **Rationale**: Upgraded to `v1.0.0`, configured standardized npm distribution metadata, `files` whitelist, repository path, and keywords.
+- `packages/renderer-webgl/package.json` [MODIFIED]:
+  - **Rationale**: Upgraded to `v1.0.0`, configured standardized npm distribution metadata, `files` whitelist, and repository directory.
+- `packages/renderer-webgpu/package.json` [MODIFIED]:
+  - **Rationale**: Upgraded to `v1.0.0`, configured standardized npm distribution metadata, `files` whitelist, and repository directory.
+- `packages/exporter/package.json` [MODIFIED]:
+  - **Rationale**: Upgraded to `v1.0.0`, configured standardized npm distribution metadata, expanded keywords with AR/WebXR/USDZ, `files` whitelist, and repository directory.
+- `packages/react/package.json` [MODIFIED]:
+  - **Rationale**: Upgraded to `v1.0.0`, configured standardized npm distribution metadata, peer dependency constraints, `files` whitelist, and repository directory.
+- `packages/web-component/package.json` [MODIFIED]:
+  - **Rationale**: Upgraded to `v1.0.0`, configured standardized npm distribution metadata, `files` whitelist, and repository directory.
+
+### 3. Static STL Asset Bundling & Hosting Resilience (`apps/demo`)
+- `apps/demo/package.json` [MODIFIED]:
+  - **Rationale**: Synchronized version to `v1.0.0`.
+- `apps/demo/vite.config.ts` [MODIFIED]:
+  - **Rationale**: Enhanced `buildingModelsPlugin` with `generateBundle` (Rollup `this.emitFile`) and `closeBundle` (file copy fallback) to ensure all 8 STL building model files from `STL-for-buildingModels/` are bundled into `dist/models/stl/` and static JSON manifests are generated at `dist/api/building-models.json` and `dist/api/building-models`. Guarantees Model 5 (Metropolis City) never encounters 404 Not Found errors on static hosts (Vercel, Netlify, GitHub Pages).
+- `apps/demo/src/main.ts` [MODIFIED]:
+  - **Rationale**: Enhanced `initBuildingModels()` with URL normalization supporting subdirectories (`BASE_URL`), dual-fetch fallback (`/api/building-models` -> `/api/building-models.json`), and offline static array fallback of all 8 models for maximum resilience.
+- `apps/demo/index.html` [MODIFIED]:
+  - **Rationale**: Updated floating header badge tag from `v0.1.0-Fase5` to `v1.0.0`.
+
+### 4. GitHub Actions CI/CD Automation
+- `.github/workflows/ci.yml` [NEW]:
+  - **Rationale**: Established automated continuous integration pipeline triggered on every push and pull request to `main`. Executes environment checkout (`actions/checkout@v4`), Node.js v20 runtime (`actions/setup-node@v4`), pnpm setup (`pnpm/action-setup@v4`), deterministic dependency installation (`pnpm install --frozen-lockfile`), Vitest test suite execution (`pnpm test`), TypeScript strict type checking (`pnpm typecheck`), monorepo packages build (`pnpm build`), and demo static application build (`pnpm --filter demo build`).
 
 ---
 

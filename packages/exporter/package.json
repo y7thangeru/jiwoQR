@@ -1,7 +1,7 @@
 {
   "name": "@jiwoqr/exporter",
-  "version": "0.1.0",
-  "description": "3D (GLB, watertight STL) and 2D high-res print export engine for JiwoQR",
+  "version": "1.0.0",
+  "description": "3D (GLB, watertight STL, USDZ/Mobile AR) and 2D high-res print export engine for JiwoQR",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -13,6 +13,10 @@
       "default": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit"
@@ -22,23 +26,37 @@
     "@jiwoqr/math": "workspace:*",
     "three": "^0.174.0"
   },
-
   "devDependencies": {
     "@types/three": "^0.174.0",
     "typescript": "^5.7.3"
   },
-
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/y7thangeru/jiwoQR.git",
+    "directory": "packages/exporter"
+  },
+  "homepage": "https://github.com/y7thangeru/jiwoQR#readme",
+  "bugs": {
+    "url": "https://github.com/y7thangeru/jiwoQR/issues"
+  },
   "keywords": [
     "jiwoqr",
     "exporter",
     "stl",
     "glb",
     "gltf",
+    "usdz",
+    "webxr",
+    "ar-quick-look",
+    "scene-viewer",
     "svg",
     "png",
     "3d-printing",
     "print"
   ],
   "author": "JiwoQR",
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }

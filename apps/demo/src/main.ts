@@ -141,17 +141,50 @@ applyCurrentState();
 
 // Dynamic Discovery & Preloading of Custom STL Building Models (Model 5)
 async function initBuildingModels() {
+  const base = import.meta.env.BASE_URL || '/';
+  const normalize = (p: string) => {
+    if (p.startsWith('/') && base !== '/') {
+      return `${base.replace(/\/$/, '')}${p}`;
+    }
+    return p;
+  };
+
   try {
-    const res = await fetch('/api/building-models');
+    // 1. Try primary API endpoint (works in dev and full-stack hosts)
+    let res = await fetch(normalize('/api/building-models'));
+    // 2. Fallback to static JSON file (works seamlessly on GitHub Pages, Vercel, Netlify)
+    if (!res.ok) {
+      res = await fetch(normalize('/api/building-models.json'));
+    }
     if (res.ok) {
       const data = await res.json();
       if (data.models && data.models.length > 0) {
-        console.log(`[JiwoQR] Discovered ${data.count} 3D STL building models in STL-for-buildingModels:`, data.models);
-        await renderer.loadCityModels(data.models);
+        const resolvedUrls = data.models.map((url: string) => normalize(url));
+        console.log(`[JiwoQR] Discovered ${data.count} 3D STL building models:`, resolvedUrls);
+        await renderer.loadCityModels(resolvedUrls);
+        return;
       }
     }
   } catch (err) {
-    console.warn('[JiwoQR] Auto-discovery of STL building models:', err);
+    console.warn('[JiwoQR] Dynamic fetch of STL building models failed, trying fallback list:', err);
+  }
+
+  // 3. Static fallback if API manifests cannot be fetched
+  const fallbackModels = [
+    normalize('/models/stl/1775481250412.stl'),
+    normalize('/models/stl/1781297319472.stl'),
+    normalize('/models/stl/1783028949729.stl'),
+    normalize('/models/stl/1783447578515.stl'),
+    normalize('/models/stl/1784060202535.stl'),
+    normalize('/models/stl/1785631958175.stl'),
+    normalize('/models/stl/1785844480796.stl'),
+    normalize('/models/stl/model_1774942878.stl'),
+  ];
+  try {
+    console.log('[JiwoQR] Loading static fallback STL building models...');
+    await renderer.loadCityModels(fallbackModels);
+  } catch (err) {
+    console.warn('[JiwoQR] Static fallback STL loading:', err);
   }
 }
 initBuildingModels();
